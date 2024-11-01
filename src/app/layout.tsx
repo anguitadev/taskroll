@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="es-ES" className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950`} 
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-200`} 
       >
         <ThemeProvider
           attribute="class"
