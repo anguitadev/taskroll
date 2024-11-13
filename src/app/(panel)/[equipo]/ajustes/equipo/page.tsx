@@ -2,10 +2,13 @@ import AjustesDelEquipo from "@/components/ajustes/equipo";
 import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/server";
 
-export default async function AjustesEquipo({ params }: { params: { equipo: string } }) {
+type Params = Promise<{ equipo: string }>;
+
+export default async function AjustesEquipo(props: { params: Params }) {
 	const supabase = await createClient();
 
-	const { equipo: equipoSlug } = await params;
+	const params = await props.params;
+	const equipoSlug = params.equipo;
 
 	const { data: equipo } = await supabase
 		.from("Equipos")
@@ -25,7 +28,7 @@ export default async function AjustesEquipo({ params }: { params: { equipo: stri
 						Aquí puedes realizar cambios sobre el equipo.
 					</span>
 				</div>
-				<AjustesDelEquipo {...equipo as Tables<"Equipos">} />
+				<AjustesDelEquipo {...(equipo as Tables<"Equipos">)} />
 			</div>
 		</>
 	);
