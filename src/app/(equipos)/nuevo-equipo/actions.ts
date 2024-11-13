@@ -20,26 +20,33 @@ export default async function nuevoEquipo(formData: FormData) {
 
 	const slug = nombreEquipo.toLowerCase().replace(/ /g, "-");
 
-	const { data: Usuarios_Equipos } = await supabase.from("Usuarios_Equipos").select(`Equipos (slug)`).eq("usuario", user.id);
+	const { data: Usuarios_Equipos } = await supabase
+		.from("Usuarios_Equipos")
+		.select(`Equipos (slug)`)
+		.eq("usuario", user.id);
 
 	if (Usuarios_Equipos && Usuarios_Equipos.length > 0) {
-		Usuarios_Equipos.forEach((equipo) => {
+		Usuarios_Equipos.forEach(equipo => {
 			if (equipo.Equipos && equipo.Equipos.slug === slug) {
 				return redirect("/nuevo-equipo?error=" + "equipo_existe");
 			}
-		})
+		});
 	}
 
 	const { data: equipo, error: errorEquipo } = await supabase
 		.from("Equipos")
 		.insert([{ nombre: nombreEquipo, slug: slug }])
-		.select("id");
+		.select("id")
+		.limit(1);
 
-	const equipoId = equipo?.[0].id;
+	const equipoId = equipo![0].id;
 
-	const { error: errorEquipoUsusario } = await supabase
-		.from("Usuarios_Equipos")
-		.insert([{ usuario: user?.id, equipo: equipoId, admin: true }]);
+	const { error: errorEquipoUsusario } = await supabase.from("Usuarios_Equipos").insert({
+		admin: true,
+		created_at: new Date().toISOString(),
+		equipo: equipoId!,
+		usuario: user.id,
+	});
 
 	if (errorEquipo) {
 		return redirect("/nuevo-equipo?error=" + errorEquipo.code);
