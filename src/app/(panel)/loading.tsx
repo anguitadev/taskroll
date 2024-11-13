@@ -1,9 +1,6 @@
 export default function Loading() {
 	return (
-		<div className="flex h-screen w-screen items-center justify-center">
-<<<<<<< HEAD
-			<span className="semibold text-2xl text-neutral-200">Cargando...</span>
-=======
+		<div className="flex h-full w-full items-center justify-center font-sans">
 			<div role="status" className="flex flex-row items-center gap-2">
 				<svg
 					aria-hidden="true"
@@ -23,7 +20,6 @@ export default function Loading() {
 				</svg>
 				<span>Cargando...</span>
 			</div>
->>>>>>> a1c1bdf (Equipos y Usuarios)
 		</div>
 	);
 }

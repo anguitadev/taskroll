@@ -3,11 +3,37 @@
 @tailwind utilities;
 
 body {
-  font-family: "Geist Sans", Arial, Helvetica, sans-serif;
+	font-family: "Geist Sans", Arial, Helvetica, sans-serif;
 }
 
 @layer base {
-  :root {
-    --radius: 0.3rem;
-  }
+	:root {
+		--radius: 0.3rem;
+	}
+}
+
+th {
+	font-weight: 500;
+}
+
+/* Estilos del scrollbar */
+
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #12121200;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #404040;
+}
+
+#selector {
+	bottom: anchor(bottom);
+	left: anchor(center);
+	translate: -50% 0;
 }

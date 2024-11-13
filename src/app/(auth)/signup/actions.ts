@@ -40,6 +40,6 @@ export default async function signup(formData: FormData) {
 		return redirect("/signup?error=signup_failed");
 	} else {
 		revalidatePath("/", "layout");
-		return redirect("/dashboard");
+		return redirect("/nuevo-equipo");
 	}
 }
