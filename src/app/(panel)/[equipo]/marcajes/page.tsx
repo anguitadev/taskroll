@@ -21,11 +21,18 @@ export default function Marcajes() {
 			.limit(1);
 
 		if (data && data.length > 0) {
-			if ((data[0].entrada && !data[0].salida) || (data[0].entrada_2 && !data[0].salida_2)) {
-				setEntrada(false);
+			const diaEntrada = new Date(data[0].entrada).getDay();
+			const hoy = new Date().getDay();
+			if (diaEntrada == hoy) {
+				if (
+					(data[0].entrada && !data[0].salida) ||
+					(data[0].entrada_2 && !data[0].salida_2)
+				) {
+					setEntrada(false);
+				}
+				return data;
 			}
 		}
-		return data;
 	}, [supabase]);
 
 	useEffect(() => {
