@@ -15,27 +15,22 @@ export default function Marcajes() {
 	const getUltimoMarcaje = useCallback(async () => {
 		const { data } = await supabase
 			.from("Marcajes")
-			.select("id, salida, entrada_2, salida_2")
+			.select("id, entrada, salida, entrada_2, salida_2")
 			.or("salida.is.null,salida_2.is.null")
 			.order("entrada", { ascending: false })
 			.limit(1);
 
 		if (data && data.length > 0) {
-			if (data[0].salida) {
-				setEntrada(true);
-				if (data[0].entrada_2) setEntrada(false);
-			} else {
+			if ((data[0].entrada && !data[0].salida) || (data[0].entrada_2 && !data[0].salida_2)) {
 				setEntrada(false);
 			}
-		} else {
-			setEntrada(true);
 		}
 		return data;
 	}, [supabase]);
 
 	useEffect(() => {
 		getUltimoMarcaje();
-	}, [entrada, getUltimoMarcaje]);
+	}, [getUltimoMarcaje]);
 
 	async function marcarEntrada() {
 		const {
@@ -83,11 +78,11 @@ export default function Marcajes() {
 		}
 	}
 
-	function handleMarcaje() {
+	async function handleMarcaje() {
 		if (entrada) {
-			marcarEntrada();
+			await marcarEntrada();
 		} else {
-			marcarSalida();
+			await marcarSalida();
 		}
 		setEntrada(!entrada);
 	}
