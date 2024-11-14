@@ -1,5 +1,6 @@
 "use client";
 import HistorialMarcajes from "@/components/marcajes/historial-marcajes";
+import Incidencia from "@/components/marcajes/incidencia";
 import { createClient } from "@/utils/supabase/client";
 import { useCallback, useEffect, useState } from "react";
 import Clock from "react-live-clock";
@@ -118,19 +119,7 @@ export default function Marcajes() {
 								Marcar {entrada ? "Entrada" : "Salida"}
 							</button>
 						</div>
-						<div className="mt-24">
-							<h2 className="text-lg font-semibold">Crear nueva incidencia</h2>
-							<form>
-								<textarea
-									placeholder="Escribe el mensaje de tu incidencia..."
-									className="mt-9 h-36 w-full rounded p-4 py-2"
-								/>
-
-								<button className="mt-4 w-full rounded bg-neutral-700 py-4 text-center font-semibold uppercase text-neutral-300">
-									Crear Incidencia
-								</button>
-							</form>
-						</div>
+						<Incidencia	/>
 					</div>
 					<HistorialMarcajes entrada={entrada} />
 				</div>
