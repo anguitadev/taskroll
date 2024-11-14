@@ -1,6 +1,6 @@
 "use client";
 
-import updateEquipo from "@/app/(panel)/[equipo]/ajustes/equipo/actions";
+import { deleteEquipo, updateEquipo } from "@/app/(panel)/[equipo]/ajustes/equipo/actions";
 import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
@@ -32,6 +32,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 
 	useEffect(() => {
 		if (searchParams.get("success")) setSuccess("Equipo actualizado correctamente.");
+		if (searchParams.get("error")) setSuccess("Ha habido un problema al actualizar el equipo.");
 	}, [pathname, searchParams]);
 
 	function handleUpdate() {
@@ -77,6 +78,10 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 	useEffect(() => {
 		getEquipo();
 	}, [equipo, getEquipo]);
+
+	function handleDelete() {
+		deleteEquipo(equipo.id);
+	}
 
 	return (
 		<>
@@ -144,6 +149,30 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 			>
 				{loading ? "Cargando ..." : "Actualizar"}
 			</button>
+			<hr className="my-6 border-neutral-700" />
+			<button
+				className="w-full rounded border border-red-600 bg-red-600/5 py-3 font-semibold text-red-600"
+				popoverTarget="pop"
+			>
+				Eliminar Equipo
+			</button>
+			<div
+				id="pop"
+				popover="auto"
+				className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+			>
+				<div className="flex flex-col gap-4 text-center">
+					<span className="text-lg font-semibold">
+						¿Estás seguro que quieres eliminar el equipo?
+					</span>
+					<button
+						className="rounded bg-red-600 p-2 text-neutral-200"
+						onClick={handleDelete}
+					>
+						Eliminar
+					</button>
+				</div>
+			</div>
 		</>
 	);
 }

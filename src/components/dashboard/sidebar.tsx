@@ -17,7 +17,7 @@ import {
 	Timer,
 } from "lucide-react";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import AjustesSidebar from "./ajustes-sidebar";
 
@@ -51,6 +51,8 @@ export default function Sidebar({
 
 	const supabase = createClient();
 
+	const router = useRouter();
+
 	const getUsuario = useCallback(async () => {
 		try {
 			const { data } = await supabase
@@ -78,14 +80,14 @@ export default function Sidebar({
 		} else {
 			setAjustes(false);
 		}
-		setSelect(false);
 	}, [pathname]);
 
-	const [equipo, setEquipo] = useState<{ id: string; nombre: string; slug: string; color: string }>(
-		equipos[0].Equipos!,
-	);
-
-	const [select, setSelect] = useState(false);
+	const [equipo, setEquipo] = useState<{
+		id: string;
+		nombre: string;
+		slug: string;
+		color: string;
+	}>(equipos[0].Equipos!);
 
 	useEffect(() => {
 		equipos.forEach(equipo => {
@@ -97,7 +99,6 @@ export default function Sidebar({
 
 	function handleTeamChange(equipo: { id: string; nombre: string; slug: string; color: string }) {
 		setEquipo(equipo);
-		setSelect(false);
 		redirect(`/${equipo.slug}`);
 	}
 
@@ -111,12 +112,12 @@ export default function Sidebar({
 	return (
 		<div className={`flex flex-col ${className}`}>
 			<div className="flex flex-row items-center justify-between p-3">
-				<Link href="/dashboard" className="text-xl font-semibold">
+				<Link href={"/" + equipo!.slug} className="text-xl font-semibold">
 					Taskroll
 				</Link>
 				<div className="flex flex-row gap-3">
-					<ArrowLeft className="size-5" />
-					<ArrowRight className="size-5 stroke-neutral-400" />
+					<ArrowLeft className="size-5 cursor-pointer" onClick={() => router.back()} />
+					<ArrowRight className="size-5 cursor-pointer" onClick={() => router.forward()} />
 				</div>
 			</div>
 			{ajustes ? (
@@ -124,23 +125,28 @@ export default function Sidebar({
 			) : (
 				<>
 					<div className="relative">
-						<div
+						<button
+							id="team-button"
 							className="flex w-full flex-row items-center gap-4 p-3 text-lg font-semibold hover:cursor-pointer"
-							onClick={() => setSelect(!select)}
+							popoverTarget="select"
 						>
 							<div className="flex flex-row items-center gap-2">
-								<span className={clsx("flex size-7 items-center justify-center rounded text-neutral-200", equipo!.color)}>
+								<span
+									className={clsx(
+										"flex size-7 items-center justify-center rounded text-neutral-200",
+										equipo!.color,
+									)}
+								>
 									{equipo!.nombre.toUpperCase().charAt(0)}
 								</span>
 								<span>{equipo!.nombre}</span>
 							</div>
 							<ChevronDown className="size-5 stroke-neutral-500" />
-						</div>
+						</button>
 						<div
-							className={clsx(
-								"w-full rounded border border-neutral-800 bg-neutral-950 text-sm",
-								select ? "absolute" : "hidden",
-							)}
+							id="select"
+							popover="auto"
+							className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
 						>
 							{equipos.map(equipo => {
 								return (
@@ -149,7 +155,12 @@ export default function Sidebar({
 										className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
 										onClick={() => handleTeamChange(equipo.Equipos!)}
 									>
-										<span className={clsx("flex size-5 items-center justify-center rounded text-neutral-200", equipo.Equipos!.color)}>
+										<span
+											className={clsx(
+												"flex size-5 items-center justify-center rounded text-neutral-200",
+												equipo.Equipos!.color,
+											)}
+										>
 											{equipo.Equipos!.nombre!.toUpperCase().charAt(0)}
 										</span>
 										<span>{equipo.Equipos!.nombre}</span>
@@ -238,7 +249,7 @@ export default function Sidebar({
 						<div className="">
 							<Link
 								href={"/" + equipo.slug + "/ajustes/cuenta/perfil"}
-								className="text-sm font-semibold flex flex-row items-center gap-3"
+								className="flex flex-row items-center gap-3 text-sm font-semibold"
 							>
 								<span
 									className={clsx(

@@ -107,6 +107,10 @@ export default function AjustesDelPerfil(usuario: User) {
 		}
 	}
 
+	function handleDelete() {
+		alert("delete");
+	}
+
 	return (
 		<>
 			<div className="mt-2 rounded border border-neutral-800">
@@ -186,6 +190,29 @@ export default function AjustesDelPerfil(usuario: User) {
 			>
 				{loading ? "Cargando ..." : "Actualizar"}
 			</button>
+			<hr className="my-6 border-neutral-700" />
+			<button
+				className="w-full rounded border border-red-600 bg-red-600/5 py-3 font-semibold text-red-600"
+				popoverTarget="pop"
+			>
+				Eliminar Cuenta
+			</button>
+			<div
+				id="pop"
+				popover="auto"
+				className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+			>
+				<div className="flex flex-col gap-4 text-center">
+					<span className="text-lg font-semibold">
+						¿Estás seguro que quieres eliminar tu cuenta?
+					</span>
+					<button className="rounded bg-red-600 p-2 text-neutral-200"
+					onClick={handleDelete}
+					disabled>
+						Eliminar
+					</button>
+				</div>
+			</div>
 		</>
 	);
 }

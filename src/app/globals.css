@@ -31,9 +31,3 @@ th {
 ::-webkit-scrollbar-thumb {
 	background: #404040;
 }
-
-#selector {
-	bottom: anchor(bottom);
-	left: anchor(center);
-	translate: -50% 0;
-}
