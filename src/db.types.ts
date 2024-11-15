@@ -58,23 +58,58 @@ export type Database = {
         }
         Relationships: []
       }
+      Incidencias: {
+        Row: {
+          comentario: string
+          creado: string
+          id: string
+          usuario: string
+        }
+        Insert: {
+          comentario: string
+          creado?: string
+          id?: string
+          usuario: string
+        }
+        Update: {
+          comentario?: string
+          creado?: string
+          id?: string
+          usuario?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Incidencias_usuario_fkey"
+            columns: ["usuario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Marcajes: {
         Row: {
           entrada: string
-          id: number
+          entrada_2: string | null
+          id: string
           salida: string | null
+          salida_2: string | null
           usuario: string | null
         }
         Insert: {
           entrada: string
-          id?: number
+          entrada_2?: string | null
+          id?: string
           salida?: string | null
+          salida_2?: string | null
           usuario?: string | null
         }
         Update: {
           entrada?: string
-          id?: number
+          entrada_2?: string | null
+          id?: string
           salida?: string | null
+          salida_2?: string | null
           usuario?: string | null
         }
         Relationships: [

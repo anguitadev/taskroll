@@ -1,16 +1,29 @@
+import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/client";
-import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Incidencia() {
 	const supabase = createClient();
 
 	const [comentario, setComentarios] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
+	const [incidencias, setIncidencias] = useState<Tables<"Incidencias">[] | null>(null);
 
-	async function crearIncidencia() {
+	const getIncidencias = useCallback(async () => {
+		const { data } = await supabase.from("Incidencias").select("*").range(0, 9);
+
+		if (data && data?.length > 0) {
+			setIncidencias(data);
+		} else {
+			setIncidencias(null);
+		}
+	}, [supabase]);
+
+	const crearIncidencia = useCallback(async () => {
 		if (comentario == "") {
-            setSuccess(null);
+			setSuccess(null);
 			setError("Por favor, introduce tu incidencia.");
 		} else {
 			const {
@@ -22,15 +35,36 @@ export default function Incidencia() {
 				usuario: user!.id,
 			});
 
-            setError(null);
-            setSuccess("Incidencia creada correctamente.");
-            setComentarios("");
+			setError(null);
+			setSuccess("Incidencia creada correctamente.");
+			setComentarios("");
+		}
+	}, [comentario, supabase]);
+
+	useEffect(() => {
+		getIncidencias();
+	}, [getIncidencias, crearIncidencia]);
+
+	async function deleteIncidencia(id: string) {
+		const { error } = await supabase.from("Incidencias").delete().eq("id", id);
+		if (!error) {
+			getIncidencias();
 		}
 	}
 
 	return (
 		<div className="mt-24">
-			<h2 className="text-lg font-semibold">Crear nueva incidencia</h2>
+			<div className="flex justify-between">
+				<h2 className="text-lg font-semibold">Crear nueva incidencia</h2>
+				{incidencias && (
+					<button
+						popoverTarget="incidencias"
+						className="cursor-pointer text-sm text-neutral-400"
+					>
+						Ver las incidencias
+					</button>
+				)}
+			</div>
 			<textarea
 				placeholder="Escribe el mensaje de tu incidencia..."
 				className="mt-9 h-36 w-full rounded p-4 py-2"
@@ -45,6 +79,36 @@ export default function Incidencia() {
 			>
 				Crear Incidencia
 			</button>
+			{incidencias && (
+				<div
+					id="incidencias"
+					popover="auto"
+					className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+				>
+					<span className="mb-6 block text-lg font-semibold">
+						Estas son tus últimas incidencias:
+					</span>
+					<div className="max-h-[600px] overflow-y-scroll">
+						{incidencias.map((incidencia, index) => (
+							<div
+								className="flex flex-col border-b border-neutral-800 p-2"
+								key={index}
+							>
+								<div className="mb-2 flex items-center justify-between">
+									<span className="text-sm font-semibold text-neutral-400">
+										{new Date(incidencia.creado).toLocaleDateString("es-ES")}
+									</span>
+									<Trash2
+										className="size-5 cursor-pointer stroke-neutral-400 transition hover:stroke-red-600"
+										onClick={() => deleteIncidencia(incidencia.id)}
+									/>
+								</div>
+								<span>{incidencia.comentario}</span>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
