@@ -9,63 +9,133 @@ interface Marcaje {
 	salida_2: string;
 }
 
+const supabase = createClient();
+
 export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
-	const meses = [
-		"Enero",
-		"Febrero",
-		"Marzo",
-		"Abril",
-		"Mayo",
-		"Jumio",
-		"Julio",
-		"Agosto",
-		"Septiembre",
-		"Octubre",
-		"Noviembre",
-		"Diciembre",
-	];
-
-	const anios = ["2024", "2023", "2022", "2021", "2020"];
-
-	const mesesAnteriores = meses.slice(0, new Date().getMonth() + 1).reverse();
-
-	// PONER SIMPLEMENTE LOS MESES Y AÑOS DE LOS QUE HAYAN ARCHIVOS
-
 	const [marcajes, setMarcajes] = useState<Marcaje[] | null>(null);
-	const supabase = createClient();
+	const [filteredMarcajes, setFilteredMarcajes] = useState<Marcaje[] | null>(null);
+	const [meses, setMeses] = useState<Record<string, string[]>>({});
+	const [selectedMonth, setSelectedMonth] = useState<string>("");
+	const [selectedYear, setSelectedYear] = useState<string>("");
 
 	const getMarcajes = useCallback(async () => {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
+		try {
+			const {
+				data: { user },
+				error: userError,
+			} = await supabase.auth.getUser();
+			if (userError || !user) throw userError || new Error("User not found");
 
-		const { data } = await supabase
-			.from("Marcajes")
-			.select("entrada, salida, entrada_2, salida_2")
-			.eq("usuario", user!.id)
-			.order("entrada", { ascending: false });
+			const { data, error } = await supabase
+				.from("Marcajes")
+				.select("entrada, salida, entrada_2, salida_2")
+				.eq("usuario", user.id)
+				.order("entrada", { ascending: false });
 
-		setMarcajes(data);
-	}, [supabase]);
+			if (error) throw error;
+
+			setMarcajes(data || []);
+		} catch (error) {
+			console.error("Error fetching marcajes:", error);
+		}
+	}, []);
+
+	const loadSelects = useCallback(() => {
+		if (!marcajes) return;
+
+		const aniosConMeses: Record<string, Set<string>> = {};
+
+		marcajes.forEach(marcaje => {
+			const entradaDate = new Date(marcaje.entrada);
+			const mes = entradaDate.toLocaleDateString("es-ES", { month: "long" });
+			const anio = entradaDate.getFullYear().toString();
+
+			if (!aniosConMeses[anio]) {
+				aniosConMeses[anio] = new Set();
+			}
+			aniosConMeses[anio].add(mes);
+		});
+
+		const sortedAnios = Object.keys(aniosConMeses).sort((a, b) => parseInt(b) - parseInt(a));
+
+		const formattedData = sortedAnios.reduce(
+			(acc, anio) => {
+				const sortedMeses = Array.from(aniosConMeses[anio]).sort((a, b) =>
+					b.localeCompare(a),
+				);
+				acc[anio] = sortedMeses;
+				return acc;
+			},
+			{} as Record<string, string[]>,
+		);
+
+		setMeses(formattedData);
+
+		const firstAnio = sortedAnios[0];
+		const firstMes = firstAnio
+			? formattedData[firstAnio][formattedData[firstAnio].length - 1]
+			: "";
+
+		if (selectedMonth === "") setSelectedMonth(firstMes);
+		if (selectedYear === "") setSelectedYear(firstAnio);
+	}, [marcajes, selectedMonth, selectedYear]);
+
+	const filterMarcajes = useCallback(() => {
+		if (!marcajes) return;
+
+		const filtered = marcajes.filter(marcaje => {
+			const date = new Date(marcaje.entrada);
+			const month = date.toLocaleDateString("es-ES", { month: "long" });
+			const year = date.getFullYear().toString();
+
+			const matchesMonth = selectedMonth ? month === selectedMonth : true;
+			const matchesYear = selectedYear ? year === selectedYear : true;
+
+			return matchesMonth && matchesYear;
+		});
+
+		setFilteredMarcajes(filtered);
+	}, [marcajes, selectedMonth, selectedYear]);
 
 	useEffect(() => {
 		getMarcajes();
 	}, [entrada, getMarcajes]);
+
+	useEffect(() => {
+		loadSelects();
+	}, [marcajes, loadSelects]);
+
+	useEffect(() => {
+		filterMarcajes();
+	}, [selectedMonth, selectedYear, filterMarcajes]);
+
+	function handleCambioAnio(anio: string) {
+		setSelectedYear(anio);
+		setSelectedMonth(meses[anio][0]);
+	}
 
 	return (
 		<div className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 p-8">
 			<div className="flex flex-row items-baseline justify-between">
 				<h2 className="text-lg font-semibold">Historial de marcajes</h2>
 				<div className="flex gap-2">
-					<select className="rounded bg-neutral-700 p-2">
-						{mesesAnteriores.map((mes, index) => (
+					<select
+						className="rounded bg-neutral-700 p-2"
+						value={selectedMonth}
+						onChange={e => setSelectedMonth(e.target.value)}
+					>
+						{meses[selectedYear]?.map((mes, index) => (
 							<option key={index} value={mes}>
-								{mes}
+								{String(mes).charAt(0).toUpperCase() + String(mes).slice(1)}
 							</option>
 						))}
 					</select>
-					<select className="rounded bg-neutral-700 p-2">
-						{anios.map((anio, index) => (
+					<select
+						className="rounded bg-neutral-700 p-2"
+						value={selectedYear}
+						onChange={e => handleCambioAnio(e.target.value)}
+					>
+						{Object.keys(meses).map((anio, index) => (
 							<option key={index} value={anio}>
 								{anio}
 							</option>
@@ -74,7 +144,7 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 				</div>
 			</div>
 			<div className="mt-12 max-h-[600px] overflow-y-scroll">
-				<table className="w-full border-separate border-spacing-y-2 text-center">
+				<table className="w-full table-fixed border-separate border-spacing-y-2 text-center">
 					<tbody>
 						<tr className="font-light text-neutral-400">
 							<th className="border-b border-neutral-700 pb-2">Jornada</th>
@@ -83,9 +153,8 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 							<th className="border-b border-neutral-700 pb-2">Entrada</th>
 							<th className="border-b border-neutral-700 pb-2">Salida</th>
 							<th className="border-b border-neutral-700 pb-2">Horas</th>
-							<th className="border-b border-neutral-700 pb-2"></th>
 						</tr>
-						{marcajes?.map((marcaje, index) => (
+						{filteredMarcajes?.map((marcaje, index) => (
 							<tr key={index} className="font-mono">
 								<td className="border-b border-neutral-700 pb-2">
 									{new Date(marcaje.entrada).toLocaleDateString("es-ES")}
