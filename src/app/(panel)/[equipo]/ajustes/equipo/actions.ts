@@ -1,5 +1,6 @@
 "use server";
 
+import { getEquipoById } from "@/lib/data";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -27,11 +28,16 @@ export async function updateEquipo({
 		.eq("id", idEquipo);
 
 	if (error) {
-		console.log(error);
-	}
+		const equipo = await getEquipoById(idEquipo);
+		if (equipo) {
+			revalidatePath("/" + equipo.slug + "/ajustes/equipo");
+			redirect("/" + equipo.slug + "/ajustes/equipo?error=" + error.code);
 
-	revalidatePath("/");
-	redirect("/" + slugEquipo + "/ajustes/equipo?success=" + "equipo_actualizado");
+		} 
+	} else {
+		revalidatePath("/");
+		redirect("/" + slugEquipo + "/ajustes/equipo?success=" + "equipo_actualizado");
+	}
 }
 
 export async function deleteEquipo(idEquipo: string) {

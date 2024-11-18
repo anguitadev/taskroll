@@ -1,23 +1,11 @@
 import Sidebar from "@/components/dashboard/sidebar";
-import { createClient } from "@/utils/supabase/server";
+import { getEquiposByIdUsuario, getUsuario } from "@/lib/data";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-	const supabase = await createClient();
+	const usuario = await getUsuario();
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	const {data: usuario} = await supabase
-		.from("Usuarios")
-		.select(`*`)
-		.eq("id", user!.id).single();
-
-	const {data: equipos} = await supabase
-		.from("Usuarios_Equipos")
-		.select(`Equipos(*)`)
-		.eq("usuario", user!.id);
+	const equipos = await getEquiposByIdUsuario(usuario!.id);
 
 	if (!equipos || equipos.length == 0) {
 		redirect("/nuevo-equipo");

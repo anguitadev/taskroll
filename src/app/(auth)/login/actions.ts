@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { getEquipoSlugByUsuarioId } from "@/lib/data";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function login(formData: FormData) {
@@ -21,17 +22,14 @@ export default async function login(formData: FormData) {
 		return redirect("/login?error=" + error.code);
 	}
 
-	const { data: equipo } = await supabase
-		.from("Usuarios_Equipos")
-		.select("Equipos(slug)")
-		.eq("usuario", usuario!.id)
-		.limit(1);
 
-	if (!equipo || equipo.length == 0) {
+	const equipoSlug = await getEquipoSlugByUsuarioId(usuario!.id);
+
+	if (!equipoSlug) {
 		revalidatePath("/", "layout");
 		redirect("/nuevo-equipo");
 	} else {
 		revalidatePath("/", "layout");
-		redirect("/" + equipo[0].Equipos!.slug);
+		redirect("/" + equipoSlug);
 	}
 }

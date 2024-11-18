@@ -1,5 +1,6 @@
 "use client";
 
+import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import {
@@ -35,14 +36,16 @@ export default function Sidebar({
 	usuario,
 }: {
 	className: string;
-	equipos: { Equipos: { id: string; nombre: string; slug: string; color: string } | null }[];
-	usuario: {
-		color: string;
-		id: string;
-		nombre_completo: string;
-		nombre_usuario: string;
-		puesto: string | null;
-	};
+	equipos: {
+		Equipos: {
+			color: string;
+			created_at: string;
+			id: string;
+			nombre: string;
+			slug: string;
+		} | null;
+	}[];
+	usuario: Tables<"Usuarios">;
 }) {
 	const pathname = usePathname();
 	const [ajustes, setAjustes] = useState(false);
@@ -91,8 +94,8 @@ export default function Sidebar({
 
 	useEffect(() => {
 		equipos.forEach(equipo => {
-			if (equipo.Equipos!.slug === pathname.split("/")[1]) {
-				setEquipo(equipo.Equipos!);
+			if (equipo.Equipos?.slug === pathname.split("/")[1]) {
+				setEquipo(equipo.Equipos);
 			}
 		});
 	}, [equipos, pathname, ajustes]);
@@ -117,7 +120,10 @@ export default function Sidebar({
 				</Link>
 				<div className="flex flex-row gap-3">
 					<ArrowLeft className="size-5 cursor-pointer" onClick={() => router.back()} />
-					<ArrowRight className="size-5 cursor-pointer" onClick={() => router.forward()} />
+					<ArrowRight
+						className="size-5 cursor-pointer"
+						onClick={() => router.forward()}
+					/>
 				</div>
 			</div>
 			{ajustes ? (
@@ -137,9 +143,9 @@ export default function Sidebar({
 										equipo!.color,
 									)}
 								>
-									{equipo!.nombre.toUpperCase().charAt(0)}
+									{equipo.nombre.toUpperCase().charAt(0)}
 								</span>
-								<span>{equipo!.nombre}</span>
+								<span>{equipo.nombre}</span>
 							</div>
 							<ChevronDown className="size-5 stroke-neutral-500" />
 						</button>
@@ -151,19 +157,19 @@ export default function Sidebar({
 							{equipos.map(equipo => {
 								return (
 									<div
-										key={equipo.Equipos!.id}
+										key={equipo.Equipos?.id}
 										className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
 										onClick={() => handleTeamChange(equipo.Equipos!)}
 									>
 										<span
 											className={clsx(
 												"flex size-5 items-center justify-center rounded text-neutral-200",
-												equipo.Equipos!.color,
+												equipo.Equipos?.color,
 											)}
 										>
-											{equipo.Equipos!.nombre!.toUpperCase().charAt(0)}
+											{equipo.Equipos?.nombre.toUpperCase().charAt(0)}
 										</span>
-										<span>{equipo.Equipos!.nombre}</span>
+										<span>{equipo.Equipos?.nombre}</span>
 									</div>
 								);
 							})}
