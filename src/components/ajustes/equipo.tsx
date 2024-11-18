@@ -112,7 +112,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 						</div>
 					</div>
 				</div>
-				<div className="flex justify-between p-6">
+				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row">
 					<label htmlFor="nombreEquipo" className="font-semibold">
 						Nombre del Equipo
 					</label>
@@ -124,15 +124,15 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 						onChange={e => setNombreEquipo(e.target.value)}
 					/>
 				</div>
-				<div className="flex justify-between border-t border-neutral-800 p-6">
+				<div className="flex flex-col md:flex-row justify-between border-t border-neutral-800 p-6">
 					<label htmlFor="slugEquipo" className="font-semibold">
 						URL del Equipo
 					</label>
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1 w-full">
 						<span>taskroll.app/</span>
 						<input
 							id="slugEquipo"
-							className="rounded border border-neutral-800 px-2 py-1"
+							className="rounded border border-neutral-800 px-2 py-1 w-full"
 							type="text"
 							value={slugEquipo || ""}
 							onChange={e => setSlugEquipo(e.target.value)}

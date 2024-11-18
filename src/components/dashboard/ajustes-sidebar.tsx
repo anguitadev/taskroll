@@ -31,13 +31,13 @@ export default function AjustesSidebar({
 		<div className={`flex flex-col ${className}`}>
 			<Link
 				href={"/" + equipoSlug}
-				className="flex grow items-center justify-center gap-2 rounded px-3 font-semibold md:mt-5 md:flex-none md:justify-start md:px-3"
+				className="flex items-center gap-2 rounded px-3 font-semibold mt-5"
 			>
 				<ChevronLeft className="size-5" />
 				Ajustes
 			</Link>
 			<div className="my-3">
-				<span className="flex grow items-center justify-center gap-2 rounded px-3 font-semibold text-neutral-400 md:flex-none md:justify-start md:p-2 md:px-3">
+				<span className="flex items-center gap-2 rounded px-3 font-semibold text-neutral-400 p-2">
 					<Users className="size-5" />
 					Equipo
 				</span>
@@ -45,7 +45,7 @@ export default function AjustesSidebar({
 					<Link
 						href={"/" + equipo!.slug + "/ajustes/equipo"}
 						className={clsx(
-							"flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3",
+							"flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3",
 							{
 								"bg-neutral-800":
 									pathname === "/" + equipo!.slug + "/ajustes/equipo",
@@ -54,41 +54,41 @@ export default function AjustesSidebar({
 					>
 						General
 					</Link>
-					<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Miembros
 					</span>
 				</div>
 			</div>
 			<div className="my-3">
-				<span className="flex grow items-center justify-center gap-2 rounded px-3 font-semibold text-neutral-400 md:flex-none md:justify-start md:p-2 md:px-3">
+				<span className="flex items-center gap-2 rounded px-3 font-semibold text-neutral-400 p-2">
 					<BriefcaseBusiness className="size-5" />
 					Entornos
 				</span>
 				<div className="ml-7">
-					<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 1
 						<ChevronDown className="size-5" />
 					</span>
 					<div className="ml-4">
-						<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+						<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 							General
 						</span>
-						<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+						<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 							Miembros
 						</span>
 					</div>
-					<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 2
 						<ChevronRight className="size-5" />
 					</span>
-					<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 3
 						<ChevronRight className="size-5" />
 					</span>
 				</div>
 			</div>
 			<div className="my-3">
-				<span className="flex grow items-center justify-center gap-2 rounded px-3 font-semibold text-neutral-400 md:flex-none md:justify-start md:p-2 md:px-3">
+				<span className="flex items-center gap-2 rounded px-3 font-semibold text-neutral-400 p-2">
 					<UserCog className="size-5" />
 					Mi Cuenta
 				</span>
@@ -96,7 +96,7 @@ export default function AjustesSidebar({
 					<Link
 						href={"/" + equipo!.slug + "/ajustes/cuenta/perfil"}
 						className={clsx(
-							"flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3",
+							"flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3",
 							{
 								"bg-neutral-800":
 									pathname === "/" + equipo!.slug + "/ajustes/cuenta/perfil",
@@ -105,7 +105,7 @@ export default function AjustesSidebar({
 					>
 						Perfil
 					</Link>
-					<span className="flex grow items-center justify-center rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-1 md:px-3">
+					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Notificaciones
 					</span>
 				</div>

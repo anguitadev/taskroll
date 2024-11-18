@@ -115,7 +115,7 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 	}
 
 	return (
-		<div className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 p-8">
+		<div className="rounded-lg border border-neutral-700 bg-neutral-800 p-8">
 			<div className="flex flex-row items-baseline justify-between">
 				<h2 className="text-lg font-semibold">Historial de marcajes</h2>
 				<div className="flex gap-2">
@@ -144,7 +144,7 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 				</div>
 			</div>
 			<div className="mt-12 max-h-[600px] overflow-y-scroll">
-				<table className="w-full table-fixed border-separate border-spacing-y-2 text-center">
+				<table className="w-full min-w-[570px] table-fixed border-separate border-spacing-y-2 text-center">
 					<tbody>
 						<tr className="font-light text-neutral-400">
 							<th className="border-b border-neutral-700 pb-2">Jornada</th>

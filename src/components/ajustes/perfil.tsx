@@ -140,11 +140,11 @@ export default function AjustesDelPerfil(usuario: User) {
 						</div>
 					</div>
 				</div>
-				<div className="flex justify-between p-6">
+				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row">
 					<span className="font-semibold">Correo Electrónico</span>
 					<span>{correoElectronico}</span>
 				</div>
-				<div className="flex justify-between border-t border-neutral-800 p-6">
+				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
 					<label htmlFor="nombreCompleto" className="font-semibold">
 						Nombre Completo
 					</label>
@@ -156,7 +156,7 @@ export default function AjustesDelPerfil(usuario: User) {
 						onChange={e => setNombreCompleto(e.target.value)}
 					/>
 				</div>
-				<div className="flex justify-between border-t border-neutral-800 p-6">
+				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
 					<label htmlFor="nombreUsuario" className="font-semibold">
 						Nombre de Usuario
 					</label>
@@ -168,7 +168,7 @@ export default function AjustesDelPerfil(usuario: User) {
 						onChange={e => setNombreUsuario(e.target.value)}
 					/>
 				</div>
-				<div className="flex justify-between border-t border-neutral-800 p-6">
+				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
 					<label htmlFor="puesto" className="font-semibold">
 						Puesto
 					</label>

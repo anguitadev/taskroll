@@ -5,7 +5,9 @@ import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import {
 	ArrowLeft,
+	ArrowLeftFromLine,
 	ArrowRight,
+	ArrowRightFromLine,
 	BriefcaseBusiness,
 	ChevronDown,
 	FileText,
@@ -51,6 +53,7 @@ export default function Sidebar({
 	const [ajustes, setAjustes] = useState(false);
 	const [nombreCompleto, setNombreCompleto] = useState<string | null>(null);
 	const [color, setColor] = useState<string | null>(null);
+	const [sidebar, setSidebar] = useState(false);
 
 	const supabase = createClient();
 
@@ -112,170 +115,202 @@ export default function Sidebar({
 		{ name: "Documentos", icon: FileText, href: "/" + equipo!.slug + "/documentos" },
 	];
 
+	function toggleSidebar() {
+		setSidebar(!sidebar);
+	}
+
 	return (
-		<div className={`flex flex-col ${className}`}>
-			<div className="flex flex-row items-center justify-between p-3">
-				<Link href={"/" + equipo!.slug} className="text-xl font-semibold">
-					Taskroll
-				</Link>
-				<div className="flex flex-row gap-3">
-					<ArrowLeft className="size-5 cursor-pointer" onClick={() => router.back()} />
-					<ArrowRight
-						className="size-5 cursor-pointer"
-						onClick={() => router.forward()}
-					/>
-				</div>
-			</div>
-			{ajustes ? (
-				<AjustesSidebar className={className} equipo={equipo} />
-			) : (
-				<>
-					<div className="relative">
-						<button
-							id="team-button"
-							className="flex w-full flex-row items-center gap-4 p-3 text-lg font-semibold hover:cursor-pointer"
-							popoverTarget="select"
-						>
-							<div className="flex flex-row items-center gap-2">
-								<span
+		<>
+			{!sidebar && (
+				<ArrowRightFromLine
+					className="absolute inset-3 size-6 stroke-neutral-400 sm:hidden"
+					onClick={toggleSidebar}
+				/>
+			)}
+			<div
+				id="sidebar"
+				className={clsx(
+					`flex-col sm:flex ${className}`,
+					sidebar
+						? "absolute flex min-w-52 border-r border-neutral-800 bg-neutral-950 h-screen p-2"
+						: "hidden",
+				)}
+			>
+				<div className={`flex-col sm:flex ${className}`}>
+					<div className="flex flex-row items-center justify-between p-3">
+						<Link href={"/" + equipo!.slug} className="text-xl font-semibold">
+							Taskroll
+						</Link>
+						{sidebar ? (
+							<ArrowLeftFromLine
+								className="absolute inset-4 ml-40 size-6 stroke-neutral-400 sm:hidden"
+								onClick={toggleSidebar}
+							/>
+						) : (
+							<div className="flex flex-row gap-3">
+								<ArrowLeft
+									className="size-5 cursor-pointer"
+									onClick={() => router.back()}
+								/>
+								<ArrowRight
+									className="size-5 cursor-pointer"
+									onClick={() => router.forward()}
+								/>
+							</div>
+						)}
+					</div>
+					{ajustes ? (
+						<AjustesSidebar className={className} equipo={equipo} />
+					) : (
+						<>
+							<div className="relative">
+								<button
+									id="team-button"
+									className="flex w-full flex-row items-center gap-4 p-3 text-lg font-semibold hover:cursor-pointer"
+									popoverTarget="select"
+								>
+									<div className="flex flex-row items-center gap-2">
+										<span
+											className={clsx(
+												"flex size-7 items-center justify-center rounded text-neutral-200",
+												equipo!.color,
+											)}
+										>
+											{equipo.nombre.toUpperCase().charAt(0)}
+										</span>
+										<span>{equipo.nombre}</span>
+									</div>
+									<ChevronDown className="size-5 stroke-neutral-500" />
+								</button>
+								<div
+									id="select"
+									popover="auto"
+									className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
+								>
+									{equipos.map(equipo => {
+										return (
+											<div
+												key={equipo.Equipos?.id}
+												className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
+												onClick={() => handleTeamChange(equipo.Equipos!)}
+											>
+												<span
+													className={clsx(
+														"flex size-5 items-center justify-center rounded text-neutral-200",
+														equipo.Equipos?.color,
+													)}
+												>
+													{equipo.Equipos?.nombre.toUpperCase().charAt(0)}
+												</span>
+												<span>{equipo.Equipos?.nombre}</span>
+											</div>
+										);
+									})}
+									<div className="border-t border-neutral-700">
+										<Link
+											href={"/" + equipo.slug + "/ajustes/equipo"}
+											className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
+										>
+											<Settings className="size-4" />
+											Ajustes del Equipo
+										</Link>
+										<div
+											className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
+											onClick={() => redirect("/nuevo-equipo")}
+										>
+											<Plus className="size-4" />
+											Añadir Nuevo Equipo
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className="mt-3 flex flex-col gap-1">
+								{links.map(link => {
+									const LinkIcon = link.icon;
+									return (
+										<Link
+											key={link.name}
+											href={link.href}
+											className={clsx(
+												"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+												{
+													"bg-neutral-800": pathname === link.href,
+												},
+											)}
+										>
+											<LinkIcon className="size-5" />
+											<span>{link.name}</span>
+										</Link>
+									);
+								})}
+							</div>
+							<div className="mt-3 flex flex-row items-center justify-between p-3">
+								<span className="text-lg font-medium">Entornos</span>
+								<div className="flex flex-row items-center gap-3">
+									<Search className="size-5 stroke-neutral-400" />
+									<Plus className="flex items-center justify-center rounded bg-indigo-500 p-0.5" />
+								</div>
+							</div>
+							<div className="flex flex-col gap-1">
+								<Link
+									href="/dashboard/entornos"
 									className={clsx(
-										"flex size-7 items-center justify-center rounded text-neutral-200",
-										equipo!.color,
+										"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+										{
+											"bg-neutral-800": pathname === "/dashboard/entornos",
+										},
 									)}
 								>
-									{equipo.nombre.toUpperCase().charAt(0)}
-								</span>
-								<span>{equipo.nombre}</span>
+									<BriefcaseBusiness className="size-5" />
+									<span>Todos los entornos</span>
+								</Link>
+								{entornos.map(link => {
+									return (
+										<Link
+											key={link.name}
+											href={link.href}
+											className={clsx(
+												"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+												{
+													"bg-neutral-800": pathname === link.href,
+												},
+											)}
+										>
+											<span className="text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold">
+												{link.icon}
+											</span>
+											<span>{link.name}</span>
+										</Link>
+									);
+								})}
 							</div>
-							<ChevronDown className="size-5 stroke-neutral-500" />
-						</button>
-						<div
-							id="select"
-							popover="auto"
-							className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
-						>
-							{equipos.map(equipo => {
-								return (
-									<div
-										key={equipo.Equipos?.id}
-										className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
-										onClick={() => handleTeamChange(equipo.Equipos!)}
+							<div className="absolute bottom-2 left-2 flex w-48 flex-row items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 p-2 lg:w-64">
+								<div className="">
+									<Link
+										href={"/" + equipo.slug + "/ajustes/cuenta/perfil"}
+										className="flex flex-row items-center gap-3 text-sm font-semibold"
 									>
 										<span
 											className={clsx(
 												"flex size-5 items-center justify-center rounded text-neutral-200",
-												equipo.Equipos?.color,
+												color,
 											)}
 										>
-											{equipo.Equipos?.nombre.toUpperCase().charAt(0)}
+											{nombreCompleto?.charAt(0).toUpperCase()}
 										</span>
-										<span>{equipo.Equipos?.nombre}</span>
-									</div>
-								);
-							})}
-							<div className="border-t border-neutral-700">
-								<Link
-									href={"/" + equipo.slug + "/ajustes/equipo"}
-									className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
-								>
-									<Settings className="size-4" />
-									Ajustes del Equipo
-								</Link>
-								<div
-									className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
-									onClick={() => redirect("/nuevo-equipo")}
-								>
-									<Plus className="size-4" />
-									Añadir Nuevo Equipo
+										{nombreCompleto}
+									</Link>
 								</div>
+								<form action="/signout" method="post" className="flex">
+									<button type="submit">
+										<LogOut className="size-5 stroke-neutral-400" />
+									</button>
+								</form>
 							</div>
-						</div>
-					</div>
-					<div className="mt-3 flex flex-col gap-1">
-						{links.map(link => {
-							const LinkIcon = link.icon;
-							return (
-								<Link
-									key={link.name}
-									href={link.href}
-									className={clsx(
-										"flex grow items-center justify-center gap-3 rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-2 md:px-3",
-										{
-											"bg-neutral-800": pathname === link.href,
-										},
-									)}
-								>
-									<LinkIcon className="size-5" />
-									<p className="hidden md:block">{link.name}</p>
-								</Link>
-							);
-						})}
-					</div>
-					<div className="mt-3 flex flex-row items-center justify-between p-3">
-						<span className="text-lg font-medium">Entornos</span>
-						<div className="flex flex-row items-center gap-3">
-							<Search className="size-5 stroke-neutral-400" />
-							<Plus className="flex items-center justify-center rounded bg-indigo-500 p-0.5" />
-						</div>
-					</div>
-					<div className="flex flex-col gap-1">
-						<Link
-							href="/dashboard/entornos"
-							className={clsx(
-								"flex grow items-center justify-center gap-3 rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-2 md:px-3",
-								{
-									"bg-neutral-800": pathname === "/dashboard/entornos",
-								},
-							)}
-						>
-							<BriefcaseBusiness className="size-5" />
-							<p className="hidden md:block">Todos los entornos</p>
-						</Link>
-						{entornos.map(link => {
-							return (
-								<Link
-									key={link.name}
-									href={link.href}
-									className={clsx(
-										"flex grow items-center justify-center gap-3 rounded p-3 text-sm transition hover:bg-neutral-800 md:flex-none md:justify-start md:p-2 md:px-3",
-										{
-											"bg-neutral-800": pathname === link.href,
-										},
-									)}
-								>
-									<span className="text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold">
-										{link.icon}
-									</span>
-									<p className="hidden md:block">{link.name}</p>
-								</Link>
-							);
-						})}
-					</div>
-					<div className="absolute bottom-2 left-2 flex w-64 flex-row items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 p-2">
-						<div className="">
-							<Link
-								href={"/" + equipo.slug + "/ajustes/cuenta/perfil"}
-								className="flex flex-row items-center gap-3 text-sm font-semibold"
-							>
-								<span
-									className={clsx(
-										"flex size-5 items-center justify-center rounded text-neutral-200",
-										color,
-									)}
-								>
-									{nombreCompleto?.charAt(0).toUpperCase()}
-								</span>
-								{nombreCompleto}
-							</Link>
-						</div>
-						<form action="/signout" method="post" className="flex">
-							<button type="submit">
-								<LogOut className="size-5 stroke-neutral-400" />
-							</button>
-						</form>
-					</div>
-				</>
-			)}
-		</div>
+						</>
+					)}
+				</div>
+			</div>
+		</>
 	);
 }

@@ -100,10 +100,10 @@ export default function Marcajes() {
 			<div className="border-b border-neutral-800 p-3 text-center">
 				<span>Registro de Marcajes</span>
 			</div>
-			<div className="px-16 pt-16">
+			<div className="xl:px-16 md:pt-16 md:pb-8 p-3 overflow-y-scroll  max-h-[calc(100vh-70px)]">
 				<h1 className="text-3xl font-bold">Registro de Marcajes</h1>
-				<div className="mt-8 flex gap-4">
-					<div className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 p-8">
+				<div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
+					<div className="rounded-lg border border-neutral-700 bg-neutral-800 p-8">
 						<div>
 							<h2 className="text-lg font-semibold">Realizar nuevo marcaje</h2>
 							<span className="mt-12 block text-center font-mono text-5xl font-semibold">
