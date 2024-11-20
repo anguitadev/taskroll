@@ -10,32 +10,29 @@ import {
 	ArrowRightFromLine,
 	BriefcaseBusiness,
 	ChevronDown,
+	ChevronRight,
 	FileText,
 	House,
+	List,
 	LogOut,
 	Mail,
 	Plus,
-	Search,
 	Settings,
 	Timer,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import NuevoEntorno from "../entornos/nuevo-entorno";
+import NuevoProyecto from "../proyectos/nuevo-proyecto";
 import AjustesSidebar from "./ajustes-sidebar";
-
-const entornos = [
-	{ name: "Entorno 1", icon: "E", href: "/dashboard/entornos/entorno-1" },
-	{ name: "Entorno 2", icon: "F", href: "/dashboard/entornos/entorno-2" },
-	{ name: "Entorno 3", icon: "A", href: "/dashboard/entornos/entorno-3" },
-	{ name: "Entorno 4", icon: "C", href: "/dashboard/entornos/entorno-4" },
-	{ name: "Entorno 5", icon: "H", href: "/dashboard/entornos/entorno-5" },
-];
 
 export default function Sidebar({
 	className,
 	equipos,
 	usuario,
+	entornos,
+	proyectos,
 }: {
 	className: string;
 	equipos: {
@@ -48,12 +45,25 @@ export default function Sidebar({
 		} | null;
 	}[];
 	usuario: Tables<"Usuarios">;
+	entornos: {
+		Entornos: {
+			color: string;
+			descripcion: string | null;
+			equipo: string;
+			id: string;
+			nombre: string;
+			propietario: string;
+			slug: string;
+		} | null;
+	}[];
+	proyectos: Record<string, { id: string; nombre: string; slug: string }[]> | undefined;
 }) {
 	const pathname = usePathname();
 	const [ajustes, setAjustes] = useState(false);
 	const [nombreCompleto, setNombreCompleto] = useState<string | null>(null);
 	const [color, setColor] = useState<string | null>(null);
 	const [sidebar, setSidebar] = useState(false);
+	const [entorno, setEntorno] = useState<string | null>(null);
 
 	const supabase = createClient();
 
@@ -119,6 +129,29 @@ export default function Sidebar({
 		setSidebar(!sidebar);
 	}
 
+	function handleNuevoProyecto(entornoId: string) {
+		setEntorno(entornoId);
+		document.getElementById("nuevo-proyecto")?.showPopover();
+	}
+
+	function toggleProyectos(entorno: string) {
+		const proyectos = document.getElementById("proyectos-" + entorno);
+		const toggle = document.getElementById(entorno + "-toggle");
+		if (proyectos) {
+			proyectos.classList.toggle("hidden");
+		}
+		if (toggle) {
+			toggle.classList.toggle("rotate-90");
+		}
+	}
+
+	function openProyectos(entorno: string) {
+		const proyectos = document.getElementById("proyectos-" + entorno);
+		if (proyectos) {
+			proyectos.classList.remove("hidden");
+		}
+	}
+
 	return (
 		<>
 			{!sidebar && (
@@ -130,13 +163,13 @@ export default function Sidebar({
 			<div
 				id="sidebar"
 				className={clsx(
-					`flex-col sm:flex ${className}`,
+					`max-h-screen flex-col justify-stretch sm:flex ${className}`,
 					sidebar
-						? "absolute flex min-w-52 border-r border-neutral-800 bg-neutral-950 h-screen p-2"
+						? "absolute flex min-w-52 border-r border-neutral-800 bg-neutral-950 p-2"
 						: "hidden",
 				)}
 			>
-				<div className={`flex-col sm:flex ${className}`}>
+				<div className={`grow flex-col sm:flex ${className}`}>
 					<div className="flex flex-row items-center justify-between p-3">
 						<Link href={"/" + equipo!.slug} className="text-xl font-semibold">
 							Taskroll
@@ -162,100 +195,103 @@ export default function Sidebar({
 					{ajustes ? (
 						<AjustesSidebar className={className} equipo={equipo} />
 					) : (
-						<>
-							<div className="relative">
-								<button
-									id="team-button"
-									className="flex w-full flex-row items-center gap-4 p-3 text-lg font-semibold hover:cursor-pointer"
-									popoverTarget="select"
-								>
-									<div className="flex flex-row items-center gap-2">
-										<span
-											className={clsx(
-												"flex size-7 items-center justify-center rounded text-neutral-200",
-												equipo!.color,
-											)}
-										>
-											{equipo.nombre.toUpperCase().charAt(0)}
-										</span>
-										<span>{equipo.nombre}</span>
-									</div>
-									<ChevronDown className="size-5 stroke-neutral-500" />
-								</button>
-								<div
-									id="select"
-									popover="auto"
-									className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
-								>
-									{equipos.map(equipo => {
-										return (
-											<div
-												key={equipo.Equipos?.id}
-												className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
-												onClick={() => handleTeamChange(equipo.Equipos!)}
+						<div className="flex max-h-[calc(100vh-70px)] grow flex-col justify-stretch">
+							<div>
+								<div className="relative">
+									<button
+										id="team-button"
+										className="flex w-full flex-row items-center gap-4 p-3 text-lg font-semibold hover:cursor-pointer"
+										popoverTarget="select"
+									>
+										<div className="flex flex-row items-center gap-2">
+											<span
+												className={clsx(
+													"flex size-7 items-center justify-center rounded text-neutral-200",
+													equipo!.color,
+												)}
 											>
-												<span
-													className={clsx(
-														"flex size-5 items-center justify-center rounded text-neutral-200",
-														equipo.Equipos?.color,
-													)}
+												{equipo.nombre.toUpperCase().charAt(0)}
+											</span>
+											<span>{equipo.nombre}</span>
+										</div>
+										<ChevronDown className="size-5 stroke-neutral-500" />
+									</button>
+									<div
+										id="select"
+										popover="auto"
+										className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
+									>
+										{equipos.map(equipo => {
+											return (
+												<div
+													key={equipo.Equipos?.id}
+													className="flex flex-row items-center gap-2 p-3 hover:cursor-pointer hover:bg-neutral-800"
+													onClick={() =>
+														handleTeamChange(equipo.Equipos!)
+													}
 												>
-													{equipo.Equipos?.nombre.toUpperCase().charAt(0)}
-												</span>
-												<span>{equipo.Equipos?.nombre}</span>
+													<span
+														className={clsx(
+															"flex size-5 items-center justify-center rounded text-neutral-200",
+															equipo.Equipos?.color,
+														)}
+													>
+														{equipo.Equipos?.nombre
+															.toUpperCase()
+															.charAt(0)}
+													</span>
+													<span>{equipo.Equipos?.nombre}</span>
+												</div>
+											);
+										})}
+										<div className="border-t border-neutral-700">
+											<Link
+												href={"/" + equipo.slug + "/ajustes/equipo"}
+												className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
+											>
+												<Settings className="size-4" />
+												Ajustes del Equipo
+											</Link>
+											<div
+												className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
+												onClick={() => redirect("/nuevo-equipo")}
+											>
+												<Plus className="size-4" />
+												Añadir Nuevo Equipo
 											</div>
-										);
-									})}
-									<div className="border-t border-neutral-700">
-										<Link
-											href={"/" + equipo.slug + "/ajustes/equipo"}
-											className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
-										>
-											<Settings className="size-4" />
-											Ajustes del Equipo
-										</Link>
-										<div
-											className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
-											onClick={() => redirect("/nuevo-equipo")}
-										>
-											<Plus className="size-4" />
-											Añadir Nuevo Equipo
 										</div>
 									</div>
 								</div>
-							</div>
-							<div className="mt-3 flex flex-col gap-1">
-								{links.map(link => {
-									const LinkIcon = link.icon;
-									return (
-										<Link
-											key={link.name}
-											href={link.href}
-											className={clsx(
-												"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
-												{
-													"bg-neutral-800": pathname === link.href,
-												},
-											)}
-										>
-											<LinkIcon className="size-5" />
-											<span>{link.name}</span>
-										</Link>
-									);
-								})}
-							</div>
-							<div className="mt-3 flex flex-row items-center justify-between p-3">
-								<span className="text-lg font-medium">Entornos</span>
-								<div className="flex flex-row items-center gap-3">
-									<Search className="size-5 stroke-neutral-400" />
-									<Plus className="flex items-center justify-center rounded bg-indigo-500 p-0.5" />
+								<div className="mt-3 flex flex-col gap-1">
+									{links.map(link => {
+										const LinkIcon = link.icon;
+										return (
+											<Link
+												key={link.name}
+												href={link.href}
+												className={clsx(
+													"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+													{
+														"bg-neutral-800": pathname === link.href,
+													},
+												)}
+											>
+												<LinkIcon className="size-5" />
+												<span>{link.name}</span>
+											</Link>
+										);
+									})}
+								</div>
+								<div className="mt-3 flex flex-row items-center justify-between p-3">
+									<span className="text-lg font-medium">Entornos</span>
+									<NuevoEntorno equipo={equipo} />
 								</div>
 							</div>
-							<div className="flex flex-col gap-1">
+							<div className="flex max-w-64 grow flex-col gap-1 overflow-x-hidden overflow-y-scroll">
 								<Link
 									href="/dashboard/entornos"
 									className={clsx(
-										"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+										"flex items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 										{
 											"bg-neutral-800": pathname === "/dashboard/entornos",
 										},
@@ -264,28 +300,161 @@ export default function Sidebar({
 									<BriefcaseBusiness className="size-5" />
 									<span>Todos los entornos</span>
 								</Link>
-								{entornos.map(link => {
+								{entornos.map(entorno => {
 									return (
-										<Link
-											key={link.name}
-											href={link.href}
-											className={clsx(
-												"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
-												{
-													"bg-neutral-800": pathname === link.href,
-												},
-											)}
-										>
-											<span className="text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold">
-												{link.icon}
-											</span>
-											<span>{link.name}</span>
-										</Link>
+										<div key={entorno.Entornos!.nombre}>
+											<div
+												className={clsx(
+													"group max-w-64 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+													{
+														"bg-neutral-800":
+															pathname ===
+															"/" +
+																equipo!.slug +
+																"/" +
+																entorno.Entornos!.slug,
+													},
+												)}
+											>
+												<div className="flex max-w-64 flex-row items-center justify-between">
+													<div className="flex grow items-center gap-3 overflow-hidden">
+														<div>
+															<span
+																className={clsx(
+																	"text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold group-hover:hidden",
+																	entorno.Entornos!.color,
+																)}
+															>
+																{entorno
+																	.Entornos!.nombre.charAt(0)
+																	.toUpperCase()}
+															</span>
+															<ChevronRight
+																id={
+																	entorno.Entornos!.slug +
+																	"-toggle"
+																}
+																className="hidden size-5 rounded stroke-neutral-500 p-0.5 hover:bg-neutral-700 group-hover:flex"
+																onClick={() =>
+																	toggleProyectos(
+																		entorno.Entornos!.slug,
+																	)
+																}
+															/>
+														</div>
+														<Link
+															href={
+																"/" +
+																equipo.slug +
+																"/" +
+																entorno.Entornos!.slug
+															}
+															className="grow truncate"
+														>
+															{entorno.Entornos!.nombre}
+														</Link>
+													</div>
+													<div
+														className={clsx(
+															"gap-1 transition-all group-hover:flex",
+															pathname ===
+																"/" +
+																	equipo!.slug +
+																	"/" +
+																	entorno.Entornos!.slug
+																? "flex"
+																: "hidden",
+														)}
+													>
+														<Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" />
+														<button
+															onClick={() =>
+																handleNuevoProyecto(
+																	entorno.Entornos!.id,
+																)
+															}
+														>
+															<Plus className="size-5 rounded stroke-neutral-500 transition hover:bg-neutral-700" />
+														</button>
+													</div>
+												</div>
+											</div>
+											<div
+												id={"proyectos-" + entorno.Entornos!.slug}
+												className="hidden"
+											>
+												{proyectos &&
+												proyectos[entorno!.Entornos!.id] !== undefined ? (
+													proyectos[entorno!.Entornos!.id].map(
+														proyecto => {
+															if (
+																pathname ==
+																"/" +
+																	equipo!.slug +
+																	"/" +
+																	entorno.Entornos!.slug +
+																	"/" +
+																	proyecto.slug
+															) {
+																openProyectos(
+																	entorno.Entornos!.slug,
+																);
+															}
+															return (
+																<Link
+																	key={proyecto.id}
+																	href={
+																		"/" +
+																		equipo.slug +
+																		"/" +
+																		entorno.Entornos!.slug +
+																		"/" +
+																		proyecto.slug
+																	}
+																	className={clsx(
+																		"flex flex-row items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+																		{
+																			"bg-neutral-800":
+																				pathname ===
+																				"/" +
+																					equipo!.slug +
+																					"/" +
+																					entorno
+																						.Entornos!
+																						.slug +
+																					"/" +
+																					proyecto.slug,
+																		},
+																	)}
+																>
+																	<List className="size-5 rounded stroke-neutral-500 p-0.5" />
+																	<span className="truncate">
+																		{proyecto.nombre}
+																	</span>
+																</Link>
+															);
+														},
+													)
+												) : (
+													<span
+														className="ml-4 cursor-pointer text-sm text-neutral-400 underline"
+														onClick={() =>
+															handleNuevoProyecto(
+																entorno.Entornos!.id,
+															)
+														}
+													>
+														Crear nuevo proyecto
+													</span>
+												)}
+											</div>
+										</div>
 									);
 								})}
+								<NuevoProyecto entorno={entorno} />
 							</div>
-							<div className="absolute bottom-2 left-2 flex w-48 flex-row items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 p-2 lg:w-64">
-								<div className="">
+							<div className="flex w-48 grow-0 flex-row items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 p-2 lg:w-64">
+								<div>
 									<Link
 										href={"/" + equipo.slug + "/ajustes/cuenta/perfil"}
 										className="flex flex-row items-center gap-3 text-sm font-semibold"
@@ -307,7 +476,7 @@ export default function Sidebar({
 									</button>
 								</form>
 							</div>
-						</>
+						</div>
 					)}
 				</div>
 			</div>

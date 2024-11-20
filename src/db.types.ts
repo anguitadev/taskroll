@@ -34,6 +34,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      Entornos: {
+        Row: {
+          color: string
+          descripcion: string | null
+          equipo: string
+          id: string
+          nombre: string
+          propietario: string
+          slug: string
+        }
+        Insert: {
+          color?: string
+          descripcion?: string | null
+          equipo: string
+          id?: string
+          nombre: string
+          propietario: string
+          slug: string
+        }
+        Update: {
+          color?: string
+          descripcion?: string | null
+          equipo?: string
+          id?: string
+          nombre?: string
+          propietario?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Entornos_equipo_fkey"
+            columns: ["equipo"]
+            isOneToOne: false
+            referencedRelation: "Equipos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Entornos_propietario_fkey"
+            columns: ["propietario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Equipos: {
         Row: {
           color: string
@@ -122,6 +167,35 @@ export type Database = {
           },
         ]
       }
+      Proyectos: {
+        Row: {
+          entorno: string
+          id: string
+          nombre: string
+          slug: string
+        }
+        Insert: {
+          entorno: string
+          id?: string
+          nombre: string
+          slug: string
+        }
+        Update: {
+          entorno?: string
+          id?: string
+          nombre?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Proyectos_entorno_fkey"
+            columns: ["entorno"]
+            isOneToOne: false
+            referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Usuarios: {
         Row: {
           color: string
@@ -145,6 +219,42 @@ export type Database = {
           puesto?: string | null
         }
         Relationships: []
+      }
+      Usuarios_Entornos: {
+        Row: {
+          admin: boolean
+          entorno: string
+          id: string
+          usuario: string
+        }
+        Insert: {
+          admin?: boolean
+          entorno: string
+          id?: string
+          usuario: string
+        }
+        Update: {
+          admin?: boolean
+          entorno?: string
+          id?: string
+          usuario?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Usuarios_Entornos_entorno_fkey"
+            columns: ["entorno"]
+            isOneToOne: false
+            referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Usuarios_Entornos_usuario_fkey"
+            columns: ["usuario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       Usuarios_Equipos: {
         Row: {
