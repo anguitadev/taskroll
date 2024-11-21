@@ -300,130 +300,99 @@ export default function Sidebar({
 									<BriefcaseBusiness className="size-5" />
 									<span>Todos los entornos</span>
 								</Link>
-								{entornos.map(entorno => {
-									return (
-										<div key={entorno.Entornos!.nombre}>
-											<div
-												className={clsx(
-													"group max-w-64 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
-													{
-														"bg-neutral-800":
-															pathname ===
-															"/" +
-																equipo!.slug +
-																"/" +
-																entorno.Entornos!.slug,
-													},
-												)}
-											>
-												<div className="flex max-w-64 flex-row items-center justify-between">
-													<div className="flex grow items-center gap-3 overflow-hidden">
-														<div>
-															<span
-																className={clsx(
-																	"text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold group-hover:hidden",
-																	entorno.Entornos!.color,
-																)}
+								{entornos.length > 0 ? (
+									entornos.map(entorno => {
+										const entornoData = entorno.Entornos;
+										if (!entornoData) return null;
+
+										const isActiveEntorno = entornoData.equipo === equipo?.id;
+										const isCurrentPath =
+											pathname === `/${equipo?.slug}/${entornoData?.slug}`;
+
+										if (isCurrentPath) {
+											openProyectos(entornoData?.slug);
+										}
+
+										return isActiveEntorno ? (
+											<div key={entornoData?.nombre}>
+												<div
+													className={clsx(
+														"group max-w-64 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+														{
+															"bg-neutral-800": isCurrentPath,
+														},
+													)}
+												>
+													<div className="flex max-w-64 flex-row items-center justify-between">
+														<div className="flex grow items-center gap-3 overflow-hidden">
+															<div>
+																<span
+																	className={clsx(
+																		"text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold group-hover:hidden",
+																		entornoData?.color,
+																	)}
+																>
+																	{entornoData?.nombre
+																		?.charAt(0)
+																		.toUpperCase()}
+																</span>
+																<ChevronRight
+																	id={`${entornoData?.slug}-toggle`}
+																	className="hidden size-5 rounded stroke-neutral-500 p-0.5 hover:bg-neutral-700 group-hover:flex"
+																	onClick={() =>
+																		toggleProyectos(
+																			entornoData?.slug,
+																		)
+																	}
+																/>
+															</div>
+															<Link
+																href={`/${equipo?.slug}/${entornoData?.slug}`}
+																className="grow truncate"
 															>
-																{entorno
-																	.Entornos!.nombre.charAt(0)
-																	.toUpperCase()}
-															</span>
-															<ChevronRight
-																id={
-																	entorno.Entornos!.slug +
-																	"-toggle"
-																}
-																className="hidden size-5 rounded stroke-neutral-500 p-0.5 hover:bg-neutral-700 group-hover:flex"
+																{entornoData?.nombre}
+															</Link>
+														</div>
+														<div
+															className={clsx(
+																"gap-1 transition-all group-hover:flex",
+																isCurrentPath ? "flex" : "hidden",
+															)}
+														>
+															<Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" />
+															<button
 																onClick={() =>
-																	toggleProyectos(
-																		entorno.Entornos!.slug,
+																	handleNuevoProyecto(
+																		entornoData?.id,
 																	)
 																}
-															/>
+															>
+																<Plus className="size-5 rounded stroke-neutral-500 transition hover:bg-neutral-700" />
+															</button>
 														</div>
-														<Link
-															href={
-																"/" +
-																equipo.slug +
-																"/" +
-																entorno.Entornos!.slug
-															}
-															className="grow truncate"
-														>
-															{entorno.Entornos!.nombre}
-														</Link>
-													</div>
-													<div
-														className={clsx(
-															"gap-1 transition-all group-hover:flex",
-															pathname ===
-																"/" +
-																	equipo!.slug +
-																	"/" +
-																	entorno.Entornos!.slug
-																? "flex"
-																: "hidden",
-														)}
-													>
-														<Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" />
-														<button
-															onClick={() =>
-																handleNuevoProyecto(
-																	entorno.Entornos!.id,
-																)
-															}
-														>
-															<Plus className="size-5 rounded stroke-neutral-500 transition hover:bg-neutral-700" />
-														</button>
 													</div>
 												</div>
-											</div>
-											<div
-												id={"proyectos-" + entorno.Entornos!.slug}
-												className="hidden"
-											>
-												{proyectos &&
-												proyectos[entorno!.Entornos!.id] !== undefined ? (
-													proyectos[entorno!.Entornos!.id].map(
-														proyecto => {
-															if (
-																pathname ==
-																"/" +
-																	equipo!.slug +
-																	"/" +
-																	entorno.Entornos!.slug +
-																	"/" +
-																	proyecto.slug
-															) {
-																openProyectos(
-																	entorno.Entornos!.slug,
-																);
+												<div
+													id={`proyectos-${entornoData?.slug}`}
+													className="hidden"
+												>
+													{proyectos && proyectos[entornoData?.id] ? (
+														proyectos[entornoData?.id].map(proyecto => {
+															const isCurrentProyecto =
+																pathname ===
+																`/${equipo?.slug}/${entornoData?.slug}/${proyecto.slug}`;
+															if (isCurrentProyecto) {
+																openProyectos(entornoData?.slug);
 															}
 															return (
 																<Link
 																	key={proyecto.id}
-																	href={
-																		"/" +
-																		equipo.slug +
-																		"/" +
-																		entorno.Entornos!.slug +
-																		"/" +
-																		proyecto.slug
-																	}
+																	href={`/${equipo?.slug}/${entornoData?.slug}/${proyecto.slug}`}
 																	className={clsx(
 																		"flex flex-row items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 																		{
 																			"bg-neutral-800":
-																				pathname ===
-																				"/" +
-																					equipo!.slug +
-																					"/" +
-																					entorno
-																						.Entornos!
-																						.slug +
-																					"/" +
-																					proyecto.slug,
+																				isCurrentProyecto,
 																		},
 																	)}
 																>
@@ -433,24 +402,37 @@ export default function Sidebar({
 																	</span>
 																</Link>
 															);
-														},
-													)
-												) : (
-													<span
-														className="ml-4 cursor-pointer text-sm text-neutral-400 underline"
-														onClick={() =>
-															handleNuevoProyecto(
-																entorno.Entornos!.id,
-															)
-														}
-													>
-														Crear nuevo proyecto
-													</span>
-												)}
+														})
+													) : (
+														<span
+															className="ml-4 cursor-pointer text-sm text-neutral-400 underline"
+															onClick={() =>
+																handleNuevoProyecto(entornoData?.id)
+															}
+														>
+															Crear nuevo proyecto
+														</span>
+													)}
+												</div>
 											</div>
-										</div>
-									);
-								})}
+										) : (
+											<button
+												popoverTarget="nuevo-entorno"
+												key={entornoData?.id}
+												className="ml-4 cursor-pointer text-left text-sm text-neutral-400 underline"
+											>
+												Crear nuevo entorno
+											</button>
+										);
+									})
+								) : (
+									<button
+										popoverTarget="nuevo-entorno"
+										className="ml-4 cursor-pointer text-left text-sm text-neutral-400 underline"
+									>
+										Crear nuevo entorno
+									</button>
+								)}
 								<NuevoProyecto entorno={entorno} />
 							</div>
 							<div className="flex w-48 grow-0 flex-row items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 p-2 lg:w-64">
