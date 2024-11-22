@@ -147,8 +147,12 @@ export default function Sidebar({
 
 	function openProyectos(entorno: string) {
 		const proyectos = document.getElementById("proyectos-" + entorno);
+		const toggle = document.getElementById(entorno + "-toggle");
 		if (proyectos) {
 			proyectos.classList.remove("hidden");
+		}
+		if (toggle) {
+			toggle.classList.add("rotate-90");
 		}
 	}
 
