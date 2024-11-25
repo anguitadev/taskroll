@@ -49,7 +49,8 @@ export default function Sidebar({
 		Entornos: {
 			color: string;
 			descripcion: string | null;
-			equipo: string;
+			entorno: string | null;
+			equipo: string | null;
 			id: string;
 			nombre: string;
 			propietario: string;
@@ -310,8 +311,9 @@ export default function Sidebar({
 										if (!entornoData) return null;
 
 										const isActiveEntorno = entornoData.equipo === equipo?.id;
-										const isCurrentPath =
-											pathname === `/${equipo?.slug}/${entornoData?.slug}`;
+										const isCurrentPath = pathname
+											.split("/")
+											.includes(entornoData?.slug);
 
 										if (isCurrentPath) {
 											openProyectos(entornoData?.slug);

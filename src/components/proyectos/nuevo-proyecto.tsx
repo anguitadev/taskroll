@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function NuevoProyecto({ entorno }: { entorno: string | null }) {
 	const [nombreProyecto, setNombreProyecto] = useState<string>("");
+	const [descripcionProyecto, setDescripcionProyecto] = useState<string>("");
 	const [clientError, setClientError] = useState<string | null>(null);
 	const [textoBoton, setTextoBoton] = useState<string>("Crear Proyecto");
 
@@ -20,12 +21,13 @@ export default function NuevoProyecto({ entorno }: { entorno: string | null }) {
 			return;
 		}
 		try {
-			await createProyecto(nombreProyecto, entorno!);
+			await createProyecto(nombreProyecto, descripcionProyecto, entorno!);
 		} catch (error) {
 			console.log(error);
 		}
 		setTextoBoton("Crear Proyecto");
 		setNombreProyecto("");
+		setDescripcionProyecto("");
 	}
 
 	return (
@@ -37,17 +39,31 @@ export default function NuevoProyecto({ entorno }: { entorno: string | null }) {
 			>
 				<span className="text-2xl font-semibold">Crear Nuevo Proyecto</span>
 				<div className="mt-6 rounded border border-neutral-800">
-					<div className="flex flex-col gap-2 p-6">
-						<label htmlFor="nombreEquipo" className="font-semibold">
-							Nombre del Proyecto
-						</label>
-						<input
-							id="nombreEquipo"
-							className="rounded border border-neutral-800 px-2 py-1"
-							type="text"
-							value={nombreProyecto || ""}
-							onChange={e => setNombreProyecto(e.target.value)}
-						/>
+					<div className="flex flex-col gap-4 p-6">
+						<div className="flex flex-col gap-2">
+							<label htmlFor="nombreProyecto" className="font-semibold">
+								Nombre del Proyecto
+							</label>
+							<input
+								id="nombreProyecto"
+								className="rounded border border-neutral-800 px-2 py-1"
+								type="text"
+								value={nombreProyecto || ""}
+								onChange={e => setNombreProyecto(e.target.value)}
+							/>
+						</div>
+						<div className="flex flex-col gap-2">
+							<label htmlFor="descripcionProyecto" className="font-semibold">
+								Descripción del Proyecto
+							</label>
+							<input
+								id="descripcionProyecto"
+								className="rounded border border-neutral-800 px-2 py-1"
+								type="text"
+								value={descripcionProyecto || ""}
+								onChange={e => setDescripcionProyecto(e.target.value)}
+							/>
+						</div>
 					</div>
 				</div>
 				{clientError && <span className="mt-2 block text-red-500">{clientError}</span>}

@@ -14,16 +14,19 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
+    "@uploadthing/react": "^7.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
-    "next": "15.0.1",
+    "next": "15.0.3",
     "next-themes": "^0.3.0",
     "react": "19.0.0-rc-69d4b800-20241021",
+    "react-documents": "^1.2.1",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
     "react-live-clock": "^6.1.25",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uploadthing": "^7.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.6",

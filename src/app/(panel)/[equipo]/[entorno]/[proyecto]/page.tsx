@@ -35,6 +35,9 @@ export default async function Proyecto(props: { params: Params }) {
 			</div>
 			<div className="flex max-h-[calc(100vh-70px)] flex-col overflow-y-scroll p-8">
 				<h1 className="text-3xl font-bold">{proyecto.nombre}</h1>
+				{proyecto.descripcion && (
+					<p className="mt-2 text-neutral-400">{proyecto.descripcion}</p>
+				)}
 				<div className="mt-8 p-4">
 					<h2 className="text-xl font-semibold">Tareas Abiertas</h2>
 					<table className="mt-2 w-full min-w-[570px] border-separate border-spacing-y-2 p-2">

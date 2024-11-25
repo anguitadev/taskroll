@@ -22,8 +22,6 @@ export async function createEntorno({
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	console.log(await supabase.auth.getUser());
-
 	let slug = nombreEntorno
 		.normalize("NFD")
 		.replace(/[\u0300-\u036f]/g, "")
@@ -48,23 +46,28 @@ export async function createEntorno({
 		})
 		.select();
 
+	if (!data || errorEntornos) {
+		return console.log(errorEntornos);
+	}
 	const { error } = await supabase.from("Usuarios_Entornos").insert({
 		entorno: data![0].id,
 		usuario: user!.id,
 		admin: true,
 	});
 
-	if (error || errorEntornos) {
-		return {
-			error: error?.code,
-		};
+	if (error) {
+		console.log(error);
 	} else {
 		revalidatePath("/", "layout");
 		redirect("/" + equipo.slug + "/" + data![0].slug);
 	}
 }
 
-export async function createProyecto(nombreProyecto: string, idEntorno: string) {
+export async function createProyecto(
+	nombreProyecto: string,
+	descripcionProyecto: string,
+	idEntorno: string,
+) {
 	const supabase = await createClient();
 
 	let proyectoSlug = nombreProyecto
@@ -74,7 +77,7 @@ export async function createProyecto(nombreProyecto: string, idEntorno: string) 
 		.replace(/ /g, "-");
 
 	const { data: proyecto } = await supabase
-		.from("Proyectos")
+		.from("Entornos")
 		.select("*")
 		.like("slug", proyectoSlug);
 
@@ -82,12 +85,18 @@ export async function createProyecto(nombreProyecto: string, idEntorno: string) 
 		proyectoSlug += "-" + proyecto.length;
 	}
 
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
 	const { data: proyectoNuevo, error } = await supabase
-		.from("Proyectos")
+		.from("Entornos")
 		.insert({
 			nombre: nombreProyecto,
+			descripcion: descripcionProyecto,
 			slug: proyectoSlug,
 			entorno: idEntorno,
+			propietario: user!.id,
 		})
 		.select()
 		.single();
@@ -105,4 +114,37 @@ export async function createProyecto(nombreProyecto: string, idEntorno: string) 
 		revalidatePath("/");
 		redirect("/" + equipo!.Equipos!.slug + "/" + entorno!.slug + "/" + proyectoNuevo!.slug);
 	}
+}
+
+export async function deleteDocumento(pathname: string) {
+	const slugs = pathname.split("/");
+	const urlDocumento = slugs.pop();
+	const supabase = await createClient();
+	const { error } = await supabase.from("Documentos").delete().eq("url", urlDocumento!);
+	if (error) {
+		return error;
+	}
+	console.log(pathname);
+	revalidatePath(slugs.join("/"));
+	redirect(slugs.join("/"));
+}
+
+export async function createDocumento(fileKey: string, nombreDocumento: string, pathname: string) {
+	const slugs = pathname.split("/");
+	const entorno = slugs[slugs.indexOf("documentos") - 1];
+	const supabase = await createClient();
+	const { data: entornoId } = await supabase
+		.from("Entornos")
+		.select("id")
+		.eq("entorno", entorno)
+		.limit(1)
+		.single();
+	const { error } = await supabase.from("Documentos").insert({
+		nombre: nombreDocumento,
+		url: fileKey,
+		entorno: entornoId!.id,
+	});
+	if (error) return error;
+	revalidatePath(pathname + "/" + fileKey);
+	redirect(pathname + "/" + fileKey);
 }

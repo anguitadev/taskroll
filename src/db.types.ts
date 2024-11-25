@@ -34,11 +34,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      Documentos: {
+        Row: {
+          contenido: string | null
+          entorno: string
+          id: string
+          nombre: string
+          url: string | null
+        }
+        Insert: {
+          contenido?: string | null
+          entorno: string
+          id?: string
+          nombre: string
+          url?: string | null
+        }
+        Update: {
+          contenido?: string | null
+          entorno?: string
+          id?: string
+          nombre?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Docuementacion_Entornos_entorno_fkey"
+            columns: ["entorno"]
+            isOneToOne: false
+            referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Entornos: {
         Row: {
           color: string
           descripcion: string | null
-          equipo: string
+          entorno: string | null
+          equipo: string | null
           id: string
           nombre: string
           propietario: string
@@ -47,7 +80,8 @@ export type Database = {
         Insert: {
           color?: string
           descripcion?: string | null
-          equipo: string
+          entorno?: string | null
+          equipo?: string | null
           id?: string
           nombre: string
           propietario: string
@@ -56,13 +90,21 @@ export type Database = {
         Update: {
           color?: string
           descripcion?: string | null
-          equipo?: string
+          entorno?: string | null
+          equipo?: string | null
           id?: string
           nombre?: string
           propietario?: string
           slug?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "Entornos_entorno_fkey"
+            columns: ["entorno"]
+            isOneToOne: false
+            referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "Entornos_equipo_fkey"
             columns: ["equipo"]
@@ -163,35 +205,6 @@ export type Database = {
             columns: ["usuario"]
             isOneToOne: false
             referencedRelation: "Usuarios"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Proyectos: {
-        Row: {
-          entorno: string
-          id: string
-          nombre: string
-          slug: string
-        }
-        Insert: {
-          entorno: string
-          id?: string
-          nombre: string
-          slug: string
-        }
-        Update: {
-          entorno?: string
-          id?: string
-          nombre?: string
-          slug?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Proyectos_entorno_fkey"
-            columns: ["entorno"]
-            isOneToOne: false
-            referencedRelation: "Entornos"
             referencedColumns: ["id"]
           },
         ]

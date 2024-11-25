@@ -70,7 +70,13 @@ export async function getEntornosbyUsuario() {
 export async function getEntornoBySlug(slug: string) {
 	const supabase = await createClient();
 
-	const { data } = await supabase.from("Entornos").select("*").eq("slug", slug).limit(1).single();
+	const { data } = await supabase
+		.from("Entornos")
+		.select("*")
+		.eq("slug", slug)
+		.is("entorno", null)
+		.limit(1)
+		.single();
 
 	return data;
 }
@@ -86,12 +92,7 @@ export async function getEntornoById(id: string) {
 export async function getProyectoBySlug(slug: string) {
 	const supabase = await createClient();
 
-	const { data } = await supabase
-		.from("Proyectos")
-		.select("*")
-		.eq("slug", slug)
-		.limit(1)
-		.single();
+	const { data } = await supabase.from("Entornos").select("*").eq("slug", slug).limit(1).single();
 
 	return data;
 }
@@ -112,7 +113,7 @@ export async function getEquipoByEntornoId(id: string) {
 export async function getProyectosByEntornoId(id: string) {
 	const supabase = await createClient();
 
-	const { data } = await supabase.from("Proyectos").select("*").eq("entorno", id);
+	const { data } = await supabase.from("Entornos").select("*").eq("entorno", id);
 
 	return data;
 }
@@ -122,7 +123,8 @@ export async function getProyectosbyEntornos(
 		Entornos: {
 			color: string;
 			descripcion: string | null;
-			equipo: string;
+			entorno: string | null;
+			equipo: string | null;
 			id: string;
 			nombre: string;
 			propietario: string;
@@ -136,13 +138,13 @@ export async function getProyectosbyEntornos(
 
 	if (ids.length > 0) {
 		const { data } = await supabase
-			.from("Proyectos")
-			.select("id, nombre, slug, Entornos(id)")
-			.in("Entornos.id", ids);
+			.from("Entornos")
+			.select("id, nombre, slug, entorno")
+			.in("entorno", ids);
 		if (data) {
 			const result = data.reduce(
 				(acc, item) => {
-					const id = item.Entornos?.id;
+					const id = item.entorno;
 					if (id) {
 						if (!acc[id]) {
 							acc[id] = [];
@@ -155,9 +157,25 @@ export async function getProyectosbyEntornos(
 					}
 					return acc;
 				},
-				{} as Record<string, { id: string ,nombre: string; slug: string }[]>,
+				{} as Record<string, { id: string; nombre: string; slug: string }[]>,
 			);
 			return result;
 		}
+	}
+}
+
+export async function getDocumentosByEntornoSlug(entornoSlug: string) {
+	const supabase = await createClient();
+
+	const { data: entornoId } = await supabase
+		.from("Entornos")
+		.select("id")
+		.eq("slug", entornoSlug)
+		.limit(1)
+		.single();
+
+	if (entornoId) {
+		const { data } = await supabase.from("Documentos").select("*").eq("entorno", entornoId.id);
+		return data;
 	}
 }
