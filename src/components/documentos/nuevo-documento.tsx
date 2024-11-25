@@ -20,7 +20,8 @@ export default function NuevoDocumento() {
 	}
 
 	async function handleNuevoDocumento(fileKey: string) {
-		createDocumento(fileKey, nombreDocumento, pathname);
+		const error = await createDocumento(fileKey, nombreDocumento, pathname);
+		if (error) setClientError("Ha habido un error al cargar el documento.");
 	}
 
 	return (
@@ -65,7 +66,7 @@ export default function NuevoDocumento() {
 								if (files.length > 0) return "Subir Documento";
 								return "Seleccionar Documento";
 							},
-							allowedContent: ({ ready, fileTypes, isUploading }) => {
+							allowedContent: ({ ready, isUploading }) => {
 								if (!ready) return "Verificando documento...";
 								if (isUploading) return "Enviando documento...";
 								return "Tipos de documentos permitidos: pdf, docx, xlsx, pptx";

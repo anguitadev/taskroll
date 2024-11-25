@@ -27,13 +27,6 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es-ES" className="scroll-smooth">
-			<head>
-				<script
-					src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"
-					integrity="sha512-hXFbhlByvaKQUnA8YLVmee6gVnmmL5RMx2GVnxuTBxMrVegwIN/1d2eZ3ICNzw0MViUotNtZEdgPW+Dq+kv4oQ=="
-					crossOrigin="anonymous"
-				></script>
-			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} bg-neutral-950 text-neutral-200 antialiased`}
 			>
