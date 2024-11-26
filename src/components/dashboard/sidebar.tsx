@@ -384,9 +384,9 @@ export default function Sidebar({
 												>
 													{proyectos && proyectos[entornoData?.id] ? (
 														proyectos[entornoData?.id].map(proyecto => {
-															const isCurrentProyecto =
-																pathname ===
-																`/${equipo?.slug}/${entornoData?.slug}/${proyecto.slug}`;
+															const isCurrentProyecto = pathname
+																.split("/")
+																.includes(proyecto.slug);
 															if (isCurrentProyecto) {
 																openProyectos(entornoData?.slug);
 															}

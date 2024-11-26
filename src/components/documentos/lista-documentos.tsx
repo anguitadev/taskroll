@@ -10,13 +10,7 @@ export default function ListaDocumentos({
 	equipoSlug,
 	entornoSlug,
 }: {
-	documentosEntorno: {
-		contenido: string | null;
-		entorno: string;
-		id: string;
-		nombre: string;
-		url: string | null;
-	}[];
+	documentosEntorno: { entorno: string; id: string; nombre: string; url: string | null }[];
 	equipoSlug: string;
 	entornoSlug: string;
 }) {

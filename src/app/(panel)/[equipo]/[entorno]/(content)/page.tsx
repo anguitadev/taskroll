@@ -35,9 +35,15 @@ export default async function Entorno({
 				</Link>
 				<Link
 					href={`/${equipoSlug}/${entornoSlug}/documentos`}
-					className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800"
+					className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
 				>
 					Documentos
+				</Link>
+				<Link
+					href={`/${equipoSlug}/${entornoSlug}/pizarra`}
+					className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
+				>
+					Pizarra
 				</Link>
 			</div>
 			<div className="my-4 rounded border border-neutral-700 p-4">

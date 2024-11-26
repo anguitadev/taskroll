@@ -8,31 +8,32 @@ export default async function DocumentosLayout({
 	params,
 }: {
 	children: React.ReactNode;
-	params: Promise<{ equipo: string; entorno: string }>;
+	params: Promise<{ equipo: string; entorno: string; proyecto: string }>;
 }) {
+	const proyectoSlug = (await params).proyecto;
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
-	const documentosEntorno = await getDocumentosByEntornoSlug(entornoSlug);
+	const documentosEntorno = await getDocumentosByEntornoSlug(proyectoSlug);
 
 	return (
 		<>
 			<div className="my-6 flex w-full items-center justify-between border-b border-neutral-700">
 				<div>
 					<Link
-						href={`/${equipoSlug}/${entornoSlug}`}
+						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}`}
 						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
 					>
 						Tareas
 					</Link>
 					<Link
-						href={`/${equipoSlug}/${entornoSlug}/documentos`}
+						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}/documentos`}
 						className="transitionborder-b cursor-pointer rounded-t border-b-2 border-indigo-600 bg-neutral-800 px-4 py-2"
 					>
 						Documentos
 					</Link>
 					<Link
-						href={`/${equipoSlug}/${entornoSlug}/pizarra`}
+						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}/pizarra`}
 						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
 					>
 						Pizarra
@@ -50,7 +51,7 @@ export default async function DocumentosLayout({
 					/>
 				)}
 
-				{documentosEntorno && documentosEntorno.length > 0 ? children : <span className="m-auto text-neutral-400">No hay documentos en el entorno.</span>}
+				{documentosEntorno && documentosEntorno.length > 0 ? children : <span className="m-auto text-neutral-400">No hay documentos en el proyecto.</span>}
 			</div>
 		</>
 	);

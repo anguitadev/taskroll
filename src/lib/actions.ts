@@ -49,6 +49,9 @@ export async function createEntorno({
 	if (!data || errorEntornos) {
 		return console.log(errorEntornos);
 	}
+
+	await createPizarra(data[0].id);
+
 	const { error } = await supabase.from("Usuarios_Entornos").insert({
 		entorno: data![0].id,
 		usuario: user!.id,
@@ -60,6 +63,18 @@ export async function createEntorno({
 	} else {
 		revalidatePath("/", "layout");
 		redirect("/" + equipo.slug + "/" + data![0].slug);
+	}
+}
+
+export async function createPizarra(idEntorno: string) {
+	const supabase = await createClient();
+
+	const { error } = await supabase.from("Pizarras").insert({
+		entorno: idEntorno
+	});
+
+	if (error) {
+		console.log(error);
 	}
 }
 
@@ -107,6 +122,9 @@ export async function createProyecto(
 			error: error?.code,
 		};
 	} else {
+
+		createPizarra(proyectoNuevo!.id);
+
 		const entorno = await getEntornoById(idEntorno);
 
 		const equipo = await getEquipoByEntornoId(idEntorno);
@@ -147,4 +165,21 @@ export async function createDocumento(fileKey: string, nombreDocumento: string, 
 	if (error) return error;
 	revalidatePath(pathname + "/" + fileKey);
 	redirect(pathname + "/" + fileKey);
+}
+
+export async function updatePizarra(slugEntorno: string, contenido: string) {
+	const supabase = await createClient();
+	const { data: entorno } = await supabase
+		.from("Entornos")
+		.select("id")
+		.eq("slug", slugEntorno)
+		.limit(1)
+		.single();
+	if (entorno) {
+		const { error } = await supabase
+			.from("Pizarras")
+			.update({ contenido: contenido })
+			.eq("entorno", entorno.id);
+		if (error) throw error;
+	}
 }

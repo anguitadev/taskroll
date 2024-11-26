@@ -36,21 +36,18 @@ export type Database = {
     Tables: {
       Documentos: {
         Row: {
-          contenido: string | null
           entorno: string
           id: string
           nombre: string
           url: string | null
         }
         Insert: {
-          contenido?: string | null
           entorno: string
           id?: string
           nombre: string
           url?: string | null
         }
         Update: {
-          contenido?: string | null
           entorno?: string
           id?: string
           nombre?: string
@@ -205,6 +202,32 @@ export type Database = {
             columns: ["usuario"]
             isOneToOne: false
             referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Pizarras: {
+        Row: {
+          contenido: string | null
+          entorno: string
+          id: number
+        }
+        Insert: {
+          contenido?: string | null
+          entorno: string
+          id?: number
+        }
+        Update: {
+          contenido?: string | null
+          entorno?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Pizarras_entorno_fkey"
+            columns: ["entorno"]
+            isOneToOne: false
+            referencedRelation: "Entornos"
             referencedColumns: ["id"]
           },
         ]

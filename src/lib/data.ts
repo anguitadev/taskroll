@@ -67,14 +67,46 @@ export async function getEntornosbyUsuario() {
 	}
 }
 
-export async function getEntornoBySlug(slug: string) {
+export async function getEntornoBySlug(entornoSlug: string) {
 	const supabase = await createClient();
 
 	const { data } = await supabase
 		.from("Entornos")
 		.select("*")
-		.eq("slug", slug)
+		.eq("slug", entornoSlug)
 		.is("entorno", null)
+		.limit(1)
+		.single();
+
+	return data;
+}
+
+export async function getEntornoBySlugAndEquipo(entornoSlug: string, equipoSlug: string) {
+	const supabase = await createClient();
+
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	if (equipo) {
+		const { data } = await supabase
+			.from("Entornos")
+			.select("*")
+			.eq("slug", entornoSlug)
+			.eq("equipo", equipo.id)
+			.is("entorno", null)
+			.limit(1)
+			.single();
+
+		return data;
+	}
+}
+
+export async function getEquipoBySlug(equipoSlug: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Equipos")
+		.select("id")
+		.eq("slug", equipoSlug)
 		.limit(1)
 		.single();
 
@@ -178,4 +210,34 @@ export async function getDocumentosByEntornoSlug(entornoSlug: string) {
 		const { data } = await supabase.from("Documentos").select("*").eq("entorno", entornoId.id);
 		return data;
 	}
+}
+
+export async function getPizarraFromEntorno(entornoSlug: string) {
+	const supabase = await createClient();
+
+	const entorno = await getEntornoBySlug(entornoSlug);
+
+	const { data } = await supabase
+		.from("Pizarras")
+		.select("contenido")
+		.eq("entorno", entorno!.id)
+		.limit(1)
+		.single();
+
+	return data;
+}
+
+export async function getPizarraFromProyecto(proyectoSlug: string) {
+	const supabase = await createClient();
+
+	const proyecto = await getProyectoBySlug(proyectoSlug);
+
+	const { data } = await supabase
+		.from("Pizarras")
+		.select("contenido")
+		.eq("entorno", proyecto!.id)
+		.limit(1)
+		.single();
+
+	return data;
 }

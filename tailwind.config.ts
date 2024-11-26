@@ -48,5 +48,5 @@ export default withUt({
 			},
 		},
 	},
-	plugins: [plugin],
+	plugins: [plugin, require("@tailwindcss/typography")],
 });
