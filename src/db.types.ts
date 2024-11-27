@@ -226,8 +226,62 @@ export type Database = {
           {
             foreignKeyName: "Pizarras_entorno_fkey"
             columns: ["entorno"]
+            isOneToOne: true
+            referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Tareas: {
+        Row: {
+          descripcion: string | null
+          entorno: string
+          estado: string
+          fecha_fin: string | null
+          fecha_inicio: string
+          id: string
+          prioridad: string
+          propietario: string
+          slug: string
+          titulo: string
+        }
+        Insert: {
+          descripcion?: string | null
+          entorno: string
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          id?: string
+          prioridad?: string
+          propietario: string
+          slug: string
+          titulo: string
+        }
+        Update: {
+          descripcion?: string | null
+          entorno?: string
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          id?: string
+          prioridad?: string
+          propietario?: string
+          slug?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Tareas_entorno_fkey"
+            columns: ["entorno"]
             isOneToOne: false
             referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Tareas_propietario_fkey"
+            columns: ["propietario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
             referencedColumns: ["id"]
           },
         ]
@@ -324,6 +378,42 @@ export type Database = {
           },
           {
             foreignKeyName: "Usuarios_Equipos_usuario_fkey"
+            columns: ["usuario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Usuarios_Tareas: {
+        Row: {
+          admin: boolean
+          id: string
+          tarea: string
+          usuario: string
+        }
+        Insert: {
+          admin?: boolean
+          id?: string
+          tarea: string
+          usuario: string
+        }
+        Update: {
+          admin?: boolean
+          id?: string
+          tarea?: string
+          usuario?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Usuarios_Tareas_tarea_fkey"
+            columns: ["tarea"]
+            isOneToOne: false
+            referencedRelation: "Tareas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Usuarios_Tareas_usuario_fkey"
             columns: ["usuario"]
             isOneToOne: false
             referencedRelation: "Usuarios"
