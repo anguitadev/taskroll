@@ -161,16 +161,21 @@ export default function Sidebar({
 	}
 
 	useEffect(() => {
-		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos!.equipo === equipo.id));
-	}, [equipo]);
+		document.getElementById("select")?.hidePopover();
+	}, [pathname]);
 
 	useEffect(() => {
+		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos!.equipo === equipo.id));
+	}, [equipo, entornos]);
+
+	useEffect(() => {
+		setNotificaciones(0);
 		try {
 			getNotificacionNumberByEquipo(equipo.id).then(res => res > 0 && setNotificaciones(res));
 		} catch (error) {
 			console.log(error);
 		}
-	}, [pathname]);
+	}, [pathname, equipo.id]);
 
 	return (
 		<>

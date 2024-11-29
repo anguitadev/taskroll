@@ -99,13 +99,13 @@ export default function ListaNotificaciones({
 								<div
 									className={
 										"flex size-5 items-center rounded-full " +
-										estados[notificacion.tarea?.estado!]
+										estados[notificacion.tarea?.estado]
 									}
 								>
 									<div
 										className={
 											"m-auto size-4 rounded-full border-2 border-neutral-900 " +
-											estados[notificacion.tarea?.estado!]
+											estados[notificacion.tarea?.estado]
 										}
 									/>
 								</div>

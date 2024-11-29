@@ -103,7 +103,7 @@ export default function AjustesTarea({
 			setInitial(false);
 			return;
 		}
-	},[usuarios, estado, initial, prioridad, fechaFinal]);
+	}, [usuarios, estado, initial, prioridad, fechaFinal]);
 
 	useEffect(() => {
 		if (mostrarUsuarios) {
@@ -130,7 +130,7 @@ export default function AjustesTarea({
 	useEffect(() => {
 		if (initial) return;
 		try {
-			cambiarFechaFinal(tarea.id, fechaFinal?.toISOString()!);
+			if (fechaFinal) cambiarFechaFinal(tarea.id, fechaFinal.toISOString());
 		} catch (error) {
 			console.log(error);
 		}
@@ -234,17 +234,20 @@ export default function AjustesTarea({
 				<div className="flex items-center gap-2 text-neutral-400">
 					<CalendarDays className="size-5" /> <span>Fecha límite</span>
 				</div>
-				<div className="relative flex w-1/2 items-center">
+				<div
+					className="relative flex w-1/2 cursor-pointer items-center"
+					onClick={toggleCalendario}
+				>
 					<span
 						className={clsx(
-							"cursor-pointer font-mono font-semibold",
-							fechaFinal?.getDate()! <= new Date().getDate()
+							"font-mono font-semibold",
+							fechaFinal && fechaFinal <= new Date()
 								? "text-red-400"
 								: "text-green-400",
 						)}
-						onClick={toggleCalendario}
 					>
-						{fechaFinal?.getDate() == new Date().getDate()
+						{fechaFinal?.toLocaleDateString("es-ES") ==
+						new Date().toLocaleDateString("es-ES")
 							? "Hoy"
 							: fechaFinal?.toLocaleDateString("es-ES")}
 					</span>

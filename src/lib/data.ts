@@ -360,8 +360,6 @@ export async function getNotificacionesByEquipoSlug(equipoSlug: string) {
 
 	if (!equipo) return;
 
-	console.log(equipo.id);
-
 	const { data } = await supabase
 		.from("Notificaciones")
 		.select(

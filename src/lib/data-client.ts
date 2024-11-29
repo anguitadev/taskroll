@@ -57,9 +57,9 @@ export async function getNotificacionNumberByEquipo(idEquipo: string) {
 
 	const notificaciones = data as unknown as Notificacion[];
 
-	notificaciones?.filter(
-		notificacion => notificacion.tarea?.entorno?.entorno?.equipo?.id === idEquipo,
+	const notificacionesEquipo = notificaciones.filter(
+		notificacion => notificacion.tarea.entorno.entorno.equipo.id == idEquipo,
 	);
 
-	return notificaciones?.length;
+	return notificacionesEquipo.length;
 }
