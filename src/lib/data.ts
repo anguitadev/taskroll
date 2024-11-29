@@ -295,10 +295,12 @@ export async function getEntornoAndProyectoNamesByTareaSlug(tareaSlug: string) {
 		.limit(1)
 		.single();
 
+	if (!proyecto?.Entornos?.entorno) return null;
+
 	const { data: entorno } = await supabase
 		.from("Entornos")
 		.select("nombre")
-		.eq("id", proyecto?.Entornos?.entorno!)
+		.eq("id", proyecto.Entornos.entorno)
 		.limit(1)
 		.single();
 
@@ -313,10 +315,63 @@ export async function getEntornoAndProyectoNamesByTareaSlug(tareaSlug: string) {
 
 export async function getUsuariosByTarea(tareaId: string) {
 	const supabase = await createClient();
-	const {data} = await supabase
+	const { data } = await supabase
 		.from("Usuarios_Tareas")
 		.select("Usuarios(*)")
 		.eq("tarea", tareaId);
-		
-	return data
+
+	return data;
+}
+
+export async function getComentariosByTarea(tareaId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Comentarios")
+		.select("*, Usuarios(nombre_completo, color)")
+		.eq("tarea", tareaId)
+		.order("created_at", { ascending: false });
+	return data;
+}
+
+interface Notificacion {
+	id: string;
+	notificacion: string;
+	created_at: string;
+	tarea: {
+		estado: string;
+		titulo: string;
+		slug: string;
+		entorno: {
+			slug: string;
+			entorno: {
+				slug: string;
+				equipo: {
+					slug: string;
+				};
+			};
+		};
+	};
+}
+
+export async function getNotificacionesByEquipoSlug(equipoSlug: string) {
+	const supabase = await createClient();
+
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	if (!equipo) return;
+
+	console.log(equipo.id);
+
+	const { data } = await supabase
+		.from("Notificaciones")
+		.select(
+			"id, notificacion, created_at, tarea:Tareas(estado, titulo, slug, entorno:Entornos(slug, entorno(slug, equipo:Equipos(slug))))",
+		)
+		.order("created_at", { ascending: false });
+
+	const notificaciones = data as unknown as Notificacion[];
+
+	return notificaciones?.filter(
+		notificacion => notificacion.tarea?.entorno?.entorno?.equipo?.slug === equipoSlug,
+	);
 }

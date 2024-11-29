@@ -34,6 +34,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      Comentarios: {
+        Row: {
+          comentario: string
+          created_at: string
+          id: string
+          tarea: string
+          usuario: string
+        }
+        Insert: {
+          comentario: string
+          created_at?: string
+          id?: string
+          tarea: string
+          usuario: string
+        }
+        Update: {
+          comentario?: string
+          created_at?: string
+          id?: string
+          tarea?: string
+          usuario?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Comentarios_tarea_fkey"
+            columns: ["tarea"]
+            isOneToOne: false
+            referencedRelation: "Tareas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Comentarios_usuario_fkey"
+            columns: ["usuario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Documentos: {
         Row: {
           entorno: string
@@ -206,6 +245,55 @@ export type Database = {
           },
         ]
       }
+      Notificaciones: {
+        Row: {
+          created_at: string
+          id: string
+          notificacion: string
+          tarea: string
+          usuario_destinatario: string
+          usuario_origen: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notificacion: string
+          tarea: string
+          usuario_destinatario: string
+          usuario_origen: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notificacion?: string
+          tarea?: string
+          usuario_destinatario?: string
+          usuario_origen?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Notificaciones_tarea_fkey"
+            columns: ["tarea"]
+            isOneToOne: false
+            referencedRelation: "Tareas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Notificaciones_usuario_destinatario_fkey"
+            columns: ["usuario_destinatario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Notificaciones_usuario_origen_fkey"
+            columns: ["usuario_origen"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Pizarras: {
         Row: {
           contenido: string | null
@@ -237,7 +325,7 @@ export type Database = {
           descripcion: string | null
           entorno: string
           estado: string
-          fecha_fin: string | null
+          fecha_fin: string
           fecha_inicio: string
           id: string
           prioridad: string
@@ -249,7 +337,7 @@ export type Database = {
           descripcion?: string | null
           entorno: string
           estado?: string
-          fecha_fin?: string | null
+          fecha_fin: string
           fecha_inicio?: string
           id?: string
           prioridad?: string
@@ -261,7 +349,7 @@ export type Database = {
           descripcion?: string | null
           entorno?: string
           estado?: string
-          fecha_fin?: string | null
+          fecha_fin?: string
           fecha_inicio?: string
           id?: string
           prioridad?: string
@@ -387,19 +475,16 @@ export type Database = {
       }
       Usuarios_Tareas: {
         Row: {
-          admin: boolean
           id: string
           tarea: string
           usuario: string
         }
         Insert: {
-          admin?: boolean
           id?: string
           tarea: string
           usuario: string
         }
         Update: {
-          admin?: boolean
           id?: string
           tarea?: string
           usuario?: string

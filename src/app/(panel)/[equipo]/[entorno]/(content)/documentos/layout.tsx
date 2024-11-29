@@ -50,7 +50,7 @@ export default async function DocumentosLayout({
 					/>
 				)}
 
-				{documentosEntorno && documentosEntorno.length > 0 ? children : <span className="m-auto text-neutral-400">No hay documentos en el entorno.</span>}
+				{documentosEntorno && documentosEntorno.length > 0 ? children : <span className="m-auto text-neutral-400 italic">No hay documentos en el entorno.</span>}
 			</div>
 		</>
 	);

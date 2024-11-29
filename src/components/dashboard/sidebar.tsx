@@ -1,6 +1,7 @@
 "use client";
 
 import { Tables } from "@/db.types";
+import { getNotificacionNumberByEquipo } from "@/lib/data-client";
 import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import {
@@ -8,6 +9,7 @@ import {
 	ArrowLeftFromLine,
 	ArrowRight,
 	ArrowRightFromLine,
+	Bell,
 	BriefcaseBusiness,
 	ChevronDown,
 	ChevronRight,
@@ -15,7 +17,6 @@ import {
 	House,
 	List,
 	LogOut,
-	Mail,
 	Plus,
 	Settings,
 	Timer,
@@ -65,6 +66,8 @@ export default function Sidebar({
 	const [color, setColor] = useState<string | null>(null);
 	const [sidebar, setSidebar] = useState(false);
 	const [entorno, setEntorno] = useState<string | null>(null);
+	const [entornosSidebar, setEntornosSidebar] = useState(entornos);
+	const [notificaciones, setNotificaciones] = useState(0);
 
 	const supabase = createClient();
 
@@ -122,7 +125,7 @@ export default function Sidebar({
 	const links = [
 		{ name: "Inicio", icon: House, href: "/" + equipo!.slug },
 		{ name: "Marcajes", icon: Timer, href: "/" + equipo!.slug + "/marcajes" },
-		{ name: "Bandeja de entrada", icon: Mail, href: "/" + equipo!.slug + "/bandeja-entrada" },
+		{ name: "Notificaciones", icon: Bell, href: "/" + equipo!.slug + "/notificaciones" },
 		{ name: "Documentos", icon: FileText, href: "/" + equipo!.slug + "/documentos" },
 	];
 
@@ -156,6 +159,18 @@ export default function Sidebar({
 			toggle.classList.add("rotate-90");
 		}
 	}
+
+	useEffect(() => {
+		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos!.equipo === equipo.id));
+	}, [equipo]);
+
+	useEffect(() => {
+		try {
+			getNotificacionNumberByEquipo(equipo.id).then(res => res > 0 && setNotificaciones(res));
+		} catch (error) {
+			console.log(error);
+		}
+	}, [pathname]);
 
 	return (
 		<>
@@ -275,14 +290,19 @@ export default function Sidebar({
 												key={link.name}
 												href={link.href}
 												className={clsx(
-													"flex grow items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
+													"flex items-center gap-2 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 													{
 														"bg-neutral-800": pathname === link.href,
 													},
 												)}
 											>
-												<LinkIcon className="size-5" />
-												<span>{link.name}</span>
+												<div className="flex grow items-center gap-3">
+													<LinkIcon className="size-5" />
+													<span>{link.name}</span>
+												</div>
+												{link.name === "Notificaciones" && notificaciones > 0 && (
+													<span className="bg-indigo-500 text-xs rounded-full size-5 flex items-center justify-center">{notificaciones}</span>
+												)}
 											</Link>
 										);
 									})}
@@ -305,12 +325,11 @@ export default function Sidebar({
 									<BriefcaseBusiness className="size-5" />
 									<span>Todos los entornos</span>
 								</Link>
-								{entornos.length > 0 ? (
-									entornos.map(entorno => {
+								{entornosSidebar.length > 0 ? (
+									entornosSidebar.map(entorno => {
 										const entornoData = entorno.Entornos;
 										if (!entornoData) return null;
 
-										const isActiveEntorno = entornoData.equipo === equipo?.id;
 										const isCurrentPath = pathname
 											.split("/")
 											.includes(entornoData?.slug);
@@ -319,7 +338,7 @@ export default function Sidebar({
 											openProyectos(entornoData?.slug);
 										}
 
-										return isActiveEntorno ? (
+										return (
 											<div key={entornoData?.nombre}>
 												<div
 													className={clsx(
@@ -421,14 +440,6 @@ export default function Sidebar({
 													)}
 												</div>
 											</div>
-										) : (
-											<button
-												popoverTarget="nuevo-entorno"
-												key={entornoData?.id}
-												className="ml-4 cursor-pointer text-left text-sm text-neutral-400 underline"
-											>
-												Crear nuevo entorno
-											</button>
 										);
 									})
 								) : (
