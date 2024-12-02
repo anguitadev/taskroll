@@ -260,17 +260,20 @@ export async function cambiarUsuariosTarea(idTarea: string, usuarios: Usuarios) 
 			.eq("tarea", idTarea)
 			.in("usuario", usuariosToRemove);
 
-		if (deleteError) throw deleteError;
+		if (deleteError) console.log(deleteError);
 	}
 
-	const upsertData = usuarios.map(item => ({
-		tarea: idTarea,
-		usuario: item.Usuarios!.id,
-	}));
+	const usuariosToAdd = newUsuariosIds.filter(id => !currentUsuariosIds.includes(id));
 
-	const { error: upsertError } = await supabase.from("Usuarios_Tareas").upsert(upsertData);
+	console.log(newUsuariosIds);
 
-	if (upsertError) throw upsertError;
+	if (usuariosToAdd.length > 0) {
+		const { error: insertError } = await supabase
+			.from("Usuarios_Tareas")
+			.insert(usuariosToAdd.map(id => ({ tarea: idTarea, usuario: id })));
+
+		if (insertError) console.log(insertError);
+	}
 
 	const notificacion = " te ha añadido a la tarea.";
 	createNotificacion(idTarea, notificacion);
@@ -335,4 +338,87 @@ export async function removeNotificacion(idNotificacion: string) {
 	const supabase = await createClient();
 	const { error } = await supabase.from("Notificaciones").delete().eq("id", idNotificacion);
 	if (error) return error;
+}
+
+export async function updateTituloTarea(idTarea: string, titulo: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Tareas").update({ titulo: titulo }).eq("id", idTarea);
+	if (error) throw error;
+}
+
+export async function deleteTarea(idTarea: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Tareas").delete().eq("id", idTarea);
+	if (error) throw error;
+}
+
+export async function deleteTareaBySlug(slugTarea: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Tareas").delete().eq("slug", slugTarea);
+	if (error) throw error;
+}
+
+export async function deleteAllNotificaciones() {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return;
+
+	const { error } = await supabase
+		.from("Notificaciones")
+		.delete()
+		.eq("usuario_destinatario", usuario.id);
+	if (error) throw error;
+}
+
+export async function createTarea(
+	titulo: string,
+	estado: string,
+	prioridad: string,
+	fecha_fin: string,
+	idProyecto: string,
+	usuarios: Usuarios,
+) {
+	const supabase = await createClient();
+	const usuario = await getUsuario();
+	if (!usuario) return;
+
+	let tareaSlug = titulo
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.replace(/ /g, "-");
+
+	const { data: tarea } = await supabase.from("Tareas").select("*").like("slug", tareaSlug);
+
+	if (tarea && tarea.length > 0) {
+		tareaSlug += "-" + tarea.length;
+	}
+
+	const { data: idTarea, error } = await supabase
+		.from("Tareas")
+		.insert({
+			titulo: titulo,
+			slug: tareaSlug,
+			estado: estado,
+			prioridad: prioridad,
+			fecha_fin: fecha_fin,
+			entorno: idProyecto,
+			propietario: usuario.id,
+		})
+		.select("id")
+		.single();
+
+	if (error) throw error;
+
+	if (usuarios && usuarios.length > 0) {
+		usuarios.map(async usuario => {
+			const { error } = await supabase.from("Usuarios_Tareas").insert({
+				tarea: idTarea.id,
+				usuario: usuario.Usuarios!.id,
+			});
+			if (error) throw error;
+		});
+	}
 }

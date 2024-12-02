@@ -1,6 +1,8 @@
 "use client";
 
 import { addComentario } from "@/lib/actions";
+import { removeComentario } from "@/lib/data-client";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 type Comentario = {
@@ -18,9 +20,11 @@ type Comentario = {
 export default function ComentariosTarea({
 	comentarios,
 	idTarea,
+	idUsuario,
 }: {
 	comentarios: Comentario[] | null;
 	idTarea: string;
+	idUsuario: string | undefined;
 }) {
 	const [comentariosTarea, setComentariosTarea] = useState<Comentario[] | null>(
 		comentarios ?? null,
@@ -41,6 +45,19 @@ export default function ComentariosTarea({
 		}
 	}
 
+	async function handleEliminarComentario(comentarioId: string) {
+		try {
+			await removeComentario(comentarioId);
+		} catch (error) {
+			console.log(error);
+		} finally {
+			if (comentariosTarea)
+				setComentariosTarea(
+					comentariosTarea.filter(comentario => comentario.id !== comentarioId),
+				);
+		}
+	}
+
 	return (
 		<>
 			<span className="block border-b border-neutral-800 p-3 font-semibold">Comentarios</span>
@@ -50,7 +67,7 @@ export default function ComentariosTarea({
 						comentariosTarea.map(comentario => (
 							<div
 								key={comentario.id}
-								className="flex flex-col gap-6 rounded bg-neutral-900 p-6"
+								className="group flex flex-col gap-6 rounded-lg border border-neutral-700 bg-neutral-900 p-4"
 							>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
@@ -66,9 +83,25 @@ export default function ComentariosTarea({
 											{comentario.Usuarios?.nombre_completo}
 										</span>
 									</div>
-									<span className="text-sm text-neutral-400">
-										{new Date(comentario.created_at).toLocaleString()}
-									</span>
+									{comentario.usuario == idUsuario ? (
+										<div>
+											<span className="text-sm text-neutral-400 group-hover:hidden">
+												{new Date(comentario.created_at).toLocaleString()}
+											</span>
+											<button
+												className="hidden group-hover:block"
+												onClick={() =>
+													handleEliminarComentario(comentario.id)
+												}
+											>
+												<Trash2 className="size-4 stroke-red-500" />
+											</button>
+										</div>
+									) : (
+										<span className="text-sm text-neutral-400">
+											{new Date(comentario.created_at).toLocaleString()}
+										</span>
+									)}
 								</div>
 								<span className="text-sm leading-relaxed">
 									{comentario.comentario}
@@ -87,7 +120,7 @@ export default function ComentariosTarea({
 				>
 					<input
 						type="text"
-						className="w-full rounded p-2"
+						className="w-full rounded border border-neutral-700 p-2"
 						placeholder="Escribe un comentario..."
 						value={comentario}
 						onChange={e => setComentario(e.target.value)}

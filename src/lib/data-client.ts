@@ -12,7 +12,11 @@ export async function getUsuariosFromEntorno(idEntorno: string) {
 	const ids = usuarios.filter(item => item.usuario !== null).map(item => item.usuario);
 
 	if (ids) {
-		const { data: usuarios } = await supabase.from("Usuarios").select("*").in("id", ids);
+		const { data: usuarios } = await supabase
+			.from("Usuarios")
+			.select("*")
+			.in("id", ids)
+			.order("nombre_completo", { ascending: true });
 		return usuarios;
 	}
 }
@@ -62,4 +66,78 @@ export async function getNotificacionNumberByEquipo(idEquipo: string) {
 	);
 
 	return notificacionesEquipo.length;
+}
+
+export async function removeComentario(idComentario: string) {
+	const supabase = createClient();
+	const { error } = await supabase.from("Comentarios").delete().eq("id", idComentario);
+	if (error) throw error;
+}
+
+interface Tarea {
+	usuario: { color: string; nombre_completo: string };
+	tarea: {
+		id: string;
+		titulo: string;
+		slug: string;
+		fecha_fin: string;
+		estado: string;
+		prioridad: string;
+	};
+}
+
+export async function getTareasByProyectoSlug(idProyecto: string) {
+	const supabase = createClient();
+
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) return;
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad)")
+		.eq("usuario", user.id)
+		.eq("tarea.entorno", idProyecto);
+
+	return data as unknown as Tarea[];
+}
+
+interface UsuariosTareas {
+	Usuarios: {
+		id: string;
+		color: string;
+		nombre_completo: string;
+	};
+}
+
+export async function getUsuariosByTarea(tareaId: string) {
+	const supabase = createClient();
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("Usuarios(*)")
+		.eq("tarea", tareaId);
+
+	return data as unknown as UsuariosTareas[];
+}
+
+export async function getUsuario() {
+	const supabase = createClient();
+
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (user) {
+		const { data } = await supabase
+			.from("Usuarios")
+			.select("*")
+			.eq("id", user.id)
+			.limit(1)
+			.single();
+		if (data) {
+			return data;
+		}
+	}
 }

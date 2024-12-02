@@ -318,7 +318,8 @@ export async function getUsuariosByTarea(tareaId: string) {
 	const { data } = await supabase
 		.from("Usuarios_Tareas")
 		.select("Usuarios(*)")
-		.eq("tarea", tareaId);
+		.eq("tarea", tareaId)
+		.order("Usuarios(nombre_completo)", { ascending: true });
 
 	return data;
 }

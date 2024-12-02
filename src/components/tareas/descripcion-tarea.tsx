@@ -33,7 +33,7 @@ export default function DescripcionTarea({
 				<span className="text-lg font-semibold">Descripción</span>
 				{descripcion && (
 					<button
-						className="flex items-center gap-2 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm text-neutral-400"
+						className="flex items-center gap-2 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm text-neutral-400  transition hover:border-indigo-500 hover:bg-indigo-600 hover:text-neutral-100"
 						onClick={handleEditar}
 					>
 						<PencilLine className="size-5" />
@@ -48,7 +48,7 @@ export default function DescripcionTarea({
 			) : (
 				<form className="max-w-full">
 					<textarea
-						className="w-full mt-4 h-[calc(100vh-425px)] overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-8"
+						className="mt-4 h-[calc(100vh-425px)] w-full overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-8"
 						value={contenidoDescripcion ?? ""}
 						onChange={e => setContenidoDescripcion(e.target.value)}
 					></textarea>

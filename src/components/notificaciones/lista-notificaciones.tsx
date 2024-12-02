@@ -1,6 +1,6 @@
 "use client";
 
-import { removeNotificacion } from "@/lib/actions";
+import { deleteAllNotificaciones, removeNotificacion } from "@/lib/actions";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -51,26 +51,24 @@ export default function ListaNotificaciones({
 		}
 	}
 
-    function handleEliminarTodasNotificaciones() {
-        try {
-            todasNotificaciones.forEach(notificacion => {
-                removeNotificacion(notificacion.id);
-            });
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setNotificaciones([]);
-        }
-    }
+	function handleEliminarTodasNotificaciones() {
+		try {
+			deleteAllNotificaciones();
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setNotificaciones([]);
+		}
+	}
 
 	return (
 		<>
-			<div className="flex justify-between items-center">
+			<div className="flex items-center justify-between">
 				<h1 className="text-3xl font-bold">Últimas notificaciones</h1>
 				{notificaciones && notificaciones.length > 0 && (
 					<button
 						onClick={handleEliminarTodasNotificaciones}
-						className="items-center gap-2 rounded border border-indigo-500 bg-indigo-600 px-2 py-1 text-neutral-100 flex"
+						className="flex items-center gap-2 rounded border border-indigo-500 bg-indigo-600 px-2 py-1 text-neutral-100"
 					>
 						<Trash2 className="size-4" /> Eliminar Notificaciones
 					</button>

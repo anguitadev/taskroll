@@ -1,7 +1,12 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
-import { cambiarEstadoTarea, cambiarFechaFinal, cambiarPrioridadTarea } from "@/lib/actions";
+import {
+	cambiarEstadoTarea,
+	cambiarFechaFinal,
+	cambiarPrioridadTarea,
+	cambiarUsuariosTarea,
+} from "@/lib/actions";
 import { getUsuariosFromEntorno } from "@/lib/data-client";
 import clsx from "clsx";
 import { es } from "date-fns/locale/es";
@@ -87,9 +92,9 @@ export default function AjustesTarea({
 	}
 
 	function addRemoveUsuario(idUsuario: string) {
-		const usuario = usuariosEntorno?.find(item => item.id === idUsuario);
+		const usuario = usuariosEntorno?.find(usuario => usuario.id === idUsuario);
 
-		const inTarea = usuarios?.find(item => item.Usuarios?.id === idUsuario);
+		const inTarea = usuarios?.find(usuario => usuario.Usuarios?.id === idUsuario);
 
 		if (inTarea) {
 			setUsuarios(usuarios!.filter(item => item.Usuarios?.id !== idUsuario));
@@ -106,11 +111,16 @@ export default function AjustesTarea({
 	}, [usuarios, estado, initial, prioridad, fechaFinal]);
 
 	useEffect(() => {
+		if (initial || !usuarios) return;
+		cambiarUsuariosTarea(tarea.id, usuarios);
+	}, [usuarios]);
+
+	useEffect(() => {
 		if (mostrarUsuarios) {
 			if (initial) return;
 			try {
 				getUsuariosFromEntorno(tarea.entorno).then(data => {
-					if (DataTransfer) setUsuariosEntorno(data!);
+					if (data) setUsuariosEntorno(data!);
 				});
 			} catch (error) {
 				console.log(error);
@@ -234,11 +244,9 @@ export default function AjustesTarea({
 				<div className="flex items-center gap-2 text-neutral-400">
 					<CalendarDays className="size-5" /> <span>Fecha límite</span>
 				</div>
-				<div
-					className="relative flex w-1/2 cursor-pointer items-center"
-					onClick={toggleCalendario}
-				>
+				<div className="relative flex w-1/2 cursor-pointer items-center">
 					<span
+						onClick={toggleCalendario}
 						className={clsx(
 							"font-mono font-semibold",
 							fechaFinal && fechaFinal <= new Date()
