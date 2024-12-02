@@ -24,8 +24,9 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 	async function loadTareas() {
 		try {
 			const data = await getTareasByProyectoSlug(idProyecto);
-			if (data) {
-				data.sort((a, b) => {
+			const tareasFiltradas = data?.filter(tarea => tarea.tarea !== null);
+			if (tareasFiltradas) {
+				tareasFiltradas.sort((a, b) => {
 					if (a.tarea?.fecha_fin && b.tarea?.fecha_fin) {
 						const fechaA = new Date(a.tarea?.fecha_fin);
 						const fechaB = new Date(b.tarea?.fecha_fin);
@@ -34,7 +35,7 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 						return 0;
 					}
 				});
-				setTareas(data);
+				setTareas(tareasFiltradas);
 			}
 		} catch (error) {
 			console.log(error);
@@ -45,7 +46,15 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 		loadTareas();
 	}, [idProyecto, pathname]);
 
-	if (!tareas || tareas.length === 0 || tareas[0].tarea === null)
+	let zeroTareas = false;
+
+	tareas.forEach(tarea => {
+		if (tarea.tarea === null) {
+			zeroTareas = true;
+		}
+	});
+
+	if (!tareas || tareas.length === 0 || zeroTareas === null)
 		return <span className="mt-4 text-center italic text-neutral-400">No hay tareas...</span>;
 
 	const tareasAbiertas = tareas.filter(tarea => tarea.tarea?.estado === "Abierto");

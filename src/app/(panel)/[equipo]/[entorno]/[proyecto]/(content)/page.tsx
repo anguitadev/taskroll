@@ -43,7 +43,7 @@ export default async function Proyecto({
 				</div>
 				<button
 					className="mb-2 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
-					popoverTarget="nueva-tarea"
+					popoverTarget={"nueva-tarea-"+proyecto.id}
 				>
 					<Plus className="size-5" />
 					Añadir Tarea

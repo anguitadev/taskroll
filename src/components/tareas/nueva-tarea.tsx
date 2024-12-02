@@ -76,7 +76,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	const pathname = usePathname();
 
 	useEffect(() => {
-		document.getElementById("nueva-tarea")?.hidePopover();
+		document.getElementById("nueva-tarea-"+entorno)?.hidePopover();
 	}, [pathname]);
 
 	async function handleCreateTarea() {
@@ -145,7 +145,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	return (
 		<>
 			<div
-				id="nueva-tarea"
+				id={"nueva-tarea-"+entorno}
 				popover="auto"
 				className="w-[750px] rounded-lg border border-neutral-800 p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm overflow-visible"
 			>

@@ -374,3 +374,32 @@ export async function getNotificacionesByEquipoSlug(equipoSlug: string) {
 		notificacion => notificacion.tarea?.entorno?.entorno?.equipo?.slug === equipoSlug,
 	);
 }
+
+interface Tarea {
+	usuario: { color: string; nombre_completo: string };
+	tarea: {
+		id: string;
+		titulo: string;
+		slug: string;
+		fecha_fin: string;
+		estado: string;
+		prioridad: string;
+	};
+}
+
+export async function getTareasByProyectoSlug(idProyecto: string) {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return;
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad)")
+		.eq("usuario", usuario.id)
+		.eq("tarea.entorno", idProyecto);
+
+	return data as unknown as Tarea[];
+}
+
