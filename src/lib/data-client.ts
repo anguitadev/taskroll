@@ -222,11 +222,7 @@ export async function getProyectosByEntornoId(id: string) {
 		.select("entorno")
 		.eq("usuario", usuario.id);
 
-	console.log
-
 	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
-
-	console.log(entornoIds);
 
 	const { data } = await supabase.from("Entornos").select("*").eq("entorno", id).in("id", entornoIds!);
 

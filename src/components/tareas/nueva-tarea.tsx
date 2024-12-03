@@ -54,9 +54,9 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	const [prioridad, setPrioridad] = useState("Ninguna");
 	const [clientError, setClientError] = useState<string | null>(null);
 	const [textoBoton, setTextoBoton] = useState<string>("Crear Tarea");
-	const [entornos, setEntornos] = useState<{ id: any; nombre: any }[] | null>([]);
+	const [entornos, setEntornos] = useState<{ id: string; nombre: string }[] | null>([]);
 	const [entornoSeleccionado, setEntornoSeleccionado] = useState<string>("");
-	const [proyectos, setProyectos] = useState<{ id: any; nombre: any }[] | null>([]);
+	const [proyectos, setProyectos] = useState<{ id: string; nombre: string }[] | null>([]);
 	const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>(entorno);
 
 	useEffect(() => {
