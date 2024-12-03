@@ -1,9 +1,10 @@
 "use client";
 import { deleteTarea } from "@/lib/actions";
-import { getUsuariosByTarea } from "@/lib/data-client";
+import { getTareaLinkById, getUsuariosByTarea } from "@/lib/data-client";
 import clsx from "clsx";
 import { FlagTriangleRight, Settings2, Trash2 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 
 type Tarea = {
 	usuario: {
@@ -17,6 +18,12 @@ type Tarea = {
 		fecha_fin: string;
 		estado: string;
 		prioridad: string;
+		entorno: {
+			nombre: string;
+			entorno: {
+				nombre: string;
+			};
+		};
 	} | null;
 };
 
@@ -30,7 +37,13 @@ interface Usuario {
 
 import { useEffect, useState } from "react";
 
-export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
+export default function TablaTareas({
+	tareas,
+	extraData,
+}: {
+	tareas: Tarea[];
+	extraData?: boolean;
+}) {
 	const [tareasFiltradas, setTareasFiltradas] = useState<Tarea[]>(tareas);
 
 	const estados: { [key: string]: string } = {
@@ -79,13 +92,42 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 	}, [tareasFiltradas]);
 
 	const router = useRouter();
-	const pathname = usePathname();
+
+	async function handleRedirect(tareaId: string, isTarea: boolean) {
+		const link = await getTareaLinkById(tareaId);
+
+		if (link && isTarea)
+			router.push(
+				"/" +
+					link?.entorno.entorno.equipo.slug +
+					"/" +
+					link?.entorno.entorno.slug +
+					"/" +
+					link?.entorno.slug +
+					"/" +
+					link?.slug,
+			);
+		if (link && !isTarea)
+			router.push(
+				"/" +
+					link?.entorno.entorno.equipo.slug +
+					"/" +
+					link?.entorno.entorno.slug +
+					"/" +
+					link?.entorno.slug,
+			);
+	}
 
 	return (
 		<table className="mt-2 w-full min-w-[570px] border-separate border-spacing-y-2 p-2">
 			<tbody>
-				<tr className="text-center text-sm font-light text-neutral-400">
+				<tr className="text-sm font-light text-neutral-400">
 					<th className="border-b border-neutral-700 pb-2 text-left">Nombre</th>
+					{extraData && (
+						<th className="w-64 border-b border-neutral-700 pb-2 text-left">
+							Proyecto
+						</th>
+					)}
 					<th className="w-44 border-b border-neutral-700 pb-2">Usuarios</th>
 					<th className="w-44 border-b border-neutral-700 pb-2">Fecha final</th>
 					<th className="w-44 border-b border-neutral-700 pb-2">Prioridad</th>
@@ -99,9 +141,7 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 							<tr className="text-center" key={tarea.tarea.id}>
 								<td className="border-b border-neutral-700 pb-2 text-left">
 									<div
-										onClick={() =>
-											router.push(pathname + "/" + tarea.tarea!.slug)
-										}
+										onClick={() => handleRedirect(tarea.tarea!.id, true)}
 										className="flex cursor-pointer gap-2"
 									>
 										<div
@@ -111,6 +151,7 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 											}
 										>
 											<div
+												title={tarea.tarea.estado}
 												className={
 													"m-auto size-4 rounded-full border-2 border-neutral-900 " +
 													estados[tarea.tarea.estado]
@@ -120,6 +161,14 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 										<span className="font-semibold">{tarea.tarea.titulo}</span>
 									</div>
 								</td>
+								{extraData && (
+									<td
+										className="cursor-pointer border-b border-neutral-700 pb-2 text-left text-sm"
+										onClick={() => handleRedirect(tarea.tarea!.id, false)}
+									>
+										{tarea.tarea.entorno.nombre}
+									</td>
+								)}
 								<td className="flex flex-row justify-center border-b border-neutral-700 pb-2">
 									{usuariosPorTarea[tarea.tarea.id]?.map(usuario => (
 										<div
@@ -138,9 +187,15 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 									className={clsx(
 										"border-b border-neutral-700 pb-2 font-mono",
 										tarea.tarea.fecha_fin &&
-											new Date(tarea.tarea.fecha_fin) <= new Date()
-											? "text-red-400"
-											: "text-green-400",
+											moment(tarea.tarea?.fecha_fin)
+												.startOf("day")
+												.isBefore(moment(new Date()).startOf("day")) &&
+											"text-red-400",
+										moment(tarea.tarea?.fecha_fin)
+											.startOf("day")
+											.isAfter(moment(new Date()).startOf("day"))
+											? "text-green-400"
+											: "text-orange-400",
 									)}
 								>
 									{new Date(tarea.tarea.fecha_fin).toLocaleDateString("es-ES") ==
@@ -150,7 +205,10 @@ export default function TablaTareas({ tareas }: { tareas: Tarea[] }) {
 												"es-ES",
 											)}
 								</td>
-								<td className="border-b border-neutral-700 pb-2">
+								<td
+									className="border-b border-neutral-700 pb-2"
+									title={tarea.tarea.prioridad}
+								>
 									<FlagTriangleRight
 										className={
 											"m-auto size-5 " + prioridad[tarea.tarea.prioridad]

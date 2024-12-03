@@ -319,11 +319,11 @@ export default function Sidebar({
 							</div>
 							<div className="flex max-w-64 grow flex-col gap-1 overflow-x-hidden overflow-y-scroll">
 								<Link
-									href="/dashboard/entornos"
+									href={`/${equipo?.slug}/tareas`}
 									className={clsx(
 										"flex items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 										{
-											"bg-neutral-800": pathname === "/dashboard/entornos",
+											"bg-neutral-800": pathname === `/${equipo?.slug}/tareas`,
 										},
 									)}
 								>

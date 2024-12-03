@@ -384,6 +384,12 @@ interface Tarea {
 		fecha_fin: string;
 		estado: string;
 		prioridad: string;
+		entorno: {
+			nombre: string;
+			entorno: {
+				nombre: string;
+			};
+		};
 	};
 }
 
@@ -403,3 +409,49 @@ export async function getTareasByProyectoSlug(idProyecto: string) {
 	return data as unknown as Tarea[];
 }
 
+export async function getTareasByEquipoId(equipoId: string) {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return;
+
+	const entornos = await getEntornosByEquipoId(equipoId);
+
+	if (!entornos) return;
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad, entorno:Entornos(nombre, slug, entorno))")
+		.eq("usuario", usuario.id);
+
+	if (!data) return;
+
+	const tareasEntornos = data.filter(tareaObj =>
+		entornos.some(entorno => entorno.id === tareaObj?.tarea?.entorno?.entorno)
+	);
+
+	return tareasEntornos as unknown as Tarea[];
+}
+
+export async function getEntornosByEquipoId(equipoId: string) {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	const { data: usuarios_entornos } = await supabase
+	.from("Usuarios_Entornos")
+	.select("entorno")
+	.eq("usuario", usuario!.id);
+
+	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
+
+	const { data } = await supabase
+		.from("Entornos")
+		.select("id")
+		.is("entorno", null)
+		.eq("equipo", equipoId)
+		.in("id", entornoIds!);
+
+	return data;
+}

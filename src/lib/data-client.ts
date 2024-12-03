@@ -141,3 +141,94 @@ export async function getUsuario() {
 		}
 	}
 }
+
+type Enlace = {
+	slug: string;
+	entorno: {
+		slug: string;
+		entorno: {
+			slug: string;
+			equipo: {
+				slug: string;
+			};
+		};
+	};
+};
+
+export async function getTareaLinkById(tareaId: string) {
+	const supabase = createClient();
+
+	const { data } = await supabase
+		.from("Tareas")
+		.select("slug, entorno:Entornos(slug, entorno(slug, equipo:Equipos(slug)))")
+		.eq("id", tareaId)
+		.limit(1)
+		.single();
+	if (data) {
+		return data as unknown as Enlace;
+	}
+}
+
+export async function getEquipoBySlug(equipoSlug: string) {
+	const supabase = createClient();
+
+	const { data } = await supabase
+		.from("Equipos")
+		.select("id")
+		.eq("slug", equipoSlug)
+		.limit(1)
+		.single();
+
+	const usuario = await getUsuario();
+
+	const {data: usuario_equipo} = await supabase.from("Usuarios_Equipos").select("*").eq("equipo", data?.id).eq("usuario", usuario?.id).limit(1).single();
+
+	if (usuario_equipo) {
+		return data;
+	}
+}
+
+export async function getEntornosByEquipoSlug(equipoSlug: string) {
+	const supabase = createClient();
+
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	const usuario = await getUsuario();
+
+	const { data: usuarios_entornos } = await supabase
+		.from("Usuarios_Entornos")
+		.select("entorno")
+		.eq("usuario", usuario.id);
+
+	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
+
+	const { data } = await supabase
+		.from("Entornos")
+		.select("id, nombre, equipo:Equipos(slug)")
+		.is("entorno", null)
+		.eq("equipo", equipo?.id)
+		.in("id", entornoIds!);
+
+	return data;
+}
+
+export async function getProyectosByEntornoId(id: string) {
+	const supabase = createClient();
+
+	const usuario = await getUsuario();
+
+	const { data: usuarios_entornos } = await supabase
+		.from("Usuarios_Entornos")
+		.select("entorno")
+		.eq("usuario", usuario.id);
+
+	console.log
+
+	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
+
+	console.log(entornoIds);
+
+	const { data } = await supabase.from("Entornos").select("*").eq("entorno", id).in("id", entornoIds!);
+
+	return data;
+}

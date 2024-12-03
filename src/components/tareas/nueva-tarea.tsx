@@ -1,9 +1,22 @@
 "use client";
 import { createTarea } from "@/lib/actions";
-import { getUsuario, getUsuariosFromEntorno } from "@/lib/data-client";
+import {
+	getEntornosByEquipoSlug,
+	getProyectosByEntornoId,
+	getUsuario,
+	getUsuariosFromEntorno,
+} from "@/lib/data-client";
 import clsx from "clsx";
 import { es } from "date-fns/locale/es";
-import { CalendarDays, Check, CirclePower, FlagTriangleRight, Rocket, Users } from "lucide-react";
+import {
+	BriefcaseBusiness,
+	CalendarDays,
+	Check,
+	CirclePower,
+	FlagTriangleRight,
+	Rocket,
+	Users,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Calendar } from "../ui/calendar";
@@ -41,6 +54,10 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	const [prioridad, setPrioridad] = useState("Ninguna");
 	const [clientError, setClientError] = useState<string | null>(null);
 	const [textoBoton, setTextoBoton] = useState<string>("Crear Tarea");
+	const [entornos, setEntornos] = useState<{ id: any; nombre: any }[] | null>([]);
+	const [entornoSeleccionado, setEntornoSeleccionado] = useState<string>("");
+	const [proyectos, setProyectos] = useState<{ id: any; nombre: any }[] | null>([]);
+	const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>(entorno);
 
 	useEffect(() => {
 		if (initial) loadUsuario();
@@ -76,7 +93,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	const pathname = usePathname();
 
 	useEffect(() => {
-		document.getElementById("nueva-tarea-"+entorno)?.hidePopover();
+		document.getElementById("nueva-tarea-" + entorno)?.hidePopover();
 	}, [pathname]);
 
 	async function handleCreateTarea() {
@@ -85,18 +102,34 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 			setClientError("Por favor, rellena los campos.");
 			return;
 		}
-		try {
-			await createTarea(
-				tituloTarea,
-				estado,
-				prioridad,
-				fechaFinal.toDateString(),
-				entorno,
-				usuarios,
-			);
-		} catch (error) {
-			console.log(error);
+		if (entorno.includes("equipo")) {
+			try {
+				await createTarea(
+					tituloTarea,
+					estado,
+					prioridad,
+					fechaFinal.toDateString(),
+					proyectoSeleccionado,
+					usuarios,
+				);
+			} catch (error) {
+				console.log(error);
+			}
+		} else {
+			try {
+				await createTarea(
+					tituloTarea,
+					estado,
+					prioridad,
+					fechaFinal.toDateString(),
+					entorno,
+					usuarios,
+				);
+			} catch (error) {
+				console.log(error);
+			}
 		}
+
 		setTextoBoton("Crear Tarea");
 		window.location.reload();
 	}
@@ -117,7 +150,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 	useEffect(() => {
 		if (mostrarUsuarios && entorno) {
 			try {
-				getUsuariosFromEntorno(entorno).then(data => {
+				getUsuariosFromEntorno(proyectoSeleccionado).then(data => {
 					if (data) setUsuariosEntorno(data!);
 				});
 			} catch (error) {
@@ -142,15 +175,44 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 		}
 	}
 
+	useEffect(() => {
+		async function fetchEntornos() {
+			if (entorno.includes("equipo")) {
+				const equipoSlug = entorno.split("-").pop();
+				const entornosEquipo = await getEntornosByEquipoSlug(equipoSlug!);
+				setEntornos(entornosEquipo!);
+				if (entornosEquipo && entornosEquipo.length > 0) {
+					setEntornoSeleccionado(entornosEquipo[0].id);
+				}
+			}
+		}
+
+		fetchEntornos();
+	}, [entorno]);
+
+	useEffect(() => {
+		async function fetchProyectos() {
+			if (entorno.includes("equipo") && entornoSeleccionado) {
+				const proyectosEntorno = await getProyectosByEntornoId(entornoSeleccionado);
+				setProyectos(proyectosEntorno!);
+				if (proyectosEntorno && proyectosEntorno.length > 0) {
+					setProyectoSeleccionado(proyectosEntorno[0].id);
+				}
+			}
+		}
+
+		fetchProyectos();
+	}, [entornoSeleccionado]);
+
 	return (
 		<>
 			<div
-				id={"nueva-tarea-"+entorno}
+				id={"nueva-tarea-" + entorno}
 				popover="auto"
-				className="w-[750px] rounded-lg border border-neutral-800 p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm overflow-visible"
+				className="min-w-[900px] overflow-visible rounded-lg border border-neutral-800 p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 			>
 				<span className="text-2xl font-semibold">Crear Nueva Tarea</span>
-				<div className="mt-6 rounded border border-neutral-800">
+				<div className="mt-6 w-full rounded border border-neutral-800">
 					<div className="flex flex-col gap-4 p-6">
 						<div className="flex flex-col gap-2">
 							<label htmlFor="nombreTarea" className="font-semibold">
@@ -164,12 +226,63 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 								onChange={e => setTituloTarea(e.target.value)}
 							/>
 						</div>
-						<div className="grid grid-cols-2 grid-rows-2 gap-x-8 gap-y-2">
+						<div className="my-8 grid grid-cols-2 grid-rows-2 gap-x-2 gap-y-6">
+							{entorno.includes("equipo") && entornos && entornos.length > 0 && (
+								<div className="flex justify-between">
+									<div className="flex items-center gap-2 text-neutral-400">
+										<BriefcaseBusiness className="size-5" />{" "}
+										<span>Entorno</span>
+									</div>
+									<div className="flex w-2/3 items-center gap-2">
+										<select
+											className="cursor-pointer appearance-none rounded px-2 py-1 transition hover:opacity-80"
+											value={entornoSeleccionado}
+											onChange={e => setEntornoSeleccionado(e.target.value)}
+										>
+											{entornos.map(entorno => (
+												<option
+													key={entorno.id}
+													value={entorno.id}
+													className="bg-neutral-900"
+												>
+													{entorno.nombre}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+							)}
+							{entorno.includes("equipo") && proyectos && proyectos.length > 0 && (
+								<div className="flex justify-between">
+									<div className="flex items-center gap-2 text-neutral-400">
+										<BriefcaseBusiness className="size-5" />{" "}
+										<span>Proyecto</span>
+									</div>
+									<div className="flex w-2/3 items-center gap-2">
+										<select
+											className="cursor-pointer appearance-none rounded px-2 py-1 transition hover:opacity-80"
+											value={proyectoSeleccionado}
+											onChange={e => setProyectoSeleccionado(e.target.value)}
+										>
+											{proyectos.map(proyecto => (
+												<option
+													key={proyecto.id}
+													value={proyecto.id}
+													className="bg-neutral-900"
+												>
+													{proyecto.nombre}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+							)}
+
 							<div className="flex justify-between">
 								<div className="flex items-center gap-2 text-neutral-400">
 									<CirclePower className="size-5" /> <span>Estado</span>
 								</div>
-								<div className="flex w-1/2 items-center gap-2">
+								<div className="flex w-2/3 items-center gap-2">
 									<select
 										className={
 											"cursor-pointer appearance-none rounded px-2 py-1 transition hover:opacity-80 " +
@@ -200,7 +313,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 									<Users className="size-5" /> <span>Usuarios</span>
 								</div>
 								<div
-									className="relative flex w-1/2 cursor-pointer items-center pl-2"
+									className="relative flex w-2/3 cursor-pointer items-center pl-2"
 									onClick={toggleUsuarios}
 								>
 									{usuarios &&
@@ -219,7 +332,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 										))}
 
 									<div
-										className="absolute top-12 -left-28 hidden w-64 rounded border border-neutral-800 bg-neutral-900 p-1"
+										className="absolute -left-2 top-12 hidden w-64 rounded border border-neutral-800 bg-neutral-900 p-1"
 										id="usuarios"
 									>
 										{usuariosEntorno &&
@@ -255,11 +368,11 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 								<div className="flex items-center gap-2 text-neutral-400">
 									<CalendarDays className="size-5" /> <span>Fecha límite</span>
 								</div>
-								<div className="relative flex w-1/2 items-center">
+								<div className="relative flex w-2/3 items-center">
 									<span
 										onClick={toggleCalendario}
 										className={clsx(
-											"font-mono font-semibold cursor-pointer",
+											"cursor-pointer font-mono font-semibold",
 											fechaFinal && fechaFinal <= new Date()
 												? "text-red-400"
 												: "text-green-400",
@@ -288,13 +401,13 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 									<Rocket className="size-5" /> <span>Prioridad</span>
 								</div>
 								<div
-									className={"flex w-1/2 items-center " + prioridades[prioridad]}
+									className={"flex w-2/3 items-center " + prioridades[prioridad]}
 								>
 									<FlagTriangleRight
 										className={"size-5 " + prioridades[prioridad]}
 									/>
 									<select
-										className="cursor-pointer appearance-none  px-1"
+										className="cursor-pointer appearance-none px-1"
 										value={prioridad}
 										onChange={e => setPrioridad(e.target.value)}
 									>

@@ -78,7 +78,7 @@ export default async function Entorno({
 					<div className="flex justify-between">
 						<Link
 							href={`/${equipoSlug}/${entornoSlug}/${proyecto.slug}`}
-							className="text-2xl font-semibold"
+							className="text-xl font-semibold"
 						>
 							{proyecto.nombre}
 						</Link>
