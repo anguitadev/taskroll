@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import TablaTareas from "./tabla-tareas";
 
 type Tarea = {
-	usuario: { color: string; nombre_completo: string };
+	usuario: {
+		color: string;
+		nombre_completo: string;
+	} | null;
 	tarea: {
 		id: string;
 		titulo: string;
@@ -13,7 +16,13 @@ type Tarea = {
 		fecha_fin: string;
 		estado: string;
 		prioridad: string;
-	};
+		entorno: {
+			nombre: string;
+			entorno: {
+				nombre: string;
+			};
+		};
+	} | null;
 };
 
 export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {

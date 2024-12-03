@@ -75,7 +75,10 @@ export async function removeComentario(idComentario: string) {
 }
 
 interface Tarea {
-	usuario: { color: string; nombre_completo: string };
+	usuario: {
+		color: string;
+		nombre_completo: string;
+	} | null;
 	tarea: {
 		id: string;
 		titulo: string;
@@ -83,8 +86,14 @@ interface Tarea {
 		fecha_fin: string;
 		estado: string;
 		prioridad: string;
-	};
-}
+		entorno: {
+			nombre: string;
+			entorno: {
+				nombre: string;
+			};
+		};
+	} | null;
+};
 
 export async function getTareasByProyectoSlug(idProyecto: string) {
 	const supabase = createClient();
