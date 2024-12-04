@@ -597,14 +597,14 @@ export async function getUsuariosWithTareaCountByEquipoSlug(equipoSlug: string) 
 		? Object.values(
 				data.reduce(
 					(acc, item) => {
-						if (!acc[item.usuario?.nombre_usuario!]) {
-							acc[item.usuario?.nombre_usuario!] = {
-								usuario: item.usuario?.nombre_usuario!,
+						if (item.usuario?.nombre_usuario && !acc[item.usuario?.nombre_usuario]) {
+							acc[item.usuario?.nombre_usuario] = {
+								usuario: item.usuario?.nombre_usuario,
 								tareas: 0,
 								fill: `var(--color-${item.usuario?.nombre_usuario})`,
 							};
 						}
-						acc[item.usuario?.nombre_usuario!].tareas += 1;
+						if (item.usuario?.nombre_usuario) acc[item.usuario?.nombre_usuario].tareas += 1;
 						return acc;
 					},
 					{} as Record<string, { usuario: string; tareas: number; fill: string }>,
