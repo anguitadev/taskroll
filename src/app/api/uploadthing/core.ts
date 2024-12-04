@@ -12,14 +12,11 @@ export const ourFileRouter = {
 		"application/vnd.openxmlformats-officedocument.presentationml.presentation",
 	])
 		// Set permissions and file types for this FileRoute
-		// .middleware(async () => {
-		// 	// This code runs on your server before upload
-		// 	// If you throw, the user will not be able to upload
-		// 	// if (!user) throw new UploadThingError("Unauthorized");
-
-		// 	// Whatever is returned here is accessible in onUploadComplete as `metadata`
-		// 	return { userId: user!.id };
-		// })
+		.middleware(() => {
+			return {
+				maxFileCount: 1,
+			};
+		})
 		.onUploadComplete(async ({ file }) => {
 			return { fileKey: file.key };
 		}),
