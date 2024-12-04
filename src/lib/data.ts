@@ -1,5 +1,6 @@
 import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/server";
+import moment from "moment";
 
 export async function getUsuario() {
 	const supabase = await createClient();
@@ -422,13 +423,15 @@ export async function getTareasByEquipoId(equipoId: string) {
 
 	const { data } = await supabase
 		.from("Usuarios_Tareas")
-		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad, entorno:Entornos(nombre, slug, entorno))")
+		.select(
+			"tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad, entorno:Entornos(nombre, slug, entorno))",
+		)
 		.eq("usuario", usuario.id);
 
 	if (!data) return;
 
 	const tareasEntornos = data.filter(tareaObj =>
-		entornos.some(entorno => entorno.id === tareaObj?.tarea?.entorno?.entorno)
+		entornos.some(entorno => entorno.id === tareaObj?.tarea?.entorno?.entorno),
 	);
 
 	return tareasEntornos as unknown as Tarea[];
@@ -440,9 +443,9 @@ export async function getEntornosByEquipoId(equipoId: string) {
 	const usuario = await getUsuario();
 
 	const { data: usuarios_entornos } = await supabase
-	.from("Usuarios_Entornos")
-	.select("entorno")
-	.eq("usuario", usuario!.id);
+		.from("Usuarios_Entornos")
+		.select("entorno")
+		.eq("usuario", usuario!.id);
 
 	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
 
@@ -454,4 +457,160 @@ export async function getEntornosByEquipoId(equipoId: string) {
 		.in("id", entornoIds!);
 
 	return data;
+}
+
+export async function getTotalTareaCountInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	return tareas?.length ?? 0;
+}
+
+export async function getProgresoTareaCountInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const progresoTareas = tareas?.filter(tarea => {
+		return tarea.tarea?.estado === "Progreso";
+	});
+
+	return progresoTareas?.length ?? 0;
+}
+
+export async function getRevisionTareaCountInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const revisionTareas = tareas?.filter(tarea => {
+		return tarea.tarea?.estado === "Revision";
+	});
+
+	return revisionTareas?.length ?? 0;
+}
+
+export async function getCompletadoTareaCountInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const completadasTareas = tareas?.filter(tarea => {
+		return tarea.tarea?.estado === "Completado";
+	});
+
+	return completadasTareas?.length ?? 0;
+}
+
+export async function getCompletadoTareaSemanaCountInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const completadasTareas = tareas?.filter(tarea => {
+		return (
+			tarea.tarea?.estado === "Completado" &&
+			moment(tarea.tarea?.fecha_fin).isAfter(moment().subtract(7, "days"))
+		);
+	});
+
+	return completadasTareas?.length ?? 0;
+}
+
+export async function getUsuariosByEquipoSlug(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return [];
+
+	const equipoId = equipo.id;
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("Usuarios(*)")
+		.eq("equipo", equipoId);
+
+	return data;
+}
+
+export async function getCompletadoTareasCountByUserId(userId: string, equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const tareasIds = tareas?.map(tarea => tarea.tarea!.id);
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(*)")
+		.eq("usuario", userId)
+		.eq("tarea.estado", "Completado")
+		.in("tarea", tareasIds!);
+
+	return data ? data.filter(tarea => tarea.tarea).length : 0;
+}
+
+export async function getTareasCountByUserId(userId: string, equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const tareasIds = tareas?.map(tarea => tarea.tarea!.id);
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("*")
+		.eq("usuario", userId)
+		.in("tarea", tareasIds!);
+
+	return data ? data.length : 0;
+}
+
+export async function getUsuariosWithTareaCountByEquipoSlug(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return [];
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	const tareasIds = tareas?.map(tarea => tarea.tarea!.id);
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("usuario:Usuarios(nombre_usuario)")
+		.in("tarea", tareasIds!);
+
+	const usuariosTareas: { usuario: string; tareas: number; fill: string }[] = data
+		? Object.values(
+				data.reduce(
+					(acc, item) => {
+						if (!acc[item.usuario?.nombre_usuario!]) {
+							acc[item.usuario?.nombre_usuario!] = {
+								usuario: item.usuario?.nombre_usuario!,
+								tareas: 0,
+								fill: `var(--color-${item.usuario?.nombre_usuario})`,
+							};
+						}
+						acc[item.usuario?.nombre_usuario!].tareas += 1;
+						return acc;
+					},
+					{} as Record<string, { usuario: string; tareas: number; fill: string }>,
+				),
+			)
+		: [];
+
+	return usuariosTareas;
 }
