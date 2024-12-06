@@ -400,6 +400,7 @@ export type Database = {
       Usuarios: {
         Row: {
           color: string
+          email: string
           id: string
           nombre_completo: string
           nombre_usuario: string
@@ -407,6 +408,7 @@ export type Database = {
         }
         Insert: {
           color?: string
+          email: string
           id: string
           nombre_completo: string
           nombre_usuario: string
@@ -414,6 +416,7 @@ export type Database = {
         }
         Update: {
           color?: string
+          email?: string
           id?: string
           nombre_completo?: string
           nombre_usuario?: string

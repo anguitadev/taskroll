@@ -18,7 +18,8 @@ export default async function signup(formData: FormData) {
 	const { data: usuarios, error: fetchError } = await supabase
 		.from("Usuarios")
 		.select("nombre_usuario")
-		.eq("nombre_usuario", username);
+		.eq("nombre_usuario", username)
+		.or(`email.eq.${email}`);
 
 	if (fetchError || (usuarios && usuarios.length > 0)) {
 		return redirect("/signup?error=user_exists");
@@ -34,6 +35,7 @@ export default async function signup(formData: FormData) {
 		id: data.user.id,
 		nombre_completo: nombreCompleto,
 		nombre_usuario: username,
+		email: email,
 	});
 
 	if (userInsertError) {

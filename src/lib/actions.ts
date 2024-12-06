@@ -1,10 +1,14 @@
 "use server";
 
+import CorreoNotificacion from "@/components/emails/tamplate";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import { getEntornoById, getEquipoByEntornoId, getUsuario, getUsuariosByTarea } from "./data";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function createEntorno({
 	nombreEntorno,
@@ -330,16 +334,20 @@ export async function createNotificacion(idTarea: string, notificacion: string) 
 
 	if (!usuariosTarea) return;
 
+	const textoNotificacion = usuario.nombre_completo + notificacion;
+
 	usuariosTarea.forEach(async item => {
 		if (item.Usuarios!.id === usuario.id) return;
 		const { error: errorNotificacion } = await supabase.from("Notificaciones").insert({
-			notificacion: usuario.nombre_completo + notificacion,
+			notificacion: textoNotificacion,
 			usuario_origen: usuario.id,
 			usuario_destinatario: item.Usuarios!.id,
 			tarea: idTarea,
 		});
 		if (errorNotificacion) return errorNotificacion;
 	});
+
+	enviarCorreosUsuarios(usuariosTarea, textoNotificacion);
 }
 
 export async function removeNotificacion(idNotificacion: string) {
@@ -437,4 +445,42 @@ export async function deleteDocumentoByUrl(documentoUrl: string) {
 	const supabase = await createClient();
 	const { error } = await supabase.from("Documentos").delete().eq("url", documentoUrl);
 	if (error) throw error;
+}
+
+type Usuario = {
+	Usuarios: {
+		color: string;
+		id: string;
+		nombre_completo: string;
+		nombre_usuario: string;
+		puesto: string | null;
+		email: string;
+	} | null;
+};
+
+export async function enviarCorreosUsuarios(usuariosTarea: Usuario[], notificacion: string) {
+	const usuarioLogged = await getUsuario();
+
+	const correos = usuariosTarea.filter(usuario => {
+		return (
+			usuario.Usuarios &&
+			usuario.Usuarios.email &&
+			usuario.Usuarios.email !== usuarioLogged?.email
+		);
+	});
+
+	if (correos) {
+		correos.map(async usuario => {
+			const { error } = await resend.emails.send({
+				from: "Taskroll <no-reply@taskroll.app>",
+				to: [usuario.Usuarios?.email!],
+				subject: "Notificación",
+				react: CorreoNotificacion({nombre_completo: usuario.Usuarios!.nombre_completo, notificacion: notificacion}),
+			});
+
+			if (error) {
+				console.log(error);
+			}
+		});
+	}
 }
