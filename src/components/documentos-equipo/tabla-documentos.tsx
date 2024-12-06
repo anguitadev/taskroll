@@ -18,7 +18,10 @@ export default function TablaDocumentos({
 					entorno: {
 						slug: string;
 						nombre: string;
-						entorno: [Object];
+						entorno: {
+							slug: string;
+							nombre: string;
+						};
 					} | null;
 				} | null;
 				id: string;
@@ -127,13 +130,10 @@ export default function TablaDocumentos({
 			{documentoSeleccionado && (
 				<div className="fixed inset-0 flex items-center justify-center">
 					<div className="h-screen w-full rounded-lg border border-neutral-800 bg-neutral-900/80 shadow-lg">
-						<button
-							className="absolute right-4 top-4"
-							onClick={closePopup}
-						>
+						<button className="absolute right-4 top-4" onClick={closePopup}>
 							<CircleX className="size-8 stroke-neutral-100 hover:stroke-red-500" />
 						</button>
-						<div className="h-screen w-2/3 m-auto">
+						<div className="m-auto h-screen w-2/3">
 							<Visualizador documento={documentoSeleccionado} />
 						</div>
 					</div>

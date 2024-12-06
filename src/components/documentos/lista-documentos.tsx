@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 
 export default function ListaDocumentos({
 	documentosEntorno,
-	equipoSlug,
-	entornoSlug,
 }: {
 	documentosEntorno: {
 		created_at: string;
@@ -17,8 +15,6 @@ export default function ListaDocumentos({
 		propietario: string;
 		url: string;
 	}[];
-	equipoSlug: string;
-	entornoSlug: string;
 }) {
 	const pathname = usePathname();
 	const selected = pathname.split("/").pop();

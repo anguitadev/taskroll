@@ -17,7 +17,10 @@ export default function WrapperDocumentos({
 					entorno: {
 						slug: string;
 						nombre: string;
-						entorno: [Object];
+						entorno: {
+							slug: string;
+							nombre: string;
+						};
 					} | null;
 				} | null;
 				id: string;

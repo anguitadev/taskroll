@@ -7,17 +7,12 @@ import { useEffect, useState } from "react";
 export default function NuevoDocumento() {
 	const [nombreDocumento, setNombreDocumento] = useState<string>("");
 	const [clientError, setClientError] = useState<string | null>(null);
-	// const [textoBoton, setTextoBoton] = useState<string>("Crear Proyecto");
 
 	const pathname = usePathname();
 
 	useEffect(() => {
 		document.getElementById("nuevo-documento")?.hidePopover();
 	}, [pathname]);
-
-	function closePopover() {
-		document.getElementById("nuevo-documento")?.hidePopover();
-	}
 
 	async function handleNuevoDocumento(fileKey: string) {
 		const error = await createDocumento(fileKey, nombreDocumento, pathname);
