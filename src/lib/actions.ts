@@ -347,7 +347,7 @@ export async function createNotificacion(idTarea: string, notificacion: string) 
 		if (errorNotificacion) return errorNotificacion;
 	});
 
-	enviarCorreosUsuarios(usuariosTarea, textoNotificacion);
+	enviarCorreosUsuarios(usuariosTarea, textoNotificacion, idTarea);
 }
 
 export async function removeNotificacion(idNotificacion: string) {
@@ -458,7 +458,13 @@ type Usuario = {
 	} | null;
 };
 
-export async function enviarCorreosUsuarios(usuariosTarea: Usuario[], notificacion: string) {
+export async function enviarCorreosUsuarios(
+	usuariosTarea: Usuario[],
+	notificacion: string,
+	idTarea: string,
+) {
+	const tareaUrl = await getTareaUrlById(idTarea);
+
 	const usuarioLogged = await getUsuario();
 
 	const correos = usuariosTarea.filter(usuario => {
@@ -476,7 +482,11 @@ export async function enviarCorreosUsuarios(usuariosTarea: Usuario[], notificaci
 				from: "Taskroll <no-reply@taskroll.app>",
 				to: [usuario.Usuarios.email],
 				subject: "Notificación",
-				react: CorreoNotificacion({nombre_completo: usuario.Usuarios!.nombre_completo, notificacion: notificacion}),
+				react: CorreoNotificacion({
+					nombre_completo: usuario.Usuarios!.nombre_completo,
+					notificacion: notificacion,
+					tareaUrl: tareaUrl,
+				}),
 			});
 
 			if (error) {
@@ -484,4 +494,26 @@ export async function enviarCorreosUsuarios(usuariosTarea: Usuario[], notificaci
 			}
 		});
 	}
+}
+
+export async function getTareaUrlById(idTarea: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Tareas")
+		.select("slug, entorno(slug, entorno(slug, equipo(slug)))")
+		.eq("id", idTarea)
+		.single();
+
+	const slugs = data as unknown as {
+		slug: string;
+		entorno: {
+			slug: string;
+			entorno: {
+				slug: string;
+				equipo: { slug: string };
+			};
+		};
+	};
+
+	return `https://taskroll.app/${slugs?.entorno?.entorno?.equipo?.slug}/${slugs?.entorno?.entorno?.slug}/${slugs?.entorno?.slug}/${slugs?.slug}`;
 }

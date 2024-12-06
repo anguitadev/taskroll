@@ -1,5 +1,6 @@
 import {
 	Body,
+	Button,
 	Container,
 	Head,
 	Heading,
@@ -13,7 +14,15 @@ import {
 
 const baseUrl = process.env.TASKROLL_URL ? `https://${process.env.TASKROLL_URL}` : "";
 
-export const CorreoNotificacion = ( {nombre_completo, notificacion} : {nombre_completo?: string; notificacion?: string}) => {
+export const CorreoNotificacion = ({
+	nombre_completo,
+	notificacion,
+	tareaUrl,
+}: {
+	nombre_completo?: string;
+	notificacion?: string;
+	tareaUrl?: string;
+}) => {
 	const previewText = "Tienes una nueva notificación.";
 
 	return (
@@ -26,8 +35,8 @@ export const CorreoNotificacion = ( {nombre_completo, notificacion} : {nombre_co
 						<Section className="mt-[32px]">
 							<Img
 								src={`${baseUrl}/logo.png`}
-								width="250"
-								height="auto"
+								width="200"
+								height="97"
 								alt="Taskroll"
 								className="mx-auto my-0"
 							/>
@@ -36,11 +45,19 @@ export const CorreoNotificacion = ( {nombre_completo, notificacion} : {nombre_co
 							<strong>Has recibido una nueva notificación</strong>
 						</Heading>
 						<Text className="text-[14px] leading-[24px] text-black">
-							Hello {nombre_completo},
+							Hola <strong>{nombre_completo}</strong>,
 						</Text>
 						<Text className="text-[14px] leading-[24px] text-black">
 							{notificacion}
 						</Text>
+						<Section className="mb-[32px] mt-[32px] text-center">
+							<Button
+								className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
+								href={tareaUrl}
+							>
+								Ver Tarea
+							</Button>
+						</Section>
 					</Container>
 				</Body>
 			</Tailwind>
