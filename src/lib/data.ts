@@ -604,7 +604,8 @@ export async function getUsuariosWithTareaCountByEquipoSlug(equipoSlug: string) 
 								fill: `var(--color-${item.usuario?.nombre_usuario})`,
 							};
 						}
-						if (item.usuario?.nombre_usuario) acc[item.usuario?.nombre_usuario].tareas += 1;
+						if (item.usuario?.nombre_usuario)
+							acc[item.usuario?.nombre_usuario].tareas += 1;
 						return acc;
 					},
 					{} as Record<string, { usuario: string; tareas: number; fill: string }>,
@@ -613,4 +614,67 @@ export async function getUsuariosWithTareaCountByEquipoSlug(equipoSlug: string) 
 		: [];
 
 	return usuariosTareas;
+}
+
+export async function getTotalTareasInEquipo(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return 0;
+
+	const tareas = await getTareasByEquipoId(equipo.id);
+
+	if (tareas) return tareas;
+}
+
+type Documentos =
+	| {
+			created_at: string;
+			destinatario: string | null;
+			entorno: {
+				slug: string;
+				nombre: string;
+				entorno: {
+					slug: string;
+					nombre: string;
+					entorno: [Object];
+				} | null;
+			} | null;
+			id: string;
+			nombre: string;
+			propietario: string;
+			url: string;
+	  }[]
+	| null;
+
+export async function getDocumentosByEquipoSlug(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	const entornosUsuario = await getEntornosbyUsuario();
+
+	if (entornosUsuario && equipo) {
+		const entornosUsuarioEnEquipo = entornosUsuario.filter(async entorno => {
+			if (entorno.Entornos) {
+				if (entorno.Entornos.entorno === null) {
+					return entorno.Entornos.equipo === equipo.id;
+				} else {
+					const entornoProyecto = await getEntornoById(entorno.Entornos.entorno);
+					if (entornoProyecto) return entornoProyecto.equipo === equipo.id;
+				}
+			}
+		});
+
+		const entornosId = entornosUsuarioEnEquipo.map(entorno => entorno.Entornos?.id);
+
+		const entornosIdString = entornosId.join(",");
+
+		const { data } = await supabase
+			.from("Documentos")
+			.select("*, entorno(nombre, slug, entorno(nombre, slug))")
+			.or(`entorno.in.(${entornosIdString}),destinatario.eq.${usuario?.id}`);
+
+		if (data) return data as unknown as Documentos;
+	}
 }

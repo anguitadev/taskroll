@@ -1,40 +1,30 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
-    Card,
-    CardContent,
-    CardFooter
+	Card,
+	CardContent
 } from "@/components/ui/card";
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
+	ChartConfig,
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-	{ month: "January", desktop: 186, mobile: 80 },
-	{ month: "February", desktop: 305, mobile: 200 },
-	{ month: "March", desktop: 237, mobile: 120 },
-	{ month: "April", desktop: 73, mobile: 190 },
-	{ month: "May", desktop: 209, mobile: 130 },
-	{ month: "June", desktop: 214, mobile: 140 },
-];
 
 const chartConfig = {
-	desktop: {
-		label: "Desktop",
+	completadas: {
+		label: "Completadas",
 		color: "hsl(var(--chart-1))",
 	},
-	mobile: {
-		label: "Mobile",
+	totales: {
+		label: "Totales",
 		color: "hsl(var(--chart-2))",
 	},
 } satisfies ChartConfig;
 
-export function GraficoCompletadas() {
+export function GraficoCompletadas( {chartData} : {chartData: {mes: string, completadas: number, totales: number}[] }) {
 	return (
 		<Card>
 			<CardContent>
@@ -42,7 +32,7 @@ export function GraficoCompletadas() {
 					<BarChart accessibilityLayer data={chartData}>
 						<CartesianGrid vertical={false} />
 						<XAxis
-							dataKey="month"
+							dataKey="mes"
 							tickLine={false}
 							tickMargin={10}
 							axisLine={false}
@@ -52,16 +42,11 @@ export function GraficoCompletadas() {
 							cursor={false}
 							content={<ChartTooltipContent indicator="dashed" />}
 						/>
-						<Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-						<Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+						<Bar dataKey="completadas" fill="var(--color-completadas)" radius={4} />
+						<Bar dataKey="totales" fill="var(--color-totales)" radius={4} />
 					</BarChart>
 				</ChartContainer>
 			</CardContent>
-			<CardFooter className="flex-col items-start gap-2 text-sm">
-				<div className="flex gap-2 font-medium leading-none">
-					Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-				</div>
-			</CardFooter>
 		</Card>
 	);
 }

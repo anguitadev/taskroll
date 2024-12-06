@@ -1,7 +1,15 @@
 import { GraficoCompletadas } from "@/components/dashboard/grafico-completadas";
 import { GraficoUsuarios } from "@/components/dashboard/grafico-usuarios";
 import TablaEstadisticas from "@/components/dashboard/tabla-estadisticas";
-import { getCompletadoTareaCountInEquipo, getCompletadoTareaSemanaCountInEquipo, getProgresoTareaCountInEquipo, getRevisionTareaCountInEquipo, getTotalTareaCountInEquipo, getUsuariosWithTareaCountByEquipoSlug } from "@/lib/data";
+import {
+	getCompletadoTareaCountInEquipo,
+	getCompletadoTareaSemanaCountInEquipo,
+	getProgresoTareaCountInEquipo,
+	getRevisionTareaCountInEquipo,
+	getTotalTareaCountInEquipo,
+	getTotalTareasInEquipo,
+	getUsuariosWithTareaCountByEquipoSlug,
+} from "@/lib/data";
 import { CalendarDays, Clock, ListChecks, Star, Users, Zap } from "lucide-react";
 import Image from "next/image";
 export default async function Equipo({ params }: { params: Promise<{ equipo: string }> }) {
@@ -14,6 +22,27 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 	const completadoTareaCount = await getCompletadoTareaCountInEquipo(equipoSlug);
 	const tareasCompletadasSemana = await getCompletadoTareaSemanaCountInEquipo(equipoSlug);
 	const usuariosTareas = await getUsuariosWithTareaCountByEquipoSlug(equipoSlug);
+	const totalTareas = await getTotalTareasInEquipo(equipoSlug);
+
+	const tareasMes: Record<string, { completadas: number; totales: number }> = {};
+
+	if (totalTareas) totalTareas.forEach(({ tarea }) => {
+		const month = new Date(tarea.fecha_fin).toLocaleString("es-ES", { month: "long" });
+		if (!tareasMes[month]) {
+			tareasMes[month] = { completadas: 0, totales: 0 };
+		}
+
+		tareasMes[month].totales += 1;
+		if (tarea.estado === "Completado") {
+			tareasMes[month].completadas += 1;
+		}
+	});
+
+	const chartData = Object.entries(tareasMes).map(([mes, { completadas, totales }]) => ({
+		mes,
+		completadas,
+		totales,
+	}));
 
 	return (
 		<>
@@ -32,7 +61,7 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 						En ellos encontrarás información relevante sobre tus proyectos.
 					</p>
 				</div>
-				<div className="mt-4 grid grid-cols-8 grid-rows-4 gap-4">
+				<div className="mt-4 grid grid-cols-8 grid-rows-3 gap-4">
 					<div className="col-span-2 rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
 							<span className="font-semibold">Tareas Totales</span>
@@ -58,12 +87,14 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 							<span className="font-semibold">Tareas Completadas</span>
 							<ListChecks className="size-5 stroke-neutral-400" />
 						</div>
-						<span className="mt-6 block text-3xl font-bold">{completadoTareaCount}</span>
+						<span className="mt-6 block text-3xl font-bold">
+							{completadoTareaCount}
+						</span>
 						<span className="mt-2 block text-sm text-neutral-400">
 							{tareasCompletadasSemana} la última semana
 						</span>
 					</div>
-					<div className="col-span-2 row-span-4 rounded border border-neutral-700 bg-neutral-800 p-4">
+					<div className="col-span-2 row-span-3 rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
 							<span className="font-semibold">
 								Tareas Completadas la Última Semana
@@ -72,21 +103,21 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 						</div>
 						<TablaEstadisticas equipoSlug={equipoSlug} />
 					</div>
-					<div className="col-span-3 row-span-3 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
+					<div className="col-span-3 row-span-2 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
 							<span className="font-semibold">Tareas Asignadas a los Usuarios</span>
 							<Users className="size-5 stroke-neutral-400" />
 						</div>
 						<GraficoUsuarios usuariosTareas={usuariosTareas} />
 					</div>
-					<div className="col-span-3 row-span-3 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
+					<div className="col-span-3 row-span-2 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
 							<span className="font-semibold">
 								Tareas Completadas en los Últimos Meses
 							</span>
 							<CalendarDays className="size-5 stroke-neutral-400" />
 						</div>
-						<GraficoCompletadas />
+						<GraficoCompletadas chartData={chartData} />
 					</div>
 				</div>
 			</div>

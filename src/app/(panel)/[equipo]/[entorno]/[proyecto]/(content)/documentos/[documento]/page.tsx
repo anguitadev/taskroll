@@ -9,8 +9,8 @@ export default async function Documento({
     const paramsData = await params;
 
 	return (
-		<>
+		<div className="grow">
 			<Visualizador documento={paramsData.documento} />
-		</>
+		</div>
 	);
 }

@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { UTApi } from "uploadthing/server";
 import { getEntornoById, getEquipoByEntornoId, getUsuario, getUsuariosByTarea } from "./data";
 
 export async function createEntorno({
@@ -149,21 +150,28 @@ export async function deleteDocumento(pathname: string) {
 export async function createDocumento(fileKey: string, nombreDocumento: string, pathname: string) {
 	const slugs = pathname.split("/");
 	const entorno = slugs[slugs.indexOf("documentos") - 1];
-	const supabase = await createClient();
-	const { data: entornoId } = await supabase
-		.from("Entornos")
-		.select("id")
-		.eq("entorno", entorno)
-		.limit(1)
-		.single();
-	const { error } = await supabase.from("Documentos").insert({
-		nombre: nombreDocumento,
-		url: fileKey,
-		entorno: entornoId!.id,
-	});
-	if (error) return error;
-	revalidatePath(pathname + "/" + fileKey);
-	redirect(pathname + "/" + fileKey);
+
+	if (entorno) {
+		const supabase = await createClient();
+
+		const { data: entornoId } = await supabase
+			.from("Entornos")
+			.select("id")
+			.eq("slug", entorno)
+			.limit(1)
+			.single();
+
+		if (entornoId) {
+			const usuario = await getUsuario();
+			const { error } = await supabase.from("Documentos").insert({
+				nombre: nombreDocumento,
+				url: fileKey,
+				entorno: entornoId!.id,
+				propietario: usuario!.id,
+			});
+			if (error) return error;
+		}
+	}
 }
 
 export async function updatePizarra(slugEntorno: string, contenido: string) {
@@ -421,4 +429,12 @@ export async function createTarea(
 			if (error) throw error;
 		});
 	}
+}
+
+export async function deleteDocumentoByUrl(documentoUrl: string) {
+	const utapi = new UTApi();
+	await utapi.deleteFiles(documentoUrl);
+	const supabase = await createClient();
+	const { error } = await supabase.from("Documentos").delete().eq("url", documentoUrl);
+	if (error) throw error;
 }

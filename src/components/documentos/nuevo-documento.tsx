@@ -12,16 +12,17 @@ export default function NuevoDocumento() {
 	const pathname = usePathname();
 
 	useEffect(() => {
-		document.getElementById("nuevo-proyecto")?.hidePopover();
+		document.getElementById("nuevo-documento")?.hidePopover();
 	}, [pathname]);
 
 	function closePopover() {
-		document.getElementById("nuevo-proyecto")?.hidePopover();
+		document.getElementById("nuevo-documento")?.hidePopover();
 	}
 
 	async function handleNuevoDocumento(fileKey: string) {
 		const error = await createDocumento(fileKey, nombreDocumento, pathname);
 		if (error) setClientError("Ha habido un error al cargar el documento.");
+		window.location.reload();
 	}
 
 	return (
@@ -51,7 +52,6 @@ export default function NuevoDocumento() {
 						endpoint="documentUploader"
 						onClientUploadComplete={res => {
 							handleNuevoDocumento(res[0].key);
-							closePopover();
 						}}
 						onUploadError={(error: Error) => {
 							alert(`ERROR! ${error.message}`);

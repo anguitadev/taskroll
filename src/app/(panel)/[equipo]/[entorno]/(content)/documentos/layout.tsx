@@ -3,6 +3,16 @@ import ListaDocumentos from "@/components/documentos/lista-documentos";
 import { getDocumentosByEntornoSlug } from "@/lib/data";
 import Link from "next/link";
 
+type Documento = {
+    created_at: string;
+    destinatario: string | null;
+    entorno: string | null;
+    id: string;
+    nombre: string;
+    propietario: string;
+    url: string;
+}
+
 export default async function DocumentosLayout({
 	children,
 	params,
@@ -13,7 +23,7 @@ export default async function DocumentosLayout({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
-	const documentosEntorno = await getDocumentosByEntornoSlug(entornoSlug);
+	const documentosEntorno: Documento[] | null | undefined = await getDocumentosByEntornoSlug(entornoSlug);
 
 	return (
 		<>

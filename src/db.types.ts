@@ -75,22 +75,31 @@ export type Database = {
       }
       Documentos: {
         Row: {
-          entorno: string
+          created_at: string
+          destinatario: string | null
+          entorno: string | null
           id: string
           nombre: string
-          url: string | null
+          propietario: string
+          url: string
         }
         Insert: {
-          entorno: string
+          created_at?: string
+          destinatario?: string | null
+          entorno?: string | null
           id?: string
           nombre: string
-          url?: string | null
+          propietario: string
+          url: string
         }
         Update: {
-          entorno?: string
+          created_at?: string
+          destinatario?: string | null
+          entorno?: string | null
           id?: string
           nombre?: string
-          url?: string | null
+          propietario?: string
+          url?: string
         }
         Relationships: [
           {
@@ -98,6 +107,20 @@ export type Database = {
             columns: ["entorno"]
             isOneToOne: false
             referencedRelation: "Entornos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Documentos_destinatario_fkey"
+            columns: ["destinatario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Documentos_propietario_fkey"
+            columns: ["propietario"]
+            isOneToOne: false
+            referencedRelation: "Usuarios"
             referencedColumns: ["id"]
           },
         ]
