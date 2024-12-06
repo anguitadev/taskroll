@@ -46,8 +46,6 @@ export default async function DocumentosLayout({
 				{documentosEntorno && documentosEntorno.length > 0 && (
 					<ListaDocumentos
 						documentosEntorno={documentosEntorno}
-						equipoSlug={equipoSlug}
-						entornoSlug={entornoSlug}
 					/>
 				)}
 
