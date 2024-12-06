@@ -471,9 +471,10 @@ export async function enviarCorreosUsuarios(usuariosTarea: Usuario[], notificaci
 
 	if (correos) {
 		correos.map(async usuario => {
+			if (!usuario.Usuarios || !usuario.Usuarios.email) return;
 			const { error } = await resend.emails.send({
 				from: "Taskroll <no-reply@taskroll.app>",
-				to: [usuario.Usuarios?.email!],
+				to: [usuario.Usuarios.email],
 				subject: "Notificación",
 				react: CorreoNotificacion({nombre_completo: usuario.Usuarios!.nombre_completo, notificacion: notificacion}),
 			});
