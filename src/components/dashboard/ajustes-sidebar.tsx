@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 export default function AjustesSidebar({
 	className,
 	equipo,
+	isAdmin,
 }: {
 	className: string;
 	equipo: {
@@ -22,6 +23,7 @@ export default function AjustesSidebar({
 		nombre: string;
 		slug: string;
 	};
+	isAdmin: boolean;
 }) {
 	const pathname = usePathname();
 
@@ -36,7 +38,7 @@ export default function AjustesSidebar({
 				<ChevronLeft className="size-5" />
 				Ajustes
 			</Link>
-			<div className="my-3">
+			{isAdmin && <div className="my-3">
 				<span className="flex items-center gap-2 rounded px-3 font-semibold text-neutral-400 p-2">
 					<Users className="size-5" />
 					Equipo
@@ -54,11 +56,17 @@ export default function AjustesSidebar({
 					>
 						General
 					</Link>
-					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
+					<Link href={"/" + equipo!.slug + "/ajustes/miembros"} className={clsx(
+							"flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3",
+							{
+								"bg-neutral-800":
+									pathname === "/" + equipo!.slug + "/ajustes/miembros",
+							},
+						)}>
 						Miembros
-					</span>
+					</Link>
 				</div>
-			</div>
+			</div>}
 			<div className="my-3">
 				<span className="flex items-center gap-2 rounded px-3 font-semibold text-neutral-400 p-2">
 					<BriefcaseBusiness className="size-5" />
@@ -105,9 +113,6 @@ export default function AjustesSidebar({
 					>
 						Perfil
 					</Link>
-					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
-						Notificaciones
-					</span>
 				</div>
 			</div>
 		</div>

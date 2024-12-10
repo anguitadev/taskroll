@@ -9,9 +9,11 @@ import {
 	getTotalTareaCountInEquipo,
 	getTotalTareasInEquipo,
 	getUsuariosWithTareaCountByEquipoSlug,
+	isUsuarioEquipoAdmin,
 } from "@/lib/data";
-import { CalendarDays, Clock, ListChecks, Star, Users, Zap } from "lucide-react";
+import { CalendarDays, Clock, ListChecks, Settings, Star, Users, Zap } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 export default async function Equipo({ params }: { params: Promise<{ equipo: string }> }) {
 	const equipoSlug = (await params).equipo;
 
@@ -44,10 +46,16 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 		totales,
 	}));
 
+	const isAdmin = await isUsuarioEquipoAdmin(equipoSlug);
+
 	return (
 		<>
-			<div className="border-b border-neutral-800 p-3 text-center">
+			<div className="relative flex justify-center border-b border-neutral-800 p-3 text-center">
 				<span>Panel de Control</span>
+				{isAdmin && <Link href={`/${equipoSlug}/ajustes/equipo`} className="absolute right-2 top-2 flex items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm font-medium text-neutral-400">
+					<Settings className="size-4" />
+					Ajustes
+				</Link>}
 			</div>
 			<div className="flex h-[calc(100vh-70px)] flex-col justify-between overflow-y-scroll p-8">
 				<div>
@@ -108,7 +116,7 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 							<span className="font-semibold">Tareas Asignadas a los Usuarios</span>
 							<Users className="size-5 stroke-neutral-400" />
 						</div>
-						<GraficoUsuarios usuariosTareas={usuariosTareas} />
+						{usuariosTareas.length > 0 ? <GraficoUsuarios usuariosTareas={usuariosTareas} /> : <span className="mt-8 italic text-neutral-400 text-sm">No hay suficiente información para mostrar...</span>}
 					</div>
 					<div className="col-span-3 row-span-2 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
@@ -117,7 +125,7 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 							</span>
 							<CalendarDays className="size-5 stroke-neutral-400" />
 						</div>
-						<GraficoCompletadas chartData={chartData} />
+						{usuariosTareas.length > 0 ? <GraficoCompletadas chartData={chartData} /> : <span className="mt-8 italic text-neutral-400 text-sm">No hay suficiente información para mostrar...</span>}
 					</div>
 				</div>
 			</div>

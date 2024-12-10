@@ -2,7 +2,7 @@ import { deleteDocumentoByUrl } from "@/lib/actions";
 import { CircleDollarSign, CircleX, Download, FileText, Settings2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Visualizador from "../documentos/visualizador";
 
 export default function TablaDocumentos({
@@ -34,6 +34,12 @@ export default function TablaDocumentos({
 }) {
 	const [documentos, setDocumentos] = useState(documentosEquipo);
 	const [documentoSeleccionado, setDocumentoSeleccionado] = useState<string | null>(null);
+	const [nominas, setNominas] = useState(false);
+
+	useEffect(() => {
+		const numeroNominas = documentosEquipo?.filter(documento => documento.entorno === null);
+		if (numeroNominas) setNominas(numeroNominas.length == documentosEquipo?.length);
+	}, [documentosEquipo]);
 
 	async function handleDeleteDocumento(documentoUrl: string) {
 		try {
@@ -62,9 +68,9 @@ export default function TablaDocumentos({
 				<tbody>
 					<tr className="text-left text-sm font-light text-neutral-400">
 						<th className="border-b border-neutral-700 pb-2">Nombre</th>
-						<th className="w-64 border-b border-neutral-700 pb-2">Entorno</th>
-						<th className="w-64 border-b border-neutral-700 pb-2">Proyecto</th>
-						<th className="w-60 border-b border-neutral-700 pb-2">Fecha</th>
+						{!nominas && <th className="w-64 border-b border-neutral-700 pb-2">Entorno</th>}
+						{!nominas && <th className="w-64 border-b border-neutral-700 pb-2">Proyecto</th>}
+						<th className="w-52 border-b border-neutral-700 pb-2">Fecha</th>
 						<th className="w-16 border-b border-neutral-700 pb-2">
 							<Settings2 className="m-auto size-5" />
 						</th>
@@ -82,7 +88,7 @@ export default function TablaDocumentos({
 								)}
 								<span className="font-semibold">{documento.nombre}</span>
 							</td>
-							<td className="border-b border-neutral-700 pb-2">
+							{!nominas && <td className="border-b border-neutral-700 pb-2">
 								{documento.entorno && documento.entorno.entorno ? (
 									<Link href={`/${equipoSlug}/${documento.entorno.entorno.slug}`}>
 										{documento.entorno.entorno.nombre}
@@ -94,8 +100,8 @@ export default function TablaDocumentos({
 								) : (
 									""
 								)}
-							</td>
-							<td className="border-b border-neutral-700 pb-2">
+							</td>}
+							{!nominas && <td className="border-b border-neutral-700 pb-2">
 								{documento.entorno && documento.entorno.entorno ? (
 									<Link
 										href={`/${equipoSlug}/${documento.entorno.entorno.slug}/${documento.entorno.slug}`}
@@ -105,7 +111,7 @@ export default function TablaDocumentos({
 								) : (
 									""
 								)}
-							</td>
+							</td>}
 							<td className="border-b border-neutral-700 pb-2 font-mono">
 								{new Date(documento.created_at).toLocaleDateString()}
 							</td>

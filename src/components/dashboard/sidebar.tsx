@@ -1,7 +1,8 @@
 "use client";
 
 import { Tables } from "@/db.types";
-import { getNotificacionNumberByEquipo } from "@/lib/data-client";
+import { getNotificacionNumberByEquipo, isUsuarioEquipoAdmin } from "@/lib/data-client";
+import type { EntornosFromUsuario, EquiposFromUsuario } from "@/lib/panel/types";
 import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import {
@@ -36,28 +37,9 @@ export default function Sidebar({
 	proyectos,
 }: {
 	className: string;
-	equipos: {
-		Equipos: {
-			color: string;
-			created_at: string;
-			id: string;
-			nombre: string;
-			slug: string;
-		} | null;
-	}[];
+	equipos: EquiposFromUsuario;
 	usuario: Tables<"Usuarios">;
-	entornos: {
-		Entornos: {
-			color: string;
-			descripcion: string | null;
-			entorno: string | null;
-			equipo: string | null;
-			id: string;
-			nombre: string;
-			propietario: string;
-			slug: string;
-		} | null;
-	}[];
+	entornos: EntornosFromUsuario;
 	proyectos: Record<string, { id: string; nombre: string; slug: string }[]> | undefined;
 }) {
 	const pathname = usePathname();
@@ -68,6 +50,7 @@ export default function Sidebar({
 	const [entorno, setEntorno] = useState<string | null>(null);
 	const [entornosSidebar, setEntornosSidebar] = useState(entornos);
 	const [notificaciones, setNotificaciones] = useState(0);
+	const [isAdmin, setIsAdmin] = useState(false);
 
 	const supabase = createClient();
 
@@ -165,7 +148,7 @@ export default function Sidebar({
 	}, [pathname]);
 
 	useEffect(() => {
-		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos!.equipo === equipo.id));
+		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos.equipo === equipo.id));
 	}, [equipo, entornos]);
 
 	useEffect(() => {
@@ -176,6 +159,19 @@ export default function Sidebar({
 			console.log(error);
 		}
 	}, [pathname, equipo.id]);
+
+
+	useEffect(() => {
+		const admin = async () => {
+			try {
+				const admin = await isUsuarioEquipoAdmin(equipo.slug);
+				setIsAdmin(admin);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		admin();
+	}, [equipo]);
 
 	return (
 		<>
@@ -218,7 +214,7 @@ export default function Sidebar({
 						)}
 					</div>
 					{ajustes ? (
-						<AjustesSidebar className={className} equipo={equipo} />
+						<AjustesSidebar className={className} equipo={equipo} isAdmin={isAdmin} />
 					) : (
 						<div className="flex max-h-[calc(100vh-70px)] grow flex-col justify-stretch">
 							<div>
@@ -270,13 +266,15 @@ export default function Sidebar({
 											);
 										})}
 										<div className="border-t border-neutral-700">
-											<Link
-												href={"/" + equipo.slug + "/ajustes/equipo"}
-												className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
-											>
-												<Settings className="size-4" />
-												Ajustes del Equipo
-											</Link>
+											{isAdmin && (
+												<Link
+													href={"/" + equipo.slug + "/ajustes/equipo"}
+													className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
+												>
+													<Settings className="size-4" />
+													Ajustes del Equipo
+												</Link>
+											)}
 											<div
 												className="flex flex-row items-center gap-2 p-3 text-neutral-400 hover:cursor-pointer hover:bg-neutral-800"
 												onClick={() => redirect("/nuevo-equipo")}
@@ -305,9 +303,12 @@ export default function Sidebar({
 													<LinkIcon className="size-5" />
 													<span>{link.name}</span>
 												</div>
-												{link.name === "Notificaciones" && notificaciones > 0 && (
-													<span className="bg-indigo-500 text-xs rounded-full size-5 flex items-center justify-center">{notificaciones}</span>
-												)}
+												{link.name === "Notificaciones" &&
+													notificaciones > 0 && (
+														<span className="flex size-5 items-center justify-center rounded-full bg-indigo-500 text-xs">
+															{notificaciones}
+														</span>
+													)}
 											</Link>
 										);
 									})}
@@ -323,7 +324,8 @@ export default function Sidebar({
 									className={clsx(
 										"flex items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 										{
-											"bg-neutral-800": pathname === `/${equipo?.slug}/tareas`,
+											"bg-neutral-800":
+												pathname === `/${equipo?.slug}/tareas`,
 										},
 									)}
 								>
@@ -337,14 +339,14 @@ export default function Sidebar({
 
 										const isCurrentPath = pathname
 											.split("/")
-											.includes(entornoData?.slug);
+											.includes(entornoData.slug);
 
 										if (isCurrentPath) {
-											openProyectos(entornoData?.slug);
+											openProyectos(entornoData.slug);
 										}
 
 										return (
-											<div key={entornoData?.nombre}>
+											<div key={entornoData.nombre}>
 												<div
 													className={clsx(
 														"group max-w-64 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
@@ -359,28 +361,28 @@ export default function Sidebar({
 																<span
 																	className={clsx(
 																		"text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold group-hover:hidden",
-																		entornoData?.color,
+																		entornoData.color,
 																	)}
 																>
-																	{entornoData?.nombre
+																	{entornoData.nombre
 																		?.charAt(0)
 																		.toUpperCase()}
 																</span>
 																<ChevronRight
-																	id={`${entornoData?.slug}-toggle`}
+																	id={`${entornoData.slug}-toggle`}
 																	className="hidden size-5 rounded stroke-neutral-500 p-0.5 hover:bg-neutral-700 group-hover:flex"
 																	onClick={() =>
 																		toggleProyectos(
-																			entornoData?.slug,
+																			entornoData.slug,
 																		)
 																	}
 																/>
 															</div>
 															<Link
-																href={`/${equipo?.slug}/${entornoData?.slug}`}
+																href={`/${equipo?.slug}/${entornoData.slug}`}
 																className="grow truncate"
 															>
-																{entornoData?.nombre}
+																{entornoData.nombre}
 															</Link>
 														</div>
 														<div
@@ -393,7 +395,7 @@ export default function Sidebar({
 															<button
 																onClick={() =>
 																	handleNuevoProyecto(
-																		entornoData?.id,
+																		entornoData.id,
 																	)
 																}
 															>
@@ -403,21 +405,21 @@ export default function Sidebar({
 													</div>
 												</div>
 												<div
-													id={`proyectos-${entornoData?.slug}`}
+													id={`proyectos-${entornoData.slug}`}
 													className="hidden"
 												>
-													{proyectos && proyectos[entornoData?.id] ? (
-														proyectos[entornoData?.id].map(proyecto => {
+													{proyectos && proyectos[entornoData.id] ? (
+														proyectos[entornoData.id].map(proyecto => {
 															const isCurrentProyecto = pathname
 																.split("/")
 																.includes(proyecto.slug);
 															if (isCurrentProyecto) {
-																openProyectos(entornoData?.slug);
+																openProyectos(entornoData.slug);
 															}
 															return (
 																<Link
 																	key={proyecto.id}
-																	href={`/${equipo?.slug}/${entornoData?.slug}/${proyecto.slug}`}
+																	href={`/${equipo?.slug}/${entornoData.slug}/${proyecto.slug}`}
 																	className={clsx(
 																		"flex flex-row items-center gap-3 rounded p-2 px-3 text-sm transition hover:bg-neutral-800 md:justify-start",
 																		{
@@ -437,7 +439,7 @@ export default function Sidebar({
 														<span
 															className="ml-4 cursor-pointer text-sm text-neutral-400 underline"
 															onClick={() =>
-																handleNuevoProyecto(entornoData?.id)
+																handleNuevoProyecto(entornoData.id)
 															}
 														>
 															Crear nuevo proyecto

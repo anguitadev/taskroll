@@ -93,7 +93,7 @@ interface Tarea {
 			};
 		};
 	} | null;
-};
+}
 
 export async function getTareasByProyectoSlug(idProyecto: string) {
 	const supabase = createClient();
@@ -190,7 +190,13 @@ export async function getEquipoBySlug(equipoSlug: string) {
 
 	const usuario = await getUsuario();
 
-	const {data: usuario_equipo} = await supabase.from("Usuarios_Equipos").select("*").eq("equipo", data?.id).eq("usuario", usuario?.id).limit(1).single();
+	const { data: usuario_equipo } = await supabase
+		.from("Usuarios_Equipos")
+		.select("*")
+		.eq("equipo", data?.id)
+		.eq("usuario", usuario?.id)
+		.limit(1)
+		.single();
 
 	if (usuario_equipo) {
 		return data;
@@ -233,7 +239,77 @@ export async function getProyectosByEntornoId(id: string) {
 
 	const entornoIds = usuarios_entornos?.map(entorno => entorno.entorno);
 
-	const { data } = await supabase.from("Entornos").select("*").eq("entorno", id).in("id", entornoIds!);
+	const { data } = await supabase
+		.from("Entornos")
+		.select("*")
+		.eq("entorno", id)
+		.in("id", entornoIds!);
 
 	return data;
+}
+
+export async function isUsuarioEquipoAdmin(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	const usuario = await getUsuario();
+
+	if (!equipo || !usuario) return false;
+
+	const supabase = createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("*")
+		.eq("equipo", equipo.id)
+		.eq("usuario", usuario.id)
+		.eq("admin", true);
+
+	return data ? data.length > 0 : false;
+}
+
+type Nominas =
+	| {
+			created_at: string;
+			destinatario: string | null;
+			entorno: {
+				slug: string;
+				nombre: string;
+				entorno: {
+					slug: string;
+					nombre: string;
+					entorno: {
+						slug: string;
+						nombre: string;
+					};
+				} | null;
+			} | null;
+			id: string;
+			nombre: string;
+			propietario: string;
+			url: string;
+	  }[]
+	| null
+	| undefined;
+
+export async function getNominasByUsuarioId(usuarioId: string) {
+	const supabase = createClient();
+
+	const usuario = await getUsuario();
+	if (!usuario) return;
+
+	const { data: usuarios_equipos } = await supabase
+		.from("Usuarios_Equipos")
+		.select("id")
+		.eq("usuario", usuario.id)
+		.eq("admin", true);
+
+	if (!usuarios_equipos) return;
+
+	const { data } = await supabase
+		.from("Documentos")
+		.select("*")
+		.eq("destinatario", usuarioId)
+		.eq("propietario", usuario.id);
+
+	if (data) return data as unknown as Nominas;
 }

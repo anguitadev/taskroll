@@ -1,24 +1,10 @@
-import { createClient } from "@/utils/supabase/server";
+import { checkUsuarioLogin } from "@/lib/auth/actions";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-	const supabase = await createClient();
-
-	const { data } = await supabase.auth.getUser();
-	if (data.user) {
-		const { data: equipo } = await supabase
-			.from("Usuarios_Equipos")
-			.select("Equipos(slug)")
-			.eq("usuario", data.user.id)
-			.limit(1);
-
-		if (!equipo || equipo.length == 0) {
-			redirect("/nuevo-equipo");
-		} else {
-			redirect("/" + equipo[0].Equipos!.slug);
-		}
-	}
+	// Comprobar si el usuario ha iniciado sesión y redirige a la página del primer equipo
+	//o a crear nuevo equipo si no tiene ninguno asignado
+	await checkUsuarioLogin();
 
 	return (
 		<div className="flex h-screen flex-col font-sans lg:my-0 lg:grid lg:grid-cols-2">

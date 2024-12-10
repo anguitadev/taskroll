@@ -533,7 +533,7 @@ export async function getUsuariosByEquipoSlug(equipoSlug: string) {
 
 	const { data } = await supabase
 		.from("Usuarios_Equipos")
-		.select("Usuarios(*)")
+		.select("admin, equipo, Usuarios(*)")
 		.eq("equipo", equipoId);
 
 	return data;
@@ -680,4 +680,35 @@ export async function getDocumentosByEquipoSlug(equipoSlug: string) {
 
 		if (data) return data as unknown as Documentos;
 	}
+}
+
+export async function isUsuarioEquipoAdmin(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	const usuario = await getUsuario();
+
+	if (!equipo || !usuario) return false;
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("*")
+		.eq("equipo", equipo.id)
+		.eq("usuario", usuario.id)
+		.eq("admin", true);
+
+	return data ? data.length > 0 : false;
+}
+
+export async function getUsuarioByNombreUsuario(nombre_usuario: string) {
+	const supabase = await createClient();
+	const { data: usuario } = await supabase
+		.from("Usuarios")
+		.select("*")
+		.eq("nombre_usuario", nombre_usuario)
+		.limit(1)
+		.single();
+	if (!usuario) return;
+	return usuario;
 }

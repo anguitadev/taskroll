@@ -6,7 +6,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
-import { getEntornoById, getEquipoByEntornoId, getUsuario, getUsuariosByTarea } from "./data";
+import {
+	getEntornoById,
+	getEquipoByEntornoId,
+	getEquipoBySlug,
+	getUsuario,
+	getUsuarioByNombreUsuario,
+	getUsuariosByEquipoSlug,
+	getUsuariosByTarea,
+} from "./data";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -151,29 +159,46 @@ export async function deleteDocumento(pathname: string) {
 	redirect(slugs.join("/"));
 }
 
-export async function createDocumento(fileKey: string, nombreDocumento: string, pathname: string) {
-	const slugs = pathname.split("/");
-	const entorno = slugs[slugs.indexOf("documentos") - 1];
-
-	if (entorno) {
+export async function createDocumento(
+	fileKey: string,
+	nombreDocumento: string,
+	pathname: string,
+	destinatario?: string,
+) {
+	if (pathname === "nomina" && destinatario) {
+		const usuario = await getUsuario();
 		const supabase = await createClient();
+		const { error } = await supabase.from("Documentos").insert({
+			nombre: nombreDocumento,
+			url: fileKey,
+			propietario: usuario!.id,
+			destinatario: destinatario,
+		});
+		if (error) return error;
+	} else {
+		const slugs = pathname.split("/");
+		const entorno = slugs[slugs.indexOf("documentos") - 1];
 
-		const { data: entornoId } = await supabase
-			.from("Entornos")
-			.select("id")
-			.eq("slug", entorno)
-			.limit(1)
-			.single();
+		if (entorno) {
+			const supabase = await createClient();
 
-		if (entornoId) {
-			const usuario = await getUsuario();
-			const { error } = await supabase.from("Documentos").insert({
-				nombre: nombreDocumento,
-				url: fileKey,
-				entorno: entornoId!.id,
-				propietario: usuario!.id,
-			});
-			if (error) return error;
+			const { data: entornoId } = await supabase
+				.from("Entornos")
+				.select("id")
+				.eq("slug", entorno)
+				.limit(1)
+				.single();
+
+			if (entornoId) {
+				const usuario = await getUsuario();
+				const { error } = await supabase.from("Documentos").insert({
+					nombre: nombreDocumento,
+					url: fileKey,
+					entorno: entornoId!.id,
+					propietario: usuario!.id,
+				});
+				if (error) return error;
+			}
 		}
 	}
 }
@@ -516,4 +541,81 @@ export async function getTareaUrlById(idTarea: string) {
 	};
 
 	return `https://taskroll.app/${slugs?.entorno?.entorno?.equipo?.slug}/${slugs?.entorno?.entorno?.slug}/${slugs?.entorno?.slug}/${slugs?.slug}`;
+}
+
+export async function updateUsuarioRolEquipo(newRol: string, idUsuario: string, idEquipo: string) {
+	const adminCount = await getAdminCountEquipo(idEquipo);
+
+	if (newRol == "miembro" && adminCount == 1)
+		throw new Error("El equipo debe tener al menos un admin");
+
+	const supabase = await createClient();
+
+	const rol = newRol === "admin" ? true : false;
+
+	const { error } = await supabase
+		.from("Usuarios_Equipos")
+		.update({ admin: rol })
+		.eq("equipo", idEquipo)
+		.eq("usuario", idUsuario);
+
+	if (error) throw error;
+}
+
+export async function getAdminCountEquipo(idEquipo: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("admin")
+		.eq("equipo", idEquipo)
+		.eq("admin", true);
+
+	return data ? data.length : 0;
+}
+
+export async function removeUsuarioEquipo(usuarioId: string, equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return;
+	const usuarioCount = await getUsuarioCountEquipo(equipo.id);
+
+	if (usuarioCount == 1) throw new Error("El equipo debe tener al menos un usuario");
+
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Usuarios_Equipos")
+		.delete()
+		.eq("equipo", equipo.id)
+		.eq("usuario", usuarioId);
+
+	if (error) throw error;
+}
+
+export async function getUsuarioCountEquipo(idEquipo: string) {
+	const supabase = await createClient();
+	const { data } = await supabase.from("Usuarios_Equipos").select("admin").eq("equipo", idEquipo);
+
+	return data ? data.length : 0;
+}
+
+export async function addUsuarioToEquipo(nombre_usuario: string, equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) throw new Error("Equipo no encontrado");
+
+	const usuario = await getUsuarioByNombreUsuario(nombre_usuario);
+	if (!usuario) throw new Error("Usuario no encontrado");
+
+	const usuariosEquipo = await getUsuariosByEquipoSlug(equipoSlug);
+
+	if (usuariosEquipo?.find(user => user.Usuarios?.id === usuario.id)) {
+		throw new Error("El usuario ya pertenece al equipo");
+	}
+
+	const supabase = await createClient();
+	const { error } = await supabase.from("Usuarios_Equipos").insert({
+		equipo: equipo.id,
+		usuario: usuario.id,
+		admin: false,
+	});
+
+	if (error) throw new Error("Ha habido un error al asignar el usuario.");
 }

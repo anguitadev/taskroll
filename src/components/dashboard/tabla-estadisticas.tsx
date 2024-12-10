@@ -1,6 +1,7 @@
 import { getCompletadoTareasCountByUserId, getTareasCountByUserId, getUsuariosByEquipoSlug } from "@/lib/data";
 
 type Usuario = {
+	admin: boolean;
 	Usuarios: {
 		color: string;
 		id: string;

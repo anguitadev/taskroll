@@ -128,7 +128,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 					<label htmlFor="slugEquipo" className="font-semibold">
 						URL del Equipo
 					</label>
-					<div className="flex items-center gap-1 w-full">
+					<div className="flex items-center gap-1">
 						<span>taskroll.app/</span>
 						<input
 							id="slugEquipo"
