@@ -313,3 +313,16 @@ export async function getNominasByUsuarioId(usuarioId: string) {
 
 	if (data) return data as unknown as Nominas;
 }
+
+export async function getMarcajesByUsuarioId(usuarioId: string) {
+	const supabase = createClient();
+
+	const { data, error } = await supabase
+		.from("Marcajes")
+		.select("*")
+		.eq("usuario", usuarioId);
+
+	if (error) throw error;
+
+	return data;
+}

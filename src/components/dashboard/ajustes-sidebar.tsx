@@ -3,11 +3,9 @@
 import clsx from "clsx";
 import {
 	BriefcaseBusiness,
-	ChevronDown,
 	ChevronLeft,
-	ChevronRight,
 	UserCog,
-	Users,
+	Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -75,23 +73,20 @@ export default function AjustesSidebar({
 				<div className="ml-7">
 					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 1
-						<ChevronDown className="size-5" />
 					</span>
 					<div className="ml-4">
 						<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
-							General
+							Proyecto 1
 						</span>
 						<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
-							Miembros
+							Proyecto 2
 						</span>
 					</div>
 					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 2
-						<ChevronRight className="size-5" />
 					</span>
 					<span className="flex items-center rounded text-sm transition hover:bg-neutral-800 p-1 px-3">
 						Entorno 3
-						<ChevronRight className="size-5" />
 					</span>
 				</div>
 			</div>

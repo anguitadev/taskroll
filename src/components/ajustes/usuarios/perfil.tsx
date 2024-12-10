@@ -5,6 +5,7 @@ import { getNominasByUsuarioId, getUsuario } from "@/lib/data-client";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import TablaMarcajes from "./tabla-marcajes";
 
 type Nominas =
 	| {
@@ -90,7 +91,7 @@ export default function Perfil({
 		<div
 			id={"perfil-" + usuario.nombre_usuario}
 			popover="auto"
-			className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm max-h-[700px]"
+			className="w-[750px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm max-h-[700px]"
 		>
 			<div className="flex items-center gap-4 border-b border-neutral-800 pb-4 text-2xl font-semibold">
 				<div
@@ -184,6 +185,9 @@ export default function Perfil({
 				</>
 			)}
 
+			{showMarcajes && (
+				<TablaMarcajes usuarioId={usuario.id} nombreUsuario={usuario.nombre_usuario} />
+			)}
 			{usuarioLoggeado?.id !== usuario.id && (
 				<div className="mt-4 flex gap-2">
 					{!showMarcajes ? (
