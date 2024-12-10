@@ -619,3 +619,9 @@ export async function addUsuarioToEquipo(nombre_usuario: string, equipoSlug: str
 
 	if (error) throw new Error("Ha habido un error al asignar el usuario.");
 }
+
+export async function deleteIncidenciaById(incidenciaId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Incidencias").delete().eq("id", incidenciaId);
+	if (error) throw error;
+}

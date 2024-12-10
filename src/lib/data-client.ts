@@ -317,10 +317,17 @@ export async function getNominasByUsuarioId(usuarioId: string) {
 export async function getMarcajesByUsuarioId(usuarioId: string) {
 	const supabase = createClient();
 
-	const { data, error } = await supabase
-		.from("Marcajes")
-		.select("*")
-		.eq("usuario", usuarioId);
+	const { data, error } = await supabase.from("Marcajes").select("*").eq("usuario", usuarioId);
+
+	if (error) throw error;
+
+	return data;
+}
+
+export async function getIncidenciasByUsuarioId(usuarioId: string) {
+	const supabase = createClient();
+
+	const { data, error } = await supabase.from("Incidencias").select("*").eq("usuario", usuarioId);
 
 	if (error) throw error;
 
