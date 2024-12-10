@@ -39,6 +39,7 @@ export default function TablaDocumentos({
 	useEffect(() => {
 		const numeroNominas = documentosEquipo?.filter(documento => documento.entorno === null);
 		if (numeroNominas) setNominas(numeroNominas.length == documentosEquipo?.length);
+		setDocumentos(documentosEquipo);
 	}, [documentosEquipo]);
 
 	async function handleDeleteDocumento(documentoUrl: string) {
