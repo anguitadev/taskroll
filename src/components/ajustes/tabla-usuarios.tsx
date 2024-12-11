@@ -6,11 +6,11 @@ import SelectRol from "./usuarios/select-rol";
 export default function TablaUsuarios({
 	usuarios,
 	usuarioLoggeado,
-	equipoSlug,
 }: {
 	usuarios: {
 		admin: boolean;
-		equipo: string;
+		equipo?: string;
+		entorno?: string;
 		Usuarios: {
 			color: string;
 			email: string;
@@ -21,7 +21,6 @@ export default function TablaUsuarios({
 		} | null;
 	}[];
 	usuarioLoggeado: string;
-	equipoSlug: string;
 }) {
 	return (
 		<table className="mt-8 w-full table-fixed border-separate border-spacing-y-2 overflow-y-scroll p-2 text-left">
@@ -54,11 +53,16 @@ export default function TablaUsuarios({
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{usuario.Usuarios.id !== usuarioLoggeado ? (
-										<SelectRol
+										usuario.equipo && (<SelectRol
 											admin={usuario.admin}
 											usuarioId={usuario.Usuarios.id}
 											equipoId={usuario.equipo}
-										/>
+										/>),
+										usuario.entorno && (<SelectRol
+											admin={usuario.admin}
+											usuarioId={usuario.Usuarios.id}
+											entornoId={usuario.entorno}
+										/>)
 									) : usuario.admin ? (
 										"Admin"
 									) : (
@@ -67,7 +71,8 @@ export default function TablaUsuarios({
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{usuario.Usuarios.id !== usuarioLoggeado && (
-										<AccionesUsuario usuarioId={usuario.Usuarios.id} equipoSlug={equipoSlug} />
+										usuario.equipo && <AccionesUsuario usuarioId={usuario.Usuarios.id} equipoId={usuario.equipo} />,
+										usuario.entorno && <AccionesUsuario usuarioId={usuario.Usuarios.id} entornoId={usuario.entorno} />
 									)}
 								</td>
 							</tr>

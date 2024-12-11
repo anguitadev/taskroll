@@ -4,14 +4,22 @@ import { Trash2 } from "lucide-react";
 
 export default function AccionesUsuario({
 	usuarioId,
-	equipoSlug,
+	equipoId,
+	entornoId,
 }: {
 	usuarioId: string;
-	equipoSlug: string;
+	equipoId?: string;
+	entornoId?: string;
 }) {
 	async function deleteUsuario(usuarioId: string) {
-		await removeUsuarioEquipo(usuarioId, equipoSlug);
-        window.location.reload();
+		if (equipoId) {
+			await removeUsuarioEquipo(usuarioId, equipoId);
+			window.location.reload();
+		}
+		if (entornoId) {
+			await removeUsuarioEquipo(usuarioId, entornoId);
+			window.location.reload();
+		}
 	}
 
 	return (

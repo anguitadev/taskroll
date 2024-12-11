@@ -562,6 +562,25 @@ export async function updateUsuarioRolEquipo(newRol: string, idUsuario: string, 
 	if (error) throw error;
 }
 
+export async function updateUsuarioRolEntorno(newRol: string, idUsuario: string, idEntorno: string) {
+	const adminCount = await getAdminCountEntorno(idEntorno);
+
+	if (newRol == "miembro" && adminCount == 1)
+		throw new Error("El entorno debe tener al menos un admin");
+
+	const supabase = await createClient();
+
+	const rol = newRol === "admin" ? true : false;
+
+	const { error } = await supabase
+		.from("Usuarios_Entornos")
+		.update({ admin: rol })
+		.eq("entorno", idEntorno)
+		.eq("usuario", idUsuario);
+
+	if (error) throw error;
+}
+
 export async function getAdminCountEquipo(idEquipo: string) {
 	const supabase = await createClient();
 	const { data } = await supabase
@@ -573,10 +592,19 @@ export async function getAdminCountEquipo(idEquipo: string) {
 	return data ? data.length : 0;
 }
 
-export async function removeUsuarioEquipo(usuarioId: string, equipoSlug: string) {
-	const equipo = await getEquipoBySlug(equipoSlug);
-	if (!equipo) return;
-	const usuarioCount = await getUsuarioCountEquipo(equipo.id);
+export async function getAdminCountEntorno(idEntorno: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin")
+		.eq("entorno", idEntorno)
+		.eq("admin", true);
+
+	return data ? data.length : 0;
+}
+
+export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
+	const usuarioCount = await getUsuarioCountEquipo(equipoId);
 
 	if (usuarioCount == 1) throw new Error("El equipo debe tener al menos un usuario");
 
@@ -584,7 +612,7 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoSlug: string)
 	const { error } = await supabase
 		.from("Usuarios_Equipos")
 		.delete()
-		.eq("equipo", equipo.id)
+		.eq("equipo", equipoId)
 		.eq("usuario", usuarioId);
 
 	if (error) throw error;
@@ -624,4 +652,13 @@ export async function deleteIncidenciaById(incidenciaId: string) {
 	const supabase = await createClient();
 	const { error } = await supabase.from("Incidencias").delete().eq("id", incidenciaId);
 	if (error) throw error;
+}
+
+export async function updateEntornoById(entornoId: string, nombre: string, descripcion: string) {	
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Entornos")
+		.update({ nombre: nombre, descripcion: descripcion })
+		.eq("id", entornoId);
+	if (error) throw new Error("Ha habido un error al actualizar el entorno.");
 }

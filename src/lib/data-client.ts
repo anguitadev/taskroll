@@ -333,3 +333,25 @@ export async function getIncidenciasByUsuarioId(usuarioId: string) {
 
 	return data;
 }
+
+export async function getEntornosWhereUsuarioAdminByEquipoSlug(equipoSlug: string) {
+	const supabase = createClient();
+
+	const usuario = await getUsuario();
+
+	const equipo = await getEquipoBySlug(equipoSlug);
+
+	if (!equipo || !usuario) return [];
+
+	const { data, error } = await supabase
+		.from("Usuarios_Entornos")
+		.select("entorno:Entornos(*)")
+		.eq("usuario", usuario.id)
+		.eq("admin", true)
+		.eq("entorno.equipo", equipo.id)
+		.not("entorno", "is", null);
+
+	if (error) throw error;
+
+	return data;
+}

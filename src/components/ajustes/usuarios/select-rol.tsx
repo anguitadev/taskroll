@@ -1,16 +1,18 @@
 "use client";
 
-import { updateUsuarioRolEquipo } from "@/lib/actions";
+import { updateUsuarioRolEntorno, updateUsuarioRolEquipo } from "@/lib/actions";
 import { useState } from "react";
 
 export default function SelectRol({
 	admin,
 	usuarioId,
 	equipoId,
+	entornoId,
 }: {
 	admin: boolean;
 	usuarioId: string;
-	equipoId: string;
+	equipoId?: string;
+	entornoId?: string;
 }) {
 	const [rol, setRol] = useState(admin ? "admin" : "miembro");
 	const [loading, setLoading] = useState(false);
@@ -21,14 +23,28 @@ export default function SelectRol({
 		setLoading(true);
 		setError(null);
 
-		try {
-			await updateUsuarioRolEquipo(newRol, usuarioId, equipoId);
-		} catch (err) {
-			console.error("No se ha podido actualizar el rol:", err);
-			setError("No se ha podido actualizar el rol. Pro favor, intenta de nuevo. "+err);
-			setRol(admin ? "admin" : "miembro");
-		} finally {
-			setLoading(false);
+		if (equipoId) {
+			try {
+				await updateUsuarioRolEquipo(newRol, usuarioId, equipoId);
+			} catch (err) {
+				console.error("No se ha podido actualizar el rol:", err);
+				setError("No se ha podido actualizar el rol. Pro favor, intenta de nuevo. " + err);
+				setRol(admin ? "admin" : "miembro");
+			} finally {
+				setLoading(false);
+			}
+		}
+
+		if (entornoId) {
+			try {
+				await updateUsuarioRolEntorno(newRol, usuarioId, entornoId);
+			} catch (err) {
+				console.error("No se ha podido actualizar el rol:", err);
+				setError("No se ha podido actualizar el rol. Pro favor, intenta de nuevo. " + err);
+				setRol(admin ? "admin" : "miembro");
+			} finally {
+				setLoading(false);
+			}
 		}
 	};
 

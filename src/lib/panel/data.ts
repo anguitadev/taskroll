@@ -11,7 +11,7 @@ export async function getEntornosbyUsuario() {
 	if (user) {
 		const { data } = await supabase
 			.from("Usuarios_Entornos")
-			.select("Entornos(*)")
+			.select("admin, Entornos(*)")
 			.eq("usuario", user.id);
 		if (data) {
 			return data as EntornosFromUsuario;

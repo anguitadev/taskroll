@@ -50,7 +50,7 @@ export default function Sidebar({
 	const [entorno, setEntorno] = useState<string | null>(null);
 	const [entornosSidebar, setEntornosSidebar] = useState(entornos);
 	const [notificaciones, setNotificaciones] = useState(0);
-	const [isAdmin, setIsAdmin] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(true);
 
 	const supabase = createClient();
 
@@ -160,18 +160,15 @@ export default function Sidebar({
 		}
 	}, [pathname, equipo.id]);
 
-
-	useEffect(() => {
-		const admin = async () => {
-			try {
-				const admin = await isUsuarioEquipoAdmin(equipo.slug);
-				setIsAdmin(admin);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		admin();
-	}, [equipo]);
+	const admin = async () => {
+		try {
+			const admin = await isUsuarioEquipoAdmin(equipo.slug);
+			setIsAdmin(admin);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	admin();
 
 	return (
 		<>
@@ -214,7 +211,12 @@ export default function Sidebar({
 						)}
 					</div>
 					{ajustes ? (
-						<AjustesSidebar className={className} equipo={equipo} isAdmin={isAdmin} />
+						<AjustesSidebar
+							className={className}
+							equipo={equipo}
+							isAdmin={isAdmin}
+							entornos={entornos}
+						/>
 					) : (
 						<div className="flex max-h-[calc(100vh-70px)] grow flex-col justify-stretch">
 							<div>

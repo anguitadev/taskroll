@@ -1,4 +1,5 @@
 export type EntornosFromUsuario = {
+	admin: boolean;
 	Entornos: {
 		color: string;
 		descripcion: string | null;

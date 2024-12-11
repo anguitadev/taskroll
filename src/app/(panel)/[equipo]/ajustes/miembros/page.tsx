@@ -44,7 +44,6 @@ export default async function Miembros(props: { params: Params }) {
 					<TablaUsuarios
 						usuarios={usuariosEquipo}
 						usuarioLoggeado={usuarioLoggeado.id}
-						equipoSlug={equipoSlug}
 					/>
 				)}
 			</div>
