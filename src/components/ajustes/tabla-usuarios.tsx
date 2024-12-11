@@ -46,23 +46,31 @@ export default function TablaUsuarios({
 									{usuario.Usuarios.nombre_usuario}
 								</td>
 								<td className="border-b border-neutral-700 pb-2 underline">
-									<a href={`mailto:${usuario.Usuarios.email}`}>{usuario.Usuarios.email}</a>
+									<a href={`mailto:${usuario.Usuarios.email}`}>
+										{usuario.Usuarios.email}
+									</a>
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{usuario.Usuarios.puesto}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{usuario.Usuarios.id !== usuarioLoggeado ? (
-										usuario.equipo && (<SelectRol
-											admin={usuario.admin}
-											usuarioId={usuario.Usuarios.id}
-											equipoId={usuario.equipo}
-										/>),
-										usuario.entorno && (<SelectRol
-											admin={usuario.admin}
-											usuarioId={usuario.Usuarios.id}
-											entornoId={usuario.entorno}
-										/>)
+										<>
+											{usuario.equipo && (
+												<SelectRol
+													admin={usuario.admin}
+													usuarioId={usuario.Usuarios.id}
+													equipoId={usuario.equipo}
+												/>
+											)}
+											{usuario.entorno && (
+												<SelectRol
+													admin={usuario.admin}
+													usuarioId={usuario.Usuarios.id}
+													entornoId={usuario.entorno}
+												/>
+											)}
+										</>
 									) : usuario.admin ? (
 										"Admin"
 									) : (
@@ -71,8 +79,20 @@ export default function TablaUsuarios({
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{usuario.Usuarios.id !== usuarioLoggeado && (
-										usuario.equipo && <AccionesUsuario usuarioId={usuario.Usuarios.id} equipoId={usuario.equipo} />,
-										usuario.entorno && <AccionesUsuario usuarioId={usuario.Usuarios.id} entornoId={usuario.entorno} />
+										<>
+											{usuario.equipo && (
+												<AccionesUsuario
+													usuarioId={usuario.Usuarios.id}
+													equipoId={usuario.equipo}
+												/>
+											)}
+											{usuario.entorno && (
+												<AccionesUsuario
+													usuarioId={usuario.Usuarios.id}
+													entornoId={usuario.entorno}
+												/>
+											)}
+										</>
 									)}
 								</td>
 							</tr>
