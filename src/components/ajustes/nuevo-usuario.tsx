@@ -1,16 +1,17 @@
 "use client";
 
-import { addUsuarioToEquipo } from "@/lib/actions";
+import { addUsuarioToEntorno, addUsuarioToEquipo } from "@/lib/actions";
 import { useState } from "react";
 
-export default function NuevoUsuario({ equipoSlug }: { equipoSlug: string }) {
+export default function NuevoUsuario({ equipoSlug, entornoSlug }: { equipoSlug?: string; entornoSlug?: string }) {
 	const [nombreusuario, setNombreUsuario] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	async function handleNuevoUsuario() {
 		let hasError = false;
 		try {
-			await addUsuarioToEquipo(nombreusuario, equipoSlug);
+			if (equipoSlug) await addUsuarioToEquipo(nombreusuario, equipoSlug);
+			if (entornoSlug) await addUsuarioToEntorno(nombreusuario, entornoSlug);
 		} catch (error) {
 			hasError = true;
 			if (error instanceof Error) setErrorMessage(error.message);
@@ -25,7 +26,7 @@ export default function NuevoUsuario({ equipoSlug }: { equipoSlug: string }) {
 			popover="auto"
 			className="flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 		>
-			<span className="mb-6 block text-lg font-semibold">Añadir nuevo usuario al equipo</span>
+			<span className="mb-6 block text-lg font-semibold">Añadir nuevo usuario al {equipoSlug ? "equipo" : "entorno" }</span>
 			<label>Introduce el nombre de usuario del nuevo miembro:</label>
 			<div className="mt-4 flex w-full gap-2">
 				<input

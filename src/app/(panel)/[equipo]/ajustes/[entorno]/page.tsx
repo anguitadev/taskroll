@@ -1,4 +1,5 @@
 import DatosEntorno from "@/components/ajustes/entornos/datos";
+import NuevoUsuario from "@/components/ajustes/nuevo-usuario";
 import TablaUsuarios from "@/components/ajustes/tabla-usuarios";
 import { Tables } from "@/db.types";
 import {
@@ -8,6 +9,7 @@ import {
 	getUsuariosByEntornoId,
 	isEntornoAdmin,
 } from "@/lib/data";
+import { Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ entorno: string }>;
@@ -42,13 +44,23 @@ export default async function AjustesEntorno(props: { params: Params }) {
 				</div>
 				<hr className="my-8 w-full border border-neutral-800" />
 				<div className="p-8">
-					<h1 className="mb-4 text-3xl font-semibold">Miembros:</h1>
+					<div className="flex items-center justify-between">
+						<h1 className="mb-4 text-3xl font-semibold">Miembros:</h1>
+						<button
+							className="mb-2 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
+							popoverTarget="nuevo-usuario"
+						>
+							<Plus className="size-5" />
+							Añadir Usuario
+						</button>
+					</div>
 					{usuarioLoggeado && usuariosEntorno && (
 						<TablaUsuarios
 							usuarios={usuariosEntorno}
 							usuarioLoggeado={usuarioLoggeado.id}
 						/>
 					)}
+					<NuevoUsuario entornoSlug={entornoSlug} />
 				</div>
 			</div>
 		</>

@@ -552,6 +552,22 @@ export async function getUsuariosByEquipoSlug(equipoSlug: string) {
 	return data;
 }
 
+export async function getUsuariosByEntornoSlug(entornoSlug: string) {
+	const entorno = await getEntornoBySlug(entornoSlug);
+	if (!entorno) return [];
+
+	const entornoId = entorno.id;
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin, entorno, Usuarios(*)")
+		.eq("entorno", entornoId);
+
+	return data;
+}
+
 export async function getCompletadoTareasCountByUserId(userId: string, equipoSlug: string) {
 	const equipo = await getEquipoBySlug(equipoSlug);
 	if (!equipo) return 0;

@@ -8,10 +8,13 @@ import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import {
 	getEntornoById,
+	getEntornoProyectoBySlug,
 	getEquipoByEntornoId,
 	getEquipoBySlug,
 	getUsuario,
 	getUsuarioByNombreUsuario,
+	getUsuariosByEntornoId,
+	getUsuariosByEntornoSlug,
 	getUsuariosByEquipoSlug,
 	getUsuariosByTarea,
 } from "./data";
@@ -562,7 +565,11 @@ export async function updateUsuarioRolEquipo(newRol: string, idUsuario: string, 
 	if (error) throw error;
 }
 
-export async function updateUsuarioRolEntorno(newRol: string, idUsuario: string, idEntorno: string) {
+export async function updateUsuarioRolEntorno(
+	newRol: string,
+	idUsuario: string,
+	idEntorno: string,
+) {
 	const adminCount = await getAdminCountEntorno(idEntorno);
 
 	if (newRol == "miembro" && adminCount == 1)
@@ -648,13 +655,52 @@ export async function addUsuarioToEquipo(nombre_usuario: string, equipoSlug: str
 	if (error) throw new Error("Ha habido un error al asignar el usuario.");
 }
 
+export async function addUsuarioToEntorno(nombre_usuario: string, entornoSlug: string) {
+	const entorno = await getEntornoProyectoBySlug(entornoSlug);
+	if (!entorno) throw new Error("Entorno no encontrado");
+
+	const usuario = await getUsuarioByNombreUsuario(nombre_usuario);
+	if (!usuario) throw new Error("Usuario no encontrado");
+
+	if (entorno.entorno === null) {
+		const equipo = await getEquipoByEntornoId(entorno.id);
+		if (!equipo?.Equipos) throw new Error("Equipo padre no encontrado");
+		const usuariosEquipo = await getUsuariosByEquipoSlug(equipo.Equipos.slug);
+		if (!usuariosEquipo?.find(user => user.Usuarios?.id === usuario.id)) {
+			throw new Error("El usuario no está asignado al equipo.");
+		}
+	} else {
+		const entornoPadre = await getEntornoById(entorno.entorno);
+		if (!entornoPadre) throw new Error("Entorno padre no encontrado");
+		const usuariosEntorno = await getUsuariosByEntornoId(entorno.entorno);
+		if (!usuariosEntorno?.find(user => user.Usuarios?.id === usuario.id)) {
+			throw new Error("El usuario no está asignado al entorno padre.");
+		}
+	}
+
+	const usuariosEntorno = await getUsuariosByEntornoSlug(entornoSlug);
+
+	if (usuariosEntorno?.find(user => user.Usuarios?.id === usuario.id)) {
+		throw new Error("El usuario ya pertenece al entorno/proyecto");
+	}
+
+	const supabase = await createClient();
+	const { error } = await supabase.from("Usuarios_Entornos").insert({
+		entorno: entorno.id,
+		usuario: usuario.id,
+		admin: false,
+	});
+
+	if (error) throw new Error("Ha habido un error al asignar el usuario.");
+}
+
 export async function deleteIncidenciaById(incidenciaId: string) {
 	const supabase = await createClient();
 	const { error } = await supabase.from("Incidencias").delete().eq("id", incidenciaId);
 	if (error) throw error;
 }
 
-export async function updateEntornoById(entornoId: string, nombre: string, descripcion: string) {	
+export async function updateEntornoById(entornoId: string, nombre: string, descripcion: string) {
 	const supabase = await createClient();
 	const { error } = await supabase
 		.from("Entornos")
