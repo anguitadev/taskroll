@@ -167,7 +167,11 @@ export async function getProyectosByEntornoId(entornoId: string) {
 export async function getProyectosByEntornoIdAndUsuarioId(entornoId: string, usuarioId: string) {
 	const supabase = await createClient();
 
-	const { data } = await supabase.from("Usuarios_Entornos").select("Entornos(*)").eq("entorno.entorno", entornoId).eq("usuario", usuarioId);
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("Entornos(*)")
+		.eq("entorno.entorno", entornoId)
+		.eq("usuario", usuarioId);
 
 	return data;
 }
@@ -695,18 +699,27 @@ export async function getDocumentosByEquipoSlug(equipoSlug: string) {
 	const entornosUsuario = await getEntornosbyUsuario();
 
 	if (entornosUsuario && equipo) {
-		const entornosUsuarioEnEquipo = entornosUsuario.filter(async entorno => {
-			if (entorno.Entornos) {
-				if (entorno.Entornos.entorno === null) {
-					return entorno.Entornos.equipo === equipo.id;
-				} else {
-					const entornoProyecto = await getEntornoById(entorno.Entornos.entorno);
-					if (entornoProyecto) return entornoProyecto.equipo === equipo.id;
+		const entornosUsuarioEnEquipo = await Promise.all(
+			entornosUsuario.map(async entorno => {
+				if (entorno.Entornos) {
+					if (entorno.Entornos.entorno === null) {
+						return entorno.Entornos.equipo === equipo.id ? entorno : null;
+					} else {
+						const entornoProyecto = await getEntornoById(entorno.Entornos.entorno);
+						if (entornoProyecto) {
+							return entornoProyecto.equipo === equipo.id ? entorno : null;
+						}
+					}
 				}
-			}
-		});
+				return null;
+			}),
+		);
 
-		const entornosId = entornosUsuarioEnEquipo.map(entorno => entorno.Entornos?.id);
+		const filteredEntornosUsuarioEnEquipo = entornosUsuarioEnEquipo.filter(
+			entorno => entorno !== null,
+		);
+
+		const entornosId = filteredEntornosUsuarioEnEquipo.map(entorno => entorno.Entornos?.id);
 
 		const entornosIdString = entornosId.join(",");
 
@@ -788,7 +801,7 @@ export async function getUsuarioById(usuarioId: string) {
 		.eq("id", usuarioId)
 		.limit(1)
 		.single();
-	
+
 	return usuario as Tables<"Usuarios">;
 }
 
