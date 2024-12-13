@@ -1,4 +1,4 @@
-import { getEntornoBySlugAndEquipo, isEntornoAdmin } from "@/lib/data";
+import { getEntornoBySlugAndEquipo, isEntornoAdmin } from "@/lib/entornos/data";
 import { Settings } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,10 +13,11 @@ export default async function DashboardLayout({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
+	// Fetch entorno del equipo
 	const entorno = await getEntornoBySlugAndEquipo(entornoSlug, equipoSlug);
-
 	if (!entorno) return notFound();
 
+	// Comprobar que el usuario es admin del entorno
 	const isAdmin = await isEntornoAdmin(entorno.id);
 	return (
 		<>

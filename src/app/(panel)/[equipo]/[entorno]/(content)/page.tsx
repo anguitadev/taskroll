@@ -1,6 +1,8 @@
 import TablaTareas from "@/components/proyectos/tabla-tareas";
 import NuevaTarea from "@/components/tareas/nueva-tarea";
-import { getEntornoBySlug, getProyectosByEntornoId, getTareasByProyectoSlug } from "@/lib/data";
+import { getEntornoBySlug } from "@/lib/entornos/data";
+import { getProyectosByEntornoId } from "@/lib/proyectos/data";
+import { getTareasByProyectoSlug } from "@/lib/tareas/data";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,9 +15,11 @@ export default async function Entorno({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
+	// Fetch entorno
 	const entorno = await getEntornoBySlug(entornoSlug);
-
 	if (!entorno) return notFound();
+
+	// Fetch proyectos del entorno
 	const proyectosEntorno = await getProyectosByEntornoId(entorno.id);
 
 	async function showTareas(proyectoId: string) {
@@ -23,12 +27,14 @@ export default async function Entorno({
 
 		let zeroTareas = true;
 
+		// Comprobamos que el objeto contenido dentro de tareas no sea null
 		tareas?.forEach(tarea => {
 			if (tarea.tarea !== null) {
 				zeroTareas = false;
 			}
 		});
 
+		// Si no hay tareas o el objeto contenido dentro de tareas es null se muestra el mensaje
 		if (!tareas || tareas.length === 0 || zeroTareas)
 			return (
 				<p className="mt-8 text-center text-sm italic text-neutral-400">
@@ -36,6 +42,7 @@ export default async function Entorno({
 				</p>
 			);
 
+		// Ordenamos las tareas
 		const tareasFiltradas = tareas.filter(tarea => tarea.tarea !== null);
 
 		tareasFiltradas.sort((a, b) => {

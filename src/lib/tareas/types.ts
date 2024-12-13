@@ -15,3 +15,24 @@ export interface Tarea {
 		};
 	};
 }
+
+export type UsuariosTareas = {
+	Usuarios: {
+		id: string;
+		color: string;
+		nombre_completo: string;
+	};
+};
+
+export type Enlace = {
+	slug: string;
+	entorno: {
+		slug: string;
+		entorno: {
+			slug: string;
+			equipo: {
+				slug: string;
+			};
+		};
+	};
+};

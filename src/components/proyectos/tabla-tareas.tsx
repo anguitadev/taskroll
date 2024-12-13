@@ -1,41 +1,20 @@
 "use client";
-import { deleteTarea } from "@/lib/actions";
-import { getTareaLinkById, getUsuariosByTarea } from "@/lib/data-client";
+import { deleteTarea } from "@/lib/tareas/actions";
+import { getTareaLinkById, getUsuariosByTarea } from "@/lib/tareas/data-client";
+import { Tarea } from "@/lib/tareas/types";
 import clsx from "clsx";
 import { FlagTriangleRight, Settings2, Trash2 } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-type Tarea = {
-	usuario: {
-		color: string;
-		nombre_completo: string;
-	} | null;
-	tarea: {
-		id: string;
-		titulo: string;
-		slug: string;
-		fecha_fin: string;
-		estado: string;
-		prioridad: string;
-		entorno: {
-			nombre: string;
-			entorno: {
-				nombre: string;
-			};
-		};
-	} | null;
-};
-
-interface Usuario {
+type Usuario = {
 	Usuarios: {
 		id: string;
 		color: string;
 		nombre_completo: string;
 	};
-}
-
-import { useEffect, useState } from "react";
+};
 
 export default function TablaTareas({
 	tareas,
@@ -65,6 +44,7 @@ export default function TablaTareas({
 		[key: string]: Usuario[];
 	}>({});
 
+	// Cargar los usuarios de cada tarea
 	useEffect(() => {
 		async function fetchUsuarios() {
 			const usuariosMap: { [key: string]: Usuario[] } = {};
@@ -82,17 +62,20 @@ export default function TablaTareas({
 		fetchUsuarios();
 	}, [tareas]);
 
+	// Eliminar tarea
 	function handleDeleteTarea(idTarea: string) {
 		setTareasFiltradas(tareasFiltradas.filter(tarea => tarea.tarea?.id !== idTarea));
 		deleteTarea(idTarea);
 	}
 
+	// Recargar la página si no hay tareas
 	useEffect(() => {
 		if (tareasFiltradas.length === 0) window.location.reload();
 	}, [tareasFiltradas]);
 
 	const router = useRouter();
 
+	// Redireccionar a la tarea
 	async function handleRedirect(tareaId: string, isTarea: boolean) {
 		const link = await getTareaLinkById(tareaId);
 

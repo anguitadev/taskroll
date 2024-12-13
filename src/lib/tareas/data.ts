@@ -148,3 +148,19 @@ export async function getTareasCountByUserId(userId: string, equipoSlug: string)
 
 	return data ? data.length : 0;
 }
+
+export async function getTareasByProyectoSlug(idProyecto: string) {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return;
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad)")
+		.eq("usuario", usuario.id)
+		.eq("tarea.entorno", idProyecto);
+
+	return data as unknown as Tarea[];
+}
