@@ -734,7 +734,7 @@ export async function removeUsuarioProyecto(usuarioId: string, proyectoId: strin
 	}
 
 	const supabase = await createClient();
-	const { data, error } = await supabase
+	const { error } = await supabase
 		.from("Usuarios_Entornos")
 		.delete()
 		.eq("entorno", proyectoId)
