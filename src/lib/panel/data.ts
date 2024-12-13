@@ -28,34 +28,21 @@ export async function getEquiposByIdUsuario(id: string) {
 }
 
 export async function getProyectosbyEntornos(entornos: EntornosFromUsuario) {
-	const supabase = await createClient();
-
-	const ids = entornos?.filter(item => item !== null).map(item => item.Entornos.id);
-
-	if (ids?.length > 0) {
-		const { data } = await supabase
-			.from("Entornos")
-			.select("id, nombre, slug, entorno")
-			.in("entorno", ids);
-		if (data) {
-			const result = data.reduce(
-				(acc, item) => {
-					const id = item.entorno;
-					if (id) {
-						if (!acc[id]) {
-							acc[id] = [];
-						}
-						acc[id].push({
-							id: item.id,
-							nombre: item.nombre,
-							slug: item.slug,
-						});
-					}
-					return acc;
-				},
-				{} as Record<string, { id: string; nombre: string; slug: string }[]>,
-			);
-			return result;
-		}
-	}
+	const proyectos = entornos.reduce(
+		(acc, entorno) => {
+			if (entorno.Entornos.entorno) {
+				if (!acc[entorno.Entornos.entorno]) {
+					acc[entorno.Entornos.entorno] = [];
+				}
+				acc[entorno.Entornos.entorno].push({
+					id: entorno.Entornos.id,
+					nombre: entorno.Entornos.nombre,
+					slug: entorno.Entornos.slug,
+				});
+			}
+			return acc;
+		},
+		{} as Record<string, { id: string; nombre: string; slug: string }[]>,
+	);
+	return proyectos;
 }

@@ -393,7 +393,7 @@ export default function Sidebar({
 																isCurrentPath ? "flex" : "hidden",
 															)}
 														>
-															<Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" />
+															<Link href={`/${equipo?.slug}/ajustes/${entornoData.slug}`}><Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" /></Link>
 															<button
 																onClick={() =>
 																	handleNuevoProyecto(

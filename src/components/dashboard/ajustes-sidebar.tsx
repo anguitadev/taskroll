@@ -99,7 +99,13 @@ export default function AjustesSidebar({
 						<div className="ml-7" key={entorno.Entornos.id}>
 							<Link
 								href={`/${equipo.slug}/ajustes/${entorno.Entornos.slug}`}
-								className="flex cursor-pointer items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800"
+								className={clsx(
+									"flex items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800",
+									{
+										"bg-neutral-800":
+											pathname === "/" + equipo.slug + "/ajustes/" + entorno.Entornos.slug,
+									},
+								)}
 							>
 								{entorno.Entornos.nombre}
 							</Link>
@@ -111,7 +117,13 @@ export default function AjustesSidebar({
 												<Link
 													href={`/${equipo.slug}/ajustes/${proyecto.Entornos.slug}`}
 													key={proyecto.Entornos.id}
-													className="flex cursor-pointer items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800"
+													className={clsx(
+														"flex items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800",
+														{
+															"bg-neutral-800":
+																pathname === "/" + equipo.slug + "/ajustes/" + proyecto.Entornos.slug,
+														},
+													)}
 												>
 													{proyecto.Entornos.nombre}
 												</Link>

@@ -120,7 +120,7 @@ export default function AjustesTarea({
 			if (initial) return;
 			try {
 				getUsuariosFromEntorno(tarea.entorno).then(data => {
-					if (data) setUsuariosEntorno(data!);
+					if (data) setUsuariosEntorno(data);
 				});
 			} catch (error) {
 				console.log(error);

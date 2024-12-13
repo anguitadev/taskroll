@@ -2,8 +2,7 @@ import Sidebar from "@/components/dashboard/sidebar";
 import { getUsuario } from "@/lib/auth/data";
 import {
 	getEntornosbyUsuario,
-	getEquiposByIdUsuario,
-	getProyectosbyEntornos,
+	getEquiposByIdUsuario
 } from "@/lib/panel/data";
 import { redirect } from "next/navigation";
 
@@ -18,11 +17,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
 	//Recibir los entornos del usuario
 	const entornos = await getEntornosbyUsuario();
 
-	let proyectos;
-
-	// Recibir los proyectos
-	//REHACER ESTO: SE TIENEN QUE RECIBIR LOS PROYECTOS QUE ESTÉN ASOCIADOS AL USUARIO
-	if (entornos) proyectos = await getProyectosbyEntornos(entornos);
+	// Cargar los proyectos
+	const proyectos = entornos?.reduce(
+		(acc, entorno) => {
+			if (entorno.Entornos.entorno) {
+				if (!acc[entorno.Entornos.entorno]) {
+					acc[entorno.Entornos.entorno] = [];
+				}
+				acc[entorno.Entornos.entorno].push({
+					id: entorno.Entornos.id,
+					nombre: entorno.Entornos.nombre,
+					slug: entorno.Entornos.slug,
+				});
+			}
+			return acc;
+		},
+		{} as Record<string, { id: string; nombre: string; slug: string }[]>,
+	);
 
 	// Si el usuario no tiene ningún equipo, redirigir a la pagina de nuevo equipo
 	if (!equipos || equipos.length == 0) {

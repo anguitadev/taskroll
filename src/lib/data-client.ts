@@ -1,11 +1,11 @@
 import { createClient } from "@/utils/supabase/client";
 
-export async function getUsuariosFromEntorno(idEntorno: string) {
+export async function getUsuariosFromEntorno(entornoId: string) {
 	const supabase = createClient();
 	const { data: usuarios } = await supabase
 		.from("Usuarios_Entornos")
 		.select("usuario")
-		.eq("entorno", idEntorno);
+		.eq("entorno", entornoId);
 
 	if (!usuarios) return null;
 
@@ -19,6 +19,30 @@ export async function getUsuariosFromEntorno(idEntorno: string) {
 			.order("nombre_completo", { ascending: true });
 		return usuarios;
 	}
+}
+
+export async function getUsuariosFromProyecto(proyectoId: string) {
+	const supabase = createClient();
+	const { data: usuarios } = await supabase
+		.from("Usuarios_Entornos")
+		.select("Usuarios(*)")
+		.eq("entorno", proyectoId)
+		.order("usuario.nombre_completo", { ascending: true });
+
+	return usuarios;
+
+	// if (!usuarios) return null;
+
+	// const ids = usuarios.filter(item => item.usuario !== null).map(item => item.usuario);
+
+	// if (ids) {
+	// 	const { data: usuarios } = await supabase
+	// 		.from("Usuarios")
+	// 		.select("*")
+	// 		.in("id", ids)
+	// 		.order("nombre_completo", { ascending: true });
+	// 	return usuarios;
+	// }
 }
 
 interface Notificacion {
