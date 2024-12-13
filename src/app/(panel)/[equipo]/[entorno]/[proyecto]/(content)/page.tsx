@@ -1,6 +1,6 @@
 import ListadoTareas from "@/components/proyectos/listado-tareas";
 import NuevaTarea from "@/components/tareas/nueva-tarea";
-import { getProyectoBySlug } from "@/lib/data";
+import { getProyectoBySlug } from "@/lib/proyectos/data";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,7 +15,6 @@ export default async function Proyecto({
 	const equipoSlug = (await params).equipo;
 
 	const proyecto = await getProyectoBySlug(proyectoSlug);
-
 	if (!proyecto) return notFound();
 
 	return (

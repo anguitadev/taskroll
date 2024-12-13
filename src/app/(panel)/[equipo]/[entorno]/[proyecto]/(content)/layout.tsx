@@ -1,7 +1,13 @@
-import { getProyectoBySlug, isEntornoAdmin } from "@/lib/data";
+import { isEntornoAdmin } from "@/lib/entornos/data";
+import { getProyectoBySlug } from "@/lib/proyectos/data";
 import { Settings } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+	title: "",
+};
 
 export default async function DashboardLayout({
 	children,
@@ -13,8 +19,9 @@ export default async function DashboardLayout({
 	const equipoSlug = (await params).equipo;
 	const proyectoSlug = (await params).proyecto;
 
-	const proyecto = await getProyectoBySlug(proyectoSlug);
+	metadata.title = "Taskroll | " + proyectoSlug;
 
+	const proyecto = await getProyectoBySlug(proyectoSlug);
 	if (!proyecto) return notFound();
 
 	const isAdmin = await isEntornoAdmin(proyecto.id);

@@ -11,6 +11,7 @@ export default async function Pizarra({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
+	// Cargar el contenido de la pizarra
 	const contenido = await getPizarraFromProyecto(proyectoSlug);
 
 	return (

@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-import { Enlace, UsuariosTareas } from "./types";
+import { Enlace, Tarea, UsuariosTareas } from "./types";
 
 export async function getTareaLinkById(tareaId: string) {
 	const supabase = createClient();
@@ -23,4 +23,22 @@ export async function getUsuariosByTarea(tareaId: string) {
 		.eq("tarea", tareaId);
 
 	return data as unknown as UsuariosTareas[];
+}
+
+export async function getTareasByProyectoSlug(idProyecto: string) {
+	const supabase = createClient();
+
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) return;
+
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("tarea:Tareas(id, titulo, slug, fecha_fin, estado, prioridad)")
+		.eq("usuario", user.id)
+		.eq("tarea.entorno", idProyecto);
+
+	return data as unknown as Tarea[];
 }

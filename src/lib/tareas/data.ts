@@ -164,3 +164,38 @@ export async function getTareasByProyectoSlug(idProyecto: string) {
 
 	return data as unknown as Tarea[];
 }
+
+export async function getEntornoAndProyectoNamesByTareaSlug(tareaSlug: string) {
+	const supabase = await createClient();
+
+	const { data: tarea } = await supabase
+		.from("Tareas")
+		.select("titulo")
+		.eq("slug", tareaSlug)
+		.limit(1)
+		.single();
+
+	const { data: proyecto } = await supabase
+		.from("Tareas")
+		.select("Entornos(nombre, entorno)")
+		.eq("slug", tareaSlug)
+		.limit(1)
+		.single();
+
+	if (!proyecto?.Entornos?.entorno) return null;
+
+	const { data: entorno } = await supabase
+		.from("Entornos")
+		.select("nombre")
+		.eq("id", proyecto.Entornos.entorno)
+		.limit(1)
+		.single();
+
+	if (!tarea || !proyecto?.Entornos || !entorno) return null;
+
+	return {
+		nombreEntorno: entorno.nombre,
+		nombreProyecto: proyecto.Entornos.nombre,
+		nombreTarea: tarea.titulo,
+	};
+}

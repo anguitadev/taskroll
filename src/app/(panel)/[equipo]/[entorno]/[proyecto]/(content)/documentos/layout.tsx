@@ -1,7 +1,12 @@
 import BotonesCabecera from "@/components/documentos/botones-cabecera";
 import ListaDocumentos from "@/components/documentos/lista-documentos";
-import { getDocumentosByEntornoSlug } from "@/lib/data";
+import { getDocumentosByEntornoSlug } from "@/lib/documentos/data";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "",
+};
 
 export default async function DocumentosLayout({
 	children,
@@ -14,6 +19,9 @@ export default async function DocumentosLayout({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
+	metadata.title = "Taskroll | " + proyectoSlug + " | Documentos";
+
+	// Cargar los documentos del entorno
 	const documentosEntorno = await getDocumentosByEntornoSlug(proyectoSlug);
 
 	return (
@@ -22,7 +30,7 @@ export default async function DocumentosLayout({
 				<div>
 					<Link
 						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}`}
-						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
+						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:border-b-2 hover:bg-neutral-800"
 					>
 						Tareas
 					</Link>
@@ -34,7 +42,7 @@ export default async function DocumentosLayout({
 					</Link>
 					<Link
 						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}/pizarra`}
-						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
+						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:border-b-2 hover:bg-neutral-800"
 					>
 						Pizarra
 					</Link>
@@ -44,12 +52,16 @@ export default async function DocumentosLayout({
 			</div>
 			<div className="flex gap-4">
 				{documentosEntorno && documentosEntorno.length > 0 && (
-					<ListaDocumentos
-						documentosEntorno={documentosEntorno}
-					/>
+					<ListaDocumentos documentosEntorno={documentosEntorno} />
 				)}
 
-				{documentosEntorno && documentosEntorno.length > 0 ? children : <span className="m-auto text-neutral-400 italic">No hay documentos en el entorno.</span>}
+				{documentosEntorno && documentosEntorno.length > 0 ? (
+					children
+				) : (
+					<span className="m-auto italic text-neutral-400">
+						No hay documentos en el entorno.
+					</span>
+				)}
 			</div>
 		</>
 	);

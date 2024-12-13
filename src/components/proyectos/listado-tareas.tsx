@@ -1,5 +1,5 @@
 "use client";
-import { getTareasByProyectoSlug } from "@/lib/data-client";
+import { getTareasByProyectoSlug } from "@/lib/tareas/data-client";
 import { Tarea } from "@/lib/tareas/types";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,7 +35,10 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 		try {
 			const data = await getTareasByProyectoSlug(idProyecto);
 			if (!data) return;
+
+			//Comprobar que el objeto contenido dentro de tareas no sea null
 			const tareasFiltradas = data.filter(tarea => tarea.tarea !== null);
+			//Ordenar las tareas por fecha
 			if (tareasFiltradas) {
 				tareasFiltradas.sort((a, b) => {
 					if (a.tarea?.fecha_fin && b.tarea?.fecha_fin) {
@@ -53,6 +56,7 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 		}
 	}
 
+	// Cargar las tareas cada vez que cambia el proyecto o la URL
 	useEffect(() => {
 		loadTareas();
 	}, [idProyecto, pathname]);
@@ -65,9 +69,11 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 		}
 	});
 
+	//Comprobar si hay tareas
 	if (!tareas || tareas.length === 0 || zeroTareas === null)
 		return <span className="mt-4 text-center italic text-neutral-400">No hay tareas...</span>;
 
+	// Filtrar las tareas por estado
 	const tareasAbiertas = tareas.filter(tarea => tarea.tarea?.estado === "Abierto");
 	const tareasProgreso = tareas.filter(tarea => tarea.tarea?.estado === "Progreso");
 	const tareasRevision = tareas.filter(tarea => tarea.tarea?.estado === "Revision");

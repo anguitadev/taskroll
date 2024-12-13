@@ -1,8 +1,13 @@
 import EliminarTarea from "@/components/tareas/eliminar-tarea";
-import { getEntornoAndProyectoNamesByTareaSlug } from "@/lib/data";
+import { getEntornoAndProyectoNamesByTareaSlug } from "@/lib/tareas/data";
 import { ChevronRight } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
+
+export const metadata: Metadata = {
+	title: "",
+};
 
 export default async function DashboardLayout({
 	children,
@@ -16,6 +21,9 @@ export default async function DashboardLayout({
 	const entornoSlug = (await params).entorno;
 	const equipoSlug = (await params).equipo;
 
+	metadata.title = "Taskroll | " + tareaSlug;
+
+	// Cargar los documentos del entorno
 	const nombres = await getEntornoAndProyectoNamesByTareaSlug(tareaSlug);
 
 	return (

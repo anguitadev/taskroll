@@ -7,3 +7,11 @@ export async function getProyectosByEntornoId(entornoId: string) {
 
     return data;
 }
+
+export async function getProyectoBySlug(slug: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase.from("Entornos").select("*").eq("slug", slug).limit(1).single();
+
+	return data;
+}
