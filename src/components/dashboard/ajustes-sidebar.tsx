@@ -29,18 +29,19 @@ export default function AjustesSidebar({
 	const [entornosAdmin, setEntornosAdmin] = useState<EntornosFromUsuario>([]);
 	const [proyectosAdmin, setProyectosAdmin] = useState<EntornosFromUsuario>([]);
 
+	// Cargar los entornos y proyectos donde el usuario es admin
 	useEffect(() => {
 		if (entornos) {
 			setEntornosAdmin(
 				entornos.filter(
-					item =>
-						item.Entornos.entorno === null &&
-						item.admin &&
-						item.Entornos.equipo === equipo.id,
+					entorno =>
+						entorno.Entornos.entorno === null &&
+						entorno.admin &&
+						entorno.Entornos.equipo === equipo.id,
 				),
 			);
 			setProyectosAdmin(
-				entornos.filter(item => item.Entornos.entorno !== null && item.admin),
+				entornos.filter(entorno => entorno.Entornos.entorno !== null && entorno.admin),
 			);
 		}
 	}, [entornos]);
@@ -103,7 +104,8 @@ export default function AjustesSidebar({
 									"flex items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800",
 									{
 										"bg-neutral-800":
-											pathname === "/" + equipo.slug + "/ajustes/" + entorno.Entornos.slug,
+											pathname ===
+											"/" + equipo.slug + "/ajustes/" + entorno.Entornos.slug,
 									},
 								)}
 							>
@@ -121,7 +123,11 @@ export default function AjustesSidebar({
 														"flex items-center rounded p-1 px-3 text-sm transition hover:bg-neutral-800",
 														{
 															"bg-neutral-800":
-																pathname === "/" + equipo.slug + "/ajustes/" + proyecto.Entornos.slug,
+																pathname ===
+																"/" +
+																	equipo.slug +
+																	"/ajustes/" +
+																	proyecto.Entornos.slug,
 														},
 													)}
 												>

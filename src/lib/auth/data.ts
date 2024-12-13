@@ -1,5 +1,6 @@
 import { Tables } from "@/db.types";
 import { createClient } from "@/utils/supabase/server";
+import { getEquipoBySlug } from "../equipos/data";
 
 export async function getUsuario() {
 	const supabase = await createClient();
@@ -22,4 +23,20 @@ export async function getUsuario() {
 			return data;
 		}
 	}
+}
+
+export async function getUsuariosByEquipoSlug(equipoSlug: string) {
+	const equipo = await getEquipoBySlug(equipoSlug);
+	if (!equipo) return [];
+
+	const equipoId = equipo.id;
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("admin, equipo, Usuarios(*)")
+		.eq("equipo", equipoId);
+
+	return data;
 }

@@ -1,5 +1,10 @@
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
+import { isUsuarioInEquipo } from "@/lib/equipos/data";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+	title: "",
+};
 
 export default async function EquipoLayout({
 	children,
@@ -8,25 +13,13 @@ export default async function EquipoLayout({
 	children: React.ReactNode;
 	params: Promise<{ equipo: string }>;
 }) {
-	const slug = (await params).equipo;
+	const equipoSlug = (await params).equipo;
 
-	const supabase = await createClient();
+	metadata.title = "Taskroll | " + equipoSlug;
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	const usuarioEquipo = await isUsuarioInEquipo(equipoSlug);
 
-	const { data: equipos } = await supabase
-		.from("Usuarios_Equipos")
-		.select(`Equipos(*)`)
-		.eq("usuario", user!.id)
-		.eq("Equipos.slug", slug);
+	if (!usuarioEquipo) return notFound();
 
-	let existe = false;
-
-	equipos?.forEach(equipo => {
-		if (equipo.Equipos) existe = true;
-	});
-
-	return existe ? <>{children}</> : redirect("/error?error=equipo_no_encontrado");
+	return <>{children}</>;
 }

@@ -10,10 +10,12 @@ export default function NuevoProyecto({ entorno }: { entorno: string | null }) {
 
 	const pathname = usePathname();
 
+	// Ocultar popover
 	useEffect(() => {
 		document.getElementById("nuevo-proyecto")?.hidePopover();
 	}, [pathname]);
 
+	// Crear nuevo proyecto
 	async function handleCreateEntorno() {
 		setTextoBoton("Cargando...");
 		if (!nombreProyecto) {

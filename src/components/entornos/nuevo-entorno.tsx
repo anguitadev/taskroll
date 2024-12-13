@@ -24,12 +24,14 @@ export default function NuevoEntorno({
 		"bg-pink-600",
 	];
 
-    const pathname = usePathname();
+	const pathname = usePathname();
 
-    useEffect(() => {
-        document.getElementById("nuevo-entorno")?.hidePopover();
-    }, [pathname]);
+	// Ocultar popover
+	useEffect(() => {
+		document.getElementById("nuevo-entorno")?.hidePopover();
+	}, [pathname]);
 
+	// Crear nuevo entorno
 	async function handleCreateEntorno() {
 		setTextoBoton("Cargando...");
 		if (!nombreEntorno) {

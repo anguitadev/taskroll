@@ -1,9 +1,10 @@
 "use client";
 
 import { Tables } from "@/db.types";
-import { getNotificacionNumberByEquipo, isUsuarioEquipoAdmin } from "@/lib/data-client";
+import { getUsuario } from "@/lib/auth/data-client";
+import { isUsuarioEquipoAdmin } from "@/lib/equipos/data-client";
+import { getNotificacionNumberByEquipo } from "@/lib/notificaciones/data-client";
 import type { EntornosFromUsuario, EquiposFromUsuario } from "@/lib/panel/types";
-import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 import {
 	ArrowLeft,
@@ -24,7 +25,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NuevoEntorno from "../entornos/nuevo-entorno";
 import NuevoProyecto from "../proyectos/nuevo-proyecto";
 import AjustesSidebar from "./ajustes-sidebar";
@@ -42,68 +43,7 @@ export default function Sidebar({
 	entornos: EntornosFromUsuario;
 	proyectos: Record<string, { id: string; nombre: string; slug: string }[]> | undefined;
 }) {
-	const pathname = usePathname();
-	const [ajustes, setAjustes] = useState(false);
-	const [nombreCompleto, setNombreCompleto] = useState<string | null>(null);
-	const [color, setColor] = useState<string | null>(null);
-	const [sidebar, setSidebar] = useState(false);
-	const [entorno, setEntorno] = useState<string | null>(null);
-	const [entornosSidebar, setEntornosSidebar] = useState(entornos);
-	const [notificaciones, setNotificaciones] = useState(0);
-	const [isAdmin, setIsAdmin] = useState(true);
-
-	const supabase = createClient();
-
-	const router = useRouter();
-
-	const getUsuario = useCallback(async () => {
-		try {
-			const { data } = await supabase
-				.from("Usuarios")
-				.select(`nombre_completo, color`)
-				.eq("nombre_usuario", usuario.nombre_usuario)
-				.single();
-
-			if (data) {
-				setNombreCompleto(data.nombre_completo);
-				setColor(data.color);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	}, [usuario, supabase]);
-
-	useEffect(() => {
-		getUsuario();
-	}, [getUsuario, usuario, ajustes]);
-
-	useEffect(() => {
-		if (pathname.split("/")[2] === "ajustes") {
-			setAjustes(true);
-		} else {
-			setAjustes(false);
-		}
-	}, [pathname]);
-
-	const [equipo, setEquipo] = useState<{
-		id: string;
-		nombre: string;
-		slug: string;
-		color: string;
-	}>(equipos[0].Equipos!);
-
-	useEffect(() => {
-		equipos.forEach(equipo => {
-			if (equipo.Equipos?.slug === pathname.split("/")[1]) {
-				setEquipo(equipo.Equipos);
-			}
-		});
-	}, [equipos, pathname, ajustes]);
-
-	function handleTeamChange(equipo: { id: string; nombre: string; slug: string; color: string }) {
-		setEquipo(equipo);
-		redirect(`/${equipo.slug}`);
-	}
+	const [equipo, setEquipo] = useState<Tables<"Equipos">>(equipos[0].Equipos!);
 
 	const links = [
 		{ name: "Inicio", icon: House, href: "/" + equipo!.slug },
@@ -112,15 +52,83 @@ export default function Sidebar({
 		{ name: "Documentos", icon: FileText, href: "/" + equipo!.slug + "/documentos" },
 	];
 
+	const pathname = usePathname();
+	const [ajustes, setAjustes] = useState(false);
+	const [nombreCompleto, setNombreCompleto] = useState<string | null>(usuario.nombre_completo);
+	const [color, setColor] = useState<string | null>(usuario.color);
+	const [sidebar, setSidebar] = useState(false);
+	const [entorno, setEntorno] = useState<string | null>(null);
+	const [entornosSidebar, setEntornosSidebar] = useState(entornos);
+	const [notificaciones, setNotificaciones] = useState(0);
+	const [isAdmin, setIsAdmin] = useState(true);
+
+	const router = useRouter();
+
+	// Cargar datos del usuario si viene de ajustes
+	useEffect(() => {
+		getUsuario().then(data => {
+			setNombreCompleto(data?.nombre_completo);
+			setColor(data?.color);
+		});
+	}, [ajustes]);
+
+	// Cambiar la vista al sidebar de ajustes
+	useEffect(() => {
+		if (pathname.split("/")[2] === "ajustes") {
+			setAjustes(true);
+		} else {
+			setAjustes(false);
+		}
+	}, [pathname]);
+
+	// Cambiar el equipo según la URL
+	useEffect(() => {
+		equipos.forEach(equipo => {
+			if (equipo.Equipos?.slug === pathname.split("/")[1]) {
+				setEquipo(equipo.Equipos);
+			}
+		});
+	}, [equipos, pathname, ajustes]);
+
+	// Comprobar si el usuario es admin
+	useEffect(() => {
+		isUsuarioEquipoAdmin(equipo.slug).then(data => setIsAdmin(data));
+	}, [equipo]);
+
+	// Ocultar el popover cuando cambie la URL
+	useEffect(() => {
+		document.getElementById("select")?.hidePopover();
+	}, [pathname]);
+
+	// Actualizar la lista de entornos cuando cambie el equipo
+	useEffect(() => {
+		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos.equipo === equipo.id));
+	}, [equipo, entornos]);
+
+	// Actualizar el numero de notificaciones
+	useEffect(() => {
+		setNotificaciones(0);
+		getNotificacionNumberByEquipo(equipo.id).then(data => data > 0 && setNotificaciones(data));
+	}, [pathname, equipo.id]);
+
+	//Cambiar el equipo
+	function handleTeamChange(equipo: Tables<"Equipos">) {
+		setEquipo(equipo);
+		redirect(`/${equipo.slug}`);
+	}
+
+	// Mostrar u ocultar el sidebar en móvil
 	function toggleSidebar() {
 		setSidebar(!sidebar);
 	}
 
+	// Crear nuevo proyecto
 	function handleNuevoProyecto(entornoId: string) {
 		setEntorno(entornoId);
 		document.getElementById("nuevo-proyecto")?.showPopover();
 	}
 
+	// Mostrar u ocultar los proyectos
 	function toggleProyectos(entorno: string) {
 		const proyectos = document.getElementById("proyectos-" + entorno);
 		const toggle = document.getElementById(entorno + "-toggle");
@@ -132,6 +140,7 @@ export default function Sidebar({
 		}
 	}
 
+	// Mostrar todos los proyectos
 	function openProyectos(entorno: string) {
 		const proyectos = document.getElementById("proyectos-" + entorno);
 		const toggle = document.getElementById(entorno + "-toggle");
@@ -142,33 +151,6 @@ export default function Sidebar({
 			toggle.classList.add("rotate-90");
 		}
 	}
-
-	useEffect(() => {
-		document.getElementById("select")?.hidePopover();
-	}, [pathname]);
-
-	useEffect(() => {
-		setEntornosSidebar(entornos.filter(entorno => entorno.Entornos.equipo === equipo.id));
-	}, [equipo, entornos]);
-
-	useEffect(() => {
-		setNotificaciones(0);
-		try {
-			getNotificacionNumberByEquipo(equipo.id).then(res => res > 0 && setNotificaciones(res));
-		} catch (error) {
-			console.log(error);
-		}
-	}, [pathname, equipo.id]);
-
-	const admin = async () => {
-		try {
-			const admin = await isUsuarioEquipoAdmin(equipo.slug);
-			setIsAdmin(admin);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-	admin();
 
 	return (
 		<>
@@ -393,7 +375,11 @@ export default function Sidebar({
 																isCurrentPath ? "flex" : "hidden",
 															)}
 														>
-															<Link href={`/${equipo?.slug}/ajustes/${entornoData.slug}`}><Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" /></Link>
+															<Link
+																href={`/${equipo?.slug}/ajustes/${entornoData.slug}`}
+															>
+																<Settings className="size-5 rounded stroke-neutral-500 p-0.5 transition hover:bg-neutral-700" />
+															</Link>
 															<button
 																onClick={() =>
 																	handleNuevoProyecto(

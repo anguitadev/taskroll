@@ -1,6 +1,7 @@
 import { GraficoCompletadas } from "@/components/dashboard/grafico-completadas";
 import { GraficoUsuarios } from "@/components/dashboard/grafico-usuarios";
 import TablaEstadisticas from "@/components/dashboard/tabla-estadisticas";
+import { getUsuariosWithTareaCountByEquipoSlug, isUsuarioEquipoAdmin } from "@/lib/equipos/data";
 import {
 	getCompletadoTareaCountInEquipo,
 	getCompletadoTareaSemanaCountInEquipo,
@@ -8,9 +9,7 @@ import {
 	getRevisionTareaCountInEquipo,
 	getTotalTareaCountInEquipo,
 	getTotalTareasInEquipo,
-	getUsuariosWithTareaCountByEquipoSlug,
-	isUsuarioEquipoAdmin,
-} from "@/lib/data";
+} from "@/lib/tareas/data";
 import { CalendarDays, Clock, ListChecks, Settings, Star, Users, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,17 +27,19 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 
 	const tareasMes: Record<string, { completadas: number; totales: number }> = {};
 
-	if (totalTareas) totalTareas.forEach(({ tarea }) => {
-		const month = new Date(tarea.fecha_fin).toLocaleString("es-ES", { month: "long" });
-		if (!tareasMes[month]) {
-			tareasMes[month] = { completadas: 0, totales: 0 };
-		}
+	// Calcular tareas completadas por mes
+	if (totalTareas)
+		totalTareas.forEach(({ tarea }) => {
+			const month = new Date(tarea.fecha_fin).toLocaleString("es-ES", { month: "long" });
+			if (!tareasMes[month]) {
+				tareasMes[month] = { completadas: 0, totales: 0 };
+			}
 
-		tareasMes[month].totales += 1;
-		if (tarea.estado === "Completado") {
-			tareasMes[month].completadas += 1;
-		}
-	});
+			tareasMes[month].totales += 1;
+			if (tarea.estado === "Completado") {
+				tareasMes[month].completadas += 1;
+			}
+		});
 
 	const chartData = Object.entries(tareasMes).map(([mes, { completadas, totales }]) => ({
 		mes,
@@ -46,16 +47,22 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 		totales,
 	}));
 
+	// Comprobar si es admin
 	const isAdmin = await isUsuarioEquipoAdmin(equipoSlug);
 
 	return (
 		<>
 			<div className="relative flex justify-center border-b border-neutral-800 p-3 text-center">
 				<span>Panel de Control</span>
-				{isAdmin && <Link href={`/${equipoSlug}/ajustes/equipo`} className="absolute right-2 top-2 flex items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm font-medium text-neutral-400">
-					<Settings className="size-4" />
-					Ajustes
-				</Link>}
+				{isAdmin && (
+					<Link
+						href={`/${equipoSlug}/ajustes/equipo`}
+						className="absolute right-2 top-2 flex items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm font-medium text-neutral-400"
+					>
+						<Settings className="size-4" />
+						Ajustes
+					</Link>
+				)}
 			</div>
 			<div className="flex h-[calc(100vh-70px)] flex-col justify-between overflow-y-scroll p-8">
 				<div>
@@ -116,7 +123,13 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 							<span className="font-semibold">Tareas Asignadas a los Usuarios</span>
 							<Users className="size-5 stroke-neutral-400" />
 						</div>
-						{usuariosTareas.length > 0 ? <GraficoUsuarios usuariosTareas={usuariosTareas} /> : <span className="mt-8 italic text-neutral-400 text-sm">No hay suficiente información para mostrar...</span>}
+						{usuariosTareas.length > 0 ? (
+							<GraficoUsuarios usuariosTareas={usuariosTareas} />
+						) : (
+							<span className="mt-8 text-sm italic text-neutral-400">
+								No hay suficiente información para mostrar...
+							</span>
+						)}
 					</div>
 					<div className="col-span-3 row-span-2 flex flex-col justify-between rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
@@ -125,7 +138,13 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 							</span>
 							<CalendarDays className="size-5 stroke-neutral-400" />
 						</div>
-						{usuariosTareas.length > 0 ? <GraficoCompletadas chartData={chartData} /> : <span className="mt-8 italic text-neutral-400 text-sm">No hay suficiente información para mostrar...</span>}
+						{usuariosTareas.length > 0 ? (
+							<GraficoCompletadas chartData={chartData} />
+						) : (
+							<span className="mt-8 text-sm italic text-neutral-400">
+								No hay suficiente información para mostrar...
+							</span>
+						)}
 					</div>
 				</div>
 			</div>
