@@ -1,29 +1,30 @@
 "use client";
 import { getTareasByProyectoSlug } from "@/lib/data-client";
+import { Tarea } from "@/lib/tareas/types";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import TablaTareas from "./tabla-tareas";
 
-type Tarea = {
-	usuario: {
-		color: string;
-		nombre_completo: string;
-	} | null;
-	tarea: {
-		id: string;
-		titulo: string;
-		slug: string;
-		fecha_fin: string;
-		estado: string;
-		prioridad: string;
-		entorno: {
-			nombre: string;
-			entorno: {
-				nombre: string;
-			};
-		};
-	} | null;
-};
+// type Tarea = {
+// 	usuario: {
+// 		color: string;
+// 		nombre_completo: string;
+// 	} | null;
+// 	tarea: {
+// 		id: string;
+// 		titulo: string;
+// 		slug: string;
+// 		fecha_fin: string;
+// 		estado: string;
+// 		prioridad: string;
+// 		entorno: {
+// 			nombre: string;
+// 			entorno: {
+// 				nombre: string;
+// 			};
+// 		};
+// 	} | null;
+// };
 
 export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 	const [tareas, setTareas] = useState<Tarea[]>([]);
@@ -33,7 +34,8 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 	async function loadTareas() {
 		try {
 			const data = await getTareasByProyectoSlug(idProyecto);
-			const tareasFiltradas = data?.filter(tarea => tarea.tarea !== null);
+			if (!data) return;
+			const tareasFiltradas = data.filter(tarea => tarea.tarea !== null);
 			if (tareasFiltradas) {
 				tareasFiltradas.sort((a, b) => {
 					if (a.tarea?.fecha_fin && b.tarea?.fecha_fin) {

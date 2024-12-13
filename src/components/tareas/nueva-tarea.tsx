@@ -1,11 +1,10 @@
 "use client";
-import { createTarea } from "@/lib/actions";
-import {
-	getEntornosByEquipoSlug,
-	getProyectosByEntornoId,
-	getUsuario,
-	getUsuariosFromEntorno,
-} from "@/lib/data-client";
+import { getUsuario } from "@/lib/auth/data-client";
+import { getEntornosByEquipoSlug, getUsuariosFromEntorno } from "@/lib/entornos/data-client";
+import { UsuariosEntorno } from "@/lib/entornos/types";
+import { getProyectosByEntornoId } from "@/lib/proyectos/data-client";
+import { createTarea } from "@/lib/tareas/actions";
+import { Usuarios } from "@/lib/tareas/types";
 import clsx from "clsx";
 import { es } from "date-fns/locale/es";
 import {
@@ -21,60 +20,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Calendar } from "../ui/calendar";
 
-type Usuarios =
-	| {
-			Usuarios: {
-				color: string;
-				id: string;
-				nombre_completo: string;
-				nombre_usuario: string;
-				puesto: string | null;
-			} | null;
-	  }[]
-	| null;
-
-type UsuariosEntorno =
-	| {
-			color: string;
-			id: string;
-			nombre_completo: string;
-			nombre_usuario: string;
-			puesto: string | null;
-	  }[]
-	| null;
-
 export default function NuevaTarea({ entorno }: { entorno: string }) {
-	const [initial, setInitial] = useState(true);
-	const [tituloTarea, setTituloTarea] = useState<string>("");
-	const [estado, setEstado] = useState<string>("Abierto");
-	const [mostrarUsuarios, setMostrarUsuarios] = useState(false);
-	const [usuarios, setUsuarios] = useState<Usuarios>([]);
-	const [usuariosEntorno, setUsuariosEntorno] = useState<UsuariosEntorno>(null);
-	const [fechaFinal, setFechaFinal] = useState<Date | undefined>(new Date());
-	const [prioridad, setPrioridad] = useState("Ninguna");
-	const [clientError, setClientError] = useState<string | null>(null);
-	const [textoBoton, setTextoBoton] = useState<string>("Crear Tarea");
-	const [entornos, setEntornos] = useState<{ id: string; nombre: string }[] | null>([]);
-	const [entornoSeleccionado, setEntornoSeleccionado] = useState<string>("");
-	const [proyectos, setProyectos] = useState<{ id: string; nombre: string }[] | null>([]);
-	const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>(entorno);
-
-	useEffect(() => {
-		if (initial) loadUsuario();
-		setInitial(false);
-	}, [initial]);
-
-	async function loadUsuario() {
-		try {
-			const data = await getUsuario();
-			if (data && usuarios?.length == 0) {
-				setUsuarios([{ Usuarios: data }]);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
 	const estados: { [key: string]: string } = {
 		Abierto: "bg-zinc-600",
 		Progreso: "bg-sky-600",
@@ -90,18 +36,99 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 		Urgente: "stroke-red-400 fill-red-400 text-red-400",
 	};
 
+	const [initial, setInitial] = useState(true);
+	const [tituloTarea, setTituloTarea] = useState<string>("");
+	const [estado, setEstado] = useState<string>("Abierto");
+	const [mostrarUsuarios, setMostrarUsuarios] = useState(false);
+	const [usuarios, setUsuarios] = useState<Usuarios[]>([]);
+	const [usuariosEntorno, setUsuariosEntorno] = useState<UsuariosEntorno[]>([]);
+	const [fechaFinal, setFechaFinal] = useState<Date | undefined>(new Date());
+	const [prioridad, setPrioridad] = useState("Ninguna");
+	const [clientError, setClientError] = useState<string | null>(null);
+	const [textoBoton, setTextoBoton] = useState<string>("Crear Tarea");
+	const [entornos, setEntornos] = useState<{ id: string; nombre: string }[] | null>([]);
+	const [entornoSeleccionado, setEntornoSeleccionado] = useState<string>("");
+	const [proyectos, setProyectos] = useState<{ id: string; nombre: string }[] | null>([]);
+	const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>(entorno);
+
 	const pathname = usePathname();
 
+	async function loadUsuario() {
+		try {
+			const data = await getUsuario();
+			if (data && usuarios.length == 0) {
+				setUsuarios([{ Usuarios: data }]);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	// Cargar el usuario en la nueva tarea solo al cargar
+	useEffect(() => {
+		if (initial) loadUsuario();
+		setInitial(false);
+	}, [initial]);
+
+	// Cerrar el popover al cambiar de página
 	useEffect(() => {
 		document.getElementById("nueva-tarea-" + entorno)?.hidePopover();
 	}, [pathname]);
 
+	// Cargar los usuarios del entorno
+	useEffect(() => {
+		if (mostrarUsuarios && entorno) {
+			try {
+				getUsuariosFromEntorno(proyectoSeleccionado).then(data => {
+					if (data) setUsuariosEntorno(data);
+				});
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	}, [mostrarUsuarios]);
+
+	// Cargar los entornos del equipo
+	useEffect(() => {
+		async function fetchEntornos() {
+			if (entorno.includes("equipo")) {
+				const equipoSlug = entorno.split("-").pop();
+				const entornosEquipo = await getEntornosByEquipoSlug(equipoSlug!);
+				setEntornos(entornosEquipo!);
+				if (entornosEquipo && entornosEquipo.length > 0) {
+					setEntornoSeleccionado(entornosEquipo[0].id);
+				}
+			}
+		}
+
+		fetchEntornos();
+	}, [entorno]);
+
+	// Cargar los proyectos del entorno
+	useEffect(() => {
+		async function fetchProyectos() {
+			if (entorno.includes("equipo") && entornoSeleccionado) {
+				const proyectosEntorno = await getProyectosByEntornoId(entornoSeleccionado);
+				setProyectos(proyectosEntorno!);
+				if (proyectosEntorno && proyectosEntorno.length > 0) {
+					setProyectoSeleccionado(proyectosEntorno[0].id);
+				}
+			}
+		}
+
+		fetchProyectos();
+	}, [entornoSeleccionado]);
+
 	async function handleCreateTarea() {
 		setTextoBoton("Cargando...");
+
+		//Comprobar los campos
 		if (!tituloTarea || !estado || !prioridad || !fechaFinal || usuarios?.length === 0) {
 			setClientError("Por favor, rellena los campos.");
 			return;
 		}
+
+		// Si la tarea viene de un equipo
 		if (entorno.includes("equipo")) {
 			try {
 				await createTarea(
@@ -134,6 +161,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 		window.location.reload();
 	}
 
+	// Función para cambiar el estado de la tarea
 	function toggleEstadoCompletado() {
 		if (estado === "Completado") {
 			setEstado("Abierto");
@@ -142,29 +170,20 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 		}
 	}
 
+	// Función para mostrar u ocultar los usuarios
 	function toggleUsuarios() {
 		setMostrarUsuarios(!mostrarUsuarios);
 		document.getElementById("usuarios")?.classList.toggle("hidden");
 	}
 
-	useEffect(() => {
-		if (mostrarUsuarios && entorno) {
-			try {
-				getUsuariosFromEntorno(proyectoSeleccionado).then(data => {
-					if (data) setUsuariosEntorno(data!);
-				});
-			} catch (error) {
-				console.log(error);
-			}
-		}
-	}, [mostrarUsuarios]);
-
+	// Función para mostrar u ocultar el calendario
 	function toggleCalendario() {
 		document.getElementById("calendario")?.classList.toggle("hidden");
 	}
 
+	// Función para añadir o quitar un usuario
 	function addRemoveUsuario(idUsuario: string) {
-		const usuario = usuariosEntorno?.find(usuario => usuario.id === idUsuario);
+		const usuario = usuariosEntorno.find(usuario => usuario.id === idUsuario);
 
 		const inTarea = usuarios?.find(usuario => usuario.Usuarios?.id === idUsuario);
 
@@ -174,35 +193,6 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 			setUsuarios(usuarios!.concat([{ Usuarios: usuario! }]));
 		}
 	}
-
-	useEffect(() => {
-		async function fetchEntornos() {
-			if (entorno.includes("equipo")) {
-				const equipoSlug = entorno.split("-").pop();
-				const entornosEquipo = await getEntornosByEquipoSlug(equipoSlug!);
-				setEntornos(entornosEquipo!);
-				if (entornosEquipo && entornosEquipo.length > 0) {
-					setEntornoSeleccionado(entornosEquipo[0].id);
-				}
-			}
-		}
-
-		fetchEntornos();
-	}, [entorno]);
-
-	useEffect(() => {
-		async function fetchProyectos() {
-			if (entorno.includes("equipo") && entornoSeleccionado) {
-				const proyectosEntorno = await getProyectosByEntornoId(entornoSeleccionado);
-				setProyectos(proyectosEntorno!);
-				if (proyectosEntorno && proyectosEntorno.length > 0) {
-					setProyectoSeleccionado(proyectosEntorno[0].id);
-				}
-			}
-		}
-
-		fetchProyectos();
-	}, [entornoSeleccionado]);
 
 	return (
 		<>

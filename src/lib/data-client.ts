@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
+import { Tarea } from "./tareas/types";
 
 export async function getUsuariosFromEntorno(entornoId: string) {
 	const supabase = createClient();
@@ -98,26 +99,26 @@ export async function removeComentario(idComentario: string) {
 	if (error) throw error;
 }
 
-interface Tarea {
-	usuario: {
-		color: string;
-		nombre_completo: string;
-	} | null;
-	tarea: {
-		id: string;
-		titulo: string;
-		slug: string;
-		fecha_fin: string;
-		estado: string;
-		prioridad: string;
-		entorno: {
-			nombre: string;
-			entorno: {
-				nombre: string;
-			};
-		};
-	} | null;
-}
+// interface Tarea {
+// 	usuario: {
+// 		color: string;
+// 		nombre_completo: string;
+// 	} | null;
+// 	tarea: {
+// 		id: string;
+// 		titulo: string;
+// 		slug: string;
+// 		fecha_fin: string;
+// 		estado: string;
+// 		prioridad: string;
+// 		entorno: {
+// 			nombre: string;
+// 			entorno: {
+// 				nombre: string;
+// 			};
+// 		};
+// 	} | null;
+// }
 
 export async function getTareasByProyectoSlug(idProyecto: string) {
 	const supabase = createClient();
