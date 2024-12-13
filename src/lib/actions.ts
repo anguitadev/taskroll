@@ -637,9 +637,10 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 				try {
 					await removeUsuarioEntorno(usuarioId, entorno.id);
 				} catch (error) {
-					throw new Error(
-						"No se ha podido eliminar el usuario del entorno " + entorno.nombre,
-					);
+					if (error)
+						throw new Error(
+							"No se ha podido eliminar el usuario del entorno " + entorno.nombre,
+						);
 				}
 			}
 		}
@@ -680,9 +681,10 @@ export async function removeUsuarioEntorno(usuarioId: string, entornoId: string)
 				try {
 					await removeUsuarioProyecto(usuarioId, proyecto.id);
 				} catch (error) {
-					throw new Error(
-						"No se ha podido eliminar el usuario del proyecto " + proyecto.nombre,
-					);
+					if (error)
+						throw new Error(
+							"No se ha podido eliminar el usuario del proyecto " + proyecto.nombre,
+						);
 				}
 			}
 		}
@@ -715,15 +717,16 @@ export async function removeUsuarioProyecto(usuarioId: string, proyectoId: strin
 					try {
 						await removeUserFromTarea(tarea.id, usuarioId);
 					} catch (error) {
-						throw new Error(
-							"No se pudo eliminar el usuario de la tarea " + tarea.titulo,
-						);
+						if (error)
+							throw new Error(
+								"No se pudo eliminar el usuario de la tarea " + tarea.titulo,
+							);
 					}
 				} else {
 					try {
 						await removeTarea(tarea.id);
 					} catch (error) {
-						throw new Error("No se pudo eliminar la tarea");
+						if (error) throw new Error("No se pudo eliminar la tarea");
 					}
 				}
 			}
