@@ -1,5 +1,5 @@
 import CanvasPizarra from "@/components/pizarra/canvas-pizarra";
-import { getPizarraFromEntorno } from "@/lib/data";
+import { getPizarraFromEntorno } from "@/lib/pizarras/data";
 import Link from "next/link";
 
 export default async function Pizarra({
@@ -18,13 +18,13 @@ export default async function Pizarra({
 				<div>
 					<Link
 						href={`/${equipoSlug}/${entornoSlug}`}
-						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
+						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:border-b-2 hover:bg-neutral-800"
 					>
 						Tareas
 					</Link>
 					<Link
 						href={`/${equipoSlug}/${entornoSlug}/documentos`}
-						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:bg-neutral-800 hover:border-b-2"
+						className="cursor-pointer rounded-t px-4 py-2 text-neutral-400 transition hover:border-b-2 hover:bg-neutral-800"
 					>
 						Documentos
 					</Link>
@@ -37,7 +37,9 @@ export default async function Pizarra({
 				</div>
 			</div>
 			<div className="flex h-full gap-4">
-				{contenido && <CanvasPizarra entorno={entornoSlug} contenido={contenido!.contenido!} />}
+				{contenido && (
+					<CanvasPizarra entorno={entornoSlug} contenido={contenido!.contenido!} />
+				)}
 			</div>
 		</>
 	);

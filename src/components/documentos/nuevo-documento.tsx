@@ -1,5 +1,5 @@
 "use client";
-import { createDocumento } from "@/lib/actions";
+import { createDocumento } from "@/lib/documentos/actions";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,10 +10,12 @@ export default function NuevoDocumento() {
 
 	const pathname = usePathname();
 
+	// Ocultar popover
 	useEffect(() => {
 		document.getElementById("nuevo-documento")?.hidePopover();
 	}, [pathname]);
 
+	// Crear nuevo documento y recargar
 	async function handleNuevoDocumento(fileKey: string) {
 		const error = await createDocumento(fileKey, nombreDocumento, pathname);
 		if (error) setClientError("Ha habido un error al cargar el documento.");

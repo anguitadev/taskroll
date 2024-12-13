@@ -1,5 +1,5 @@
 "use client";
-import { deleteDocumentoByUrl } from "@/lib/actions";
+import { deleteDocumentoByUrl } from "@/lib/documentos/actions";
 import { Download, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ export default function BotonesCabecera() {
 	const pathname = usePathname();
 	const router = useRouter();
 
+	// Mostrar los botones
 	useEffect(() => {
 		if (!pathname.endsWith("documentos")) {
 			setDescargar(true);
@@ -25,6 +26,7 @@ export default function BotonesCabecera() {
 		}
 	}, [pathname]);
 
+	// Eliminar documento
 	async function handleDeleteDocumento() {
 		try {
 			await deleteDocumentoByUrl(url);

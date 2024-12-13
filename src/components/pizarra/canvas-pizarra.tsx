@@ -1,6 +1,6 @@
 "use client";
 
-import { updatePizarra } from "@/lib/actions";
+import { updatePizarra } from "@/lib/pizarras/actions";
 import { PencilLine } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
@@ -16,6 +16,7 @@ export default function CanvasPizarra({
 	const [editar, setEditar] = useState(false);
 	const [contenidoPizarra, setContenidoPizarra] = useState<string>(contenido);
 
+	// Editar pizarra
 	function handleEditar() {
 		if (editar) {
 			try {
@@ -37,7 +38,7 @@ export default function CanvasPizarra({
 				{editar ? "Guardar Pizarra" : "Editar Pizarra"}
 			</button>
 			{!editar ? (
-				<div className="prose dark:prose-invert mx-auto min-h-full min-w-[1000px] bg-neutral-800 p-8">
+				<div className="prose mx-auto min-h-full min-w-[1000px] bg-neutral-800 p-8 dark:prose-invert">
 					<Markdown remarkPlugins={[remarkGfm]}>{contenidoPizarra}</Markdown>
 				</div>
 			) : (
