@@ -658,7 +658,7 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 export async function removeUsuarioEntorno(usuarioId: string, entornoId: string) {
 	const entorno = await getEntornoById(entornoId);
 	if (entorno && entorno.entorno) {
-		await removeUsuarioProyecto(usuarioId, entorno.entorno);
+		await removeUsuarioProyecto(usuarioId, entornoId);
 		return;
 	}
 
@@ -734,11 +734,12 @@ export async function removeUsuarioProyecto(usuarioId: string, proyectoId: strin
 	}
 
 	const supabase = await createClient();
-	const { error } = await supabase
+	const { data, error } = await supabase
 		.from("Usuarios_Entornos")
 		.delete()
 		.eq("entorno", proyectoId)
 		.eq("usuario", usuarioId);
+
 	if (error) throw error;
 }
 

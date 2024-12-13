@@ -18,7 +18,7 @@ export default function AccionesUsuario({
 			} catch (error) {
 				alert(error);
 			}
-			// window.location.reload();
+			window.location.reload();
 		}
 		if (entornoId) {
 			try {
@@ -26,7 +26,7 @@ export default function AccionesUsuario({
 			} catch (error) {
 				alert(error);
 			}
-			// window.location.reload();
+			window.location.reload();
 		}
 	}
 

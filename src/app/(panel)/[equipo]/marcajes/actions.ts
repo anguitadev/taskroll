@@ -6,16 +6,13 @@ const {
 } = await supabase.auth.getUser();
 
 export async function marcarEntrada() {
-	const { data, error } = await supabase
+	await supabase
 		.from("marcajes")
 		.insert({
 			usuario: user!.id,
 			entrada: Date.now(),
 		})
 		.select();
-
-	console.log(data);
-	console.log(error);
 }
 
 export async function marcarSalida() {
