@@ -1,5 +1,5 @@
 "use client";
-import { removeUsuarioEquipo } from "@/lib/actions";
+import { removeUsuarioEntorno, removeUsuarioEquipo } from "@/lib/actions";
 import { Trash2 } from "lucide-react";
 
 export default function AccionesUsuario({
@@ -13,12 +13,20 @@ export default function AccionesUsuario({
 }) {
 	async function deleteUsuario(usuarioId: string) {
 		if (equipoId) {
-			await removeUsuarioEquipo(usuarioId, equipoId);
-			window.location.reload();
+			try {
+				await removeUsuarioEquipo(usuarioId, equipoId);
+			} catch (error) {
+				alert(error);
+			}
+			// window.location.reload();
 		}
 		if (entornoId) {
-			await removeUsuarioEquipo(usuarioId, entornoId);
-			window.location.reload();
+			try {
+				await removeUsuarioEntorno(usuarioId, entornoId);
+			} catch (error) {
+				alert(error);
+			}
+			// window.location.reload();
 		}
 	}
 

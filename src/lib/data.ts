@@ -156,10 +156,18 @@ export async function getEquipoByEntornoId(id: string) {
 	return data;
 }
 
-export async function getProyectosByEntornoId(id: string) {
+export async function getProyectosByEntornoId(entornoId: string) {
 	const supabase = await createClient();
 
-	const { data } = await supabase.from("Entornos").select("*").eq("entorno", id);
+	const { data } = await supabase.from("Entornos").select("*").eq("entorno", entornoId);
+
+	return data;
+}
+
+export async function getProyectosByEntornoIdAndUsuarioId(entornoId: string, usuarioId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase.from("Usuarios_Entornos").select("Entornos(*)").eq("entorno.entorno", entornoId).eq("usuario", usuarioId);
 
 	return data;
 }
@@ -730,6 +738,36 @@ export async function isUsuarioEquipoAdmin(equipoSlug: string) {
 	return data ? data.length > 0 : false;
 }
 
+export async function isEquipoAdminByUsuarioId(usuarioId: string, equipoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("admin")
+		.eq("equipo", equipoId)
+		.eq("usuario", usuarioId)
+		.eq("admin", true)
+		.limit(1)
+		.single();
+
+	return data ? data.admin : false;
+}
+
+export async function isEntornoAdminByUsuarioId(usuarioId: string, entornoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin")
+		.eq("entorno", entornoId)
+		.eq("usuario", usuarioId)
+		.eq("admin", true)
+		.limit(1)
+		.single();
+
+	return data ? data.admin : false;
+}
+
 export async function getUsuarioByNombreUsuario(nombre_usuario: string) {
 	const supabase = await createClient();
 	const { data: usuario } = await supabase
@@ -776,4 +814,44 @@ export async function isEntornoAdmin(entornoId: string) {
 		.limit(1)
 		.single();
 	return entorno?.admin;
+}
+
+export async function getAdminCountEntorno(entornoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin")
+		.eq("entorno", entornoId)
+		.eq("admin", true);
+	return data ? data.length : 0;
+}
+
+export async function getTareasByEntornoId(entornoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase.from("Tareas").select("*").eq("entorno", entornoId);
+	return data;
+}
+
+export async function getUsuariosByTareaId(tareaId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("Usuarios(*)")
+		.eq("tarea", tareaId);
+	return data;
+}
+
+export async function getUsuariosByProyectoId(proyectoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("Usuarios(*)")
+		.eq("entorno", proyectoId);
+	return data;
+}
+
+export async function getAllEntornosByEquipoId(equipoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase.from("Entornos").select("*").eq("equipo", equipoId);
+	return data;
 }

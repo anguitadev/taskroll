@@ -7,16 +7,23 @@ import { redirect } from "next/navigation";
 import { Resend } from "resend";
 import { UTApi } from "uploadthing/server";
 import {
+	getAllEntornosByEquipoId,
 	getEntornoById,
 	getEntornoProyectoBySlug,
 	getEquipoByEntornoId,
 	getEquipoBySlug,
+	getProyectosByEntornoId,
+	getTareasByEntornoId,
 	getUsuario,
 	getUsuarioByNombreUsuario,
 	getUsuariosByEntornoId,
 	getUsuariosByEntornoSlug,
 	getUsuariosByEquipoSlug,
+	getUsuariosByProyectoId,
 	getUsuariosByTarea,
+	getUsuariosByTareaId,
+	isEntornoAdminByUsuarioId,
+	isEquipoAdminByUsuarioId,
 } from "./data";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -588,32 +595,55 @@ export async function updateUsuarioRolEntorno(
 	if (error) throw error;
 }
 
-export async function getAdminCountEquipo(idEquipo: string) {
+export async function getAdminCountEquipo(equipoId: string) {
 	const supabase = await createClient();
 	const { data } = await supabase
 		.from("Usuarios_Equipos")
 		.select("admin")
-		.eq("equipo", idEquipo)
+		.eq("equipo", equipoId)
 		.eq("admin", true);
 
 	return data ? data.length : 0;
 }
 
-export async function getAdminCountEntorno(idEntorno: string) {
+export async function getAdminCountEntorno(entornoId: string) {
 	const supabase = await createClient();
 	const { data } = await supabase
 		.from("Usuarios_Entornos")
 		.select("admin")
-		.eq("entorno", idEntorno)
+		.eq("entorno", entornoId)
 		.eq("admin", true);
 
 	return data ? data.length : 0;
 }
 
 export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
-	const usuarioCount = await getUsuarioCountEquipo(equipoId);
+	let adminCount = await getAdminCountEquipo(equipoId);
+	const isAdmin = await isEquipoAdminByUsuarioId(usuarioId, equipoId);
 
-	if (usuarioCount == 1) throw new Error("El equipo debe tener al menos un usuario");
+	if (isAdmin) adminCount--;
+
+	if (adminCount == 0) throw new Error("El equipo debe tener al menos un admin");
+
+	const entornosEquipo = await getAllEntornosByEquipoId(equipoId);
+
+	if (entornosEquipo) {
+		for (const entorno of entornosEquipo) {
+			const usuariosEntorno = await getUsuariosByEntornoId(entorno.id);
+			if (
+				usuariosEntorno &&
+				usuariosEntorno.find(usuario => usuario.Usuarios?.id == usuarioId)
+			) {
+				try {
+					await removeUsuarioEntorno(usuarioId, entorno.id);
+				} catch (error) {
+					throw new Error(
+						"No se ha podido eliminar el usuario del entorno " + entorno.nombre,
+					);
+				}
+			}
+		}
+	}
 
 	const supabase = await createClient();
 	const { error } = await supabase
@@ -621,15 +651,108 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 		.delete()
 		.eq("equipo", equipoId)
 		.eq("usuario", usuarioId);
-
 	if (error) throw error;
 }
 
-export async function getUsuarioCountEquipo(idEquipo: string) {
-	const supabase = await createClient();
-	const { data } = await supabase.from("Usuarios_Equipos").select("admin").eq("equipo", idEquipo);
+export async function removeUsuarioEntorno(usuarioId: string, entornoId: string) {
+	const entorno = await getEntornoById(entornoId);
+	if (entorno && entorno.entorno) {
+		await removeUsuarioProyecto(usuarioId, entorno.entorno);
+		return;
+	}
 
-	return data ? data.length : 0;
+	let adminCount = await getAdminCountEntorno(entornoId);
+	const isAdmin = await isEntornoAdminByUsuarioId(usuarioId, entornoId);
+
+	if (isAdmin) adminCount--;
+
+	if (adminCount == 0) throw new Error("El entorno debe tener al menos un admin");
+
+	const proyectosEntorno = await getProyectosByEntornoId(entornoId);
+
+	if (proyectosEntorno) {
+		for (const proyecto of proyectosEntorno) {
+			const usuariosProyecto = await getUsuariosByProyectoId(proyecto.id);
+			if (
+				usuariosProyecto &&
+				usuariosProyecto.find(usuario => usuario.Usuarios?.id == usuarioId)
+			) {
+				try {
+					await removeUsuarioProyecto(usuarioId, proyecto.id);
+				} catch (error) {
+					throw new Error(
+						"No se ha podido eliminar el usuario del proyecto " + proyecto.nombre,
+					);
+				}
+			}
+		}
+	}
+
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Usuarios_Entornos")
+		.delete()
+		.eq("entorno", entornoId)
+		.eq("usuario", usuarioId);
+	if (error) throw error;
+}
+
+export async function removeUsuarioProyecto(usuarioId: string, proyectoId: string) {
+	let adminCount = await getAdminCountEntorno(proyectoId);
+	const isAdmin = await isEntornoAdminByUsuarioId(usuarioId, proyectoId);
+
+	if (isAdmin) adminCount--;
+
+	if (adminCount == 0) throw new Error("El proyecto debe tener al menos un admin");
+
+	const tareasProyecto = await getTareasByEntornoId(proyectoId);
+
+	if (tareasProyecto) {
+		for (const tarea of tareasProyecto) {
+			const usuariosTarea = await getUsuariosByTareaId(tarea.id);
+			if (usuariosTarea && usuariosTarea.find(usuario => usuario.Usuarios?.id == usuarioId)) {
+				if (usuariosTarea.length > 1) {
+					try {
+						await removeUserFromTarea(tarea.id, usuarioId);
+					} catch (error) {
+						throw new Error(
+							"No se pudo eliminar el usuario de la tarea " + tarea.titulo,
+						);
+					}
+				} else {
+					try {
+						await removeTarea(tarea.id);
+					} catch (error) {
+						throw new Error("No se pudo eliminar la tarea");
+					}
+				}
+			}
+		}
+	}
+
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Usuarios_Entornos")
+		.delete()
+		.eq("entorno", proyectoId)
+		.eq("usuario", usuarioId);
+	if (error) throw error;
+}
+
+export async function removeUserFromTarea(tareaId: string, userId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Usuarios_Tareas")
+		.delete()
+		.eq("tarea", tareaId)
+		.eq("usuario", userId);
+	if (error) throw error;
+}
+
+export async function removeTarea(tareaId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Tareas").delete().eq("id", tareaId);
+	if (error) throw error;
 }
 
 export async function addUsuarioToEquipo(nombre_usuario: string, equipoSlug: string) {
