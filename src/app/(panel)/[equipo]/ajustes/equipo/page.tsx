@@ -1,6 +1,6 @@
 import AjustesDelEquipo from "@/components/ajustes/equipo";
 import { Tables } from "@/db.types";
-import { getEquipoBySlug, isUsuarioEquipoAdmin } from "@/lib/equipos/data";
+import { getEquipoById, getEquipoBySlug, isUsuarioEquipoAdmin } from "@/lib/equipos/data";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ equipo: string }>;
@@ -12,7 +12,9 @@ export default async function AjustesEquipo(props: { params: Params }) {
 	const isAdmin = await isUsuarioEquipoAdmin(equipoSlug);
 	if (!isAdmin) return notFound();
 
-	const equipo = await getEquipoBySlug(equipoSlug);
+	const equipoId = await getEquipoBySlug(equipoSlug);
+	if (!equipoId) return notFound();
+	const equipo = await getEquipoById(equipoId.id);
 
 	return (
 		<>

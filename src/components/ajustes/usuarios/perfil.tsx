@@ -86,13 +86,17 @@ export default function Perfil({
 		setUsuarioLoggeado(user);
 	}
 
-	fetchLoggedUser();
+	useEffect(() => {
+		if (!initial) {
+			fetchLoggedUser();
+		}
+	}, [initial]);
 
 	return (
 		<div
 			id={"perfil-" + usuario.nombre_usuario}
 			popover="auto"
-			className="w-[750px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm max-h-[700px]"
+			className="max-h-[700px] w-[750px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 		>
 			<div className="flex items-center gap-4 border-b border-neutral-800 pb-4 text-2xl font-semibold">
 				<div
@@ -140,7 +144,7 @@ export default function Perfil({
 						</div>
 					)}
 					<button
-						className="flex gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 w-full justify-center"
+						className="flex w-full justify-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1"
 						onClick={() => setNuevaNomina(!nuevaNomina)}
 					>
 						{!nuevaNomina ? (

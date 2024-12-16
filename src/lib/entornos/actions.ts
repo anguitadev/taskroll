@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getUsuarioByNombreUsuario, getUsuariosByEquipoSlug } from "../auth/data";
+import { getUsuario, getUsuarioByNombreUsuario, getUsuariosByEquipoSlug } from "../auth/data";
 import { getEquipoByEntornoId, getEquipoBySlug } from "../equipos/data";
 import { removeUsuarioProyecto } from "../proyectos/actions";
 import { getProyectosByEntornoId, getUsuariosByProyectoId } from "../proyectos/data";
@@ -223,5 +223,16 @@ export async function updateUsuarioRolEntorno(
 		.eq("entorno", idEntorno)
 		.eq("usuario", idUsuario);
 
+	if (error) throw error;
+}
+
+export async function deleteEntornoById(entornoId: string) {
+	const usuario = await getUsuario();
+	if (!usuario) return;
+	const isAdmin = await isEntornoAdminByUsuarioId(usuario.id, entornoId);
+	if (!isAdmin) return;
+	
+	const supabase = await createClient();
+	const { error } = await supabase.from("Entornos").delete().eq("id", entornoId);
 	if (error) throw error;
 }

@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getUsuario } from "../auth/data";
 import { createPizarra } from "../entornos/actions";
 import { getAdminCountEntorno, getEntornoById, isEntornoAdminByUsuarioId } from "../entornos/data";
 import { getEquipoByEntornoId } from "../equipos/data";
@@ -30,9 +31,8 @@ export async function createProyecto(
 		proyectoSlug += "-" + proyecto.length;
 	}
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	const usuario = await getUsuario();
+	if (!usuario) return;
 
 	const { data: proyectoNuevo, error } = await supabase
 		.from("Entornos")
@@ -41,7 +41,7 @@ export async function createProyecto(
 			descripcion: descripcionProyecto,
 			slug: proyectoSlug,
 			entorno: idEntorno,
-			propietario: user!.id,
+			propietario: usuario.id,
 		})
 		.select()
 		.single();
@@ -52,14 +52,19 @@ export async function createProyecto(
 			error: error?.code,
 		};
 	} else {
-		createPizarra(proyectoNuevo!.id);
+		await supabase.from("Usuarios_Entornos").insert({
+			usuario: usuario.id,
+			entorno: proyectoNuevo.id,
+			admin: true,
+		});
+
+		createPizarra(proyectoNuevo.id);
 
 		const entorno = await getEntornoById(idEntorno);
-
 		const equipo = await getEquipoByEntornoId(idEntorno);
 
 		revalidatePath("/");
-		redirect("/" + equipo!.Equipos!.slug + "/" + entorno!.slug + "/" + proyectoNuevo!.slug);
+		redirect("/" + equipo?.Equipos!.slug + "/" + entorno?.slug + "/" + proyectoNuevo.slug);
 	}
 }
 

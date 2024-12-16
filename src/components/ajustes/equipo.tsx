@@ -72,7 +72,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 								colorEquipo,
 							)}
 						>
-							{nombreEquipo!.charAt(0).toUpperCase()}
+							{nombreEquipo.charAt(0).toUpperCase()}
 						</span>
 						<div className="flex flex-row gap-2">
 							{colorOptions.map((color, index) => {

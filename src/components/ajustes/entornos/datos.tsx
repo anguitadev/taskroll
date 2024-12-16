@@ -1,19 +1,25 @@
 "use client";
 import { Tables } from "@/db.types";
-import { updateEntornoById } from "@/lib/entornos/actions";
+import { deleteEntornoById, updateEntornoById } from "@/lib/entornos/actions";
 import { Entorno } from "@/lib/entornos/types";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function DatosEntorno({
 	entorno,
 	propietario,
+	isAdmin,
 }: {
 	entorno: Entorno;
 	propietario: Tables<"Usuarios">;
+	isAdmin: boolean;
 }) {
 	const [nombre, setNombre] = useState(entorno?.nombre);
 	const [descripcion, setDescripcion] = useState(entorno?.descripcion);
 	const [clientError, setClientError] = useState<string | null>(null);
+
+	const pathname = usePathname();
 
 	async function handleUpdate() {
 		if (nombre === "") {
@@ -24,6 +30,18 @@ export default function DatosEntorno({
 			await updateEntornoById(entorno.id, nombre, descripcion ?? "");
 		} catch (error) {
 			if (error instanceof Error) setClientError(error.message);
+		} finally {
+			window.location.reload();
+		}
+	}
+
+	async function handleDelete() {
+		try {
+			await deleteEntornoById(entorno.id);
+		} catch (error) {
+			if (error instanceof Error) setClientError(error.message);
+		} finally {
+			window.location.href = pathname.substring(0, pathname.lastIndexOf("/"));
 		}
 	}
 
@@ -67,13 +85,21 @@ export default function DatosEntorno({
 						/>
 					</div>
 				</div>
-				{clientError && <p className="text-red-500 mt-2">{clientError}</p>}
-				<button
-					className="mt-4 rounded border border-indigo-500 bg-indigo-600 p-1 font-medium"
-					onClick={handleUpdate}
-				>
-					Actualizar
-				</button>
+				{clientError && <p className="mt-2 text-red-500">{clientError}</p>}
+				<div className="flex gap-2">
+					<button
+						className={clsx("mt-4 rounded border border-indigo-500 bg-indigo-600 p-1 font-medium", isAdmin && " w-1/2")}
+						onClick={handleUpdate}
+					>
+						Actualizar
+					</button>
+					{isAdmin &&<button
+						className="mt-4 rounded border border-red-500 bg-red-600 p-1 font-medium w-1/2"
+						onClick={handleDelete}
+					>
+						Eliminar
+					</button>}
+				</div>
 			</>
 		);
 }

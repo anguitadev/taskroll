@@ -80,7 +80,7 @@ export default async function Entorno({
 					Pizarra
 				</Link>
 			</div>
-			{proyectosEntorno?.map(proyecto => (
+			{proyectosEntorno ? proyectosEntorno.map(proyecto => (
 				<div key={proyecto.id} className="my-4 rounded border border-neutral-700 p-4">
 					<div className="flex justify-between">
 						<Link
@@ -100,7 +100,9 @@ export default async function Entorno({
 					{showTareas(proyecto.id)}
 					<NuevaTarea entorno={proyecto.id} />
 				</div>
-			))}
+			)) : (
+				<span className="block text-center text-sm text-neutral-400">No hay ninguna tarea...</span>
+			)}
 		</>
 	);
 }

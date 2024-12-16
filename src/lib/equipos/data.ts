@@ -148,5 +148,7 @@ export async function getEquipoSlugByUsuarioId(id: string) {
 		.eq("usuario", id)
 		.limit(1);
 
-	return equipo![0].Equipos?.slug;
+	if (!equipo || equipo.length == 0) return null;
+
+	return equipo[0].Equipos?.slug;
 }
