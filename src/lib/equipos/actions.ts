@@ -1,3 +1,4 @@
+"use server";
 import { createClient } from "@/utils/supabase/server";
 import { getAllEntornosByEquipoId } from "../data";
 import { removeUsuarioEntorno } from "../entornos/actions";
