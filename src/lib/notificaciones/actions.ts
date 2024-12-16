@@ -35,6 +35,26 @@ export async function createNotificacion(idTarea: string, notificacion: string) 
 	enviarCorreosUsuarios(usuariosTarea, textoNotificacion, idTarea);
 }
 
+export async function deleteNotificacion(idNotificacion: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Notificaciones").delete().eq("id", idNotificacion);
+	if (error) return error;
+}
+
+export async function deleteAllNotificaciones() {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return;
+
+	const { error } = await supabase
+		.from("Notificaciones")
+		.delete()
+		.eq("usuario_destinatario", usuario.id);
+	if (error) throw error;
+}
+
 export async function enviarCorreosUsuarios(
 	usuariosTarea: UsuariosTareas[],
 	notificacion: string,

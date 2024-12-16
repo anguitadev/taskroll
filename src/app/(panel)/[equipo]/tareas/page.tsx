@@ -1,9 +1,17 @@
 import BusquedaTareas from "@/components/entornos/busqueda-tareas";
 import ListaTareas from "@/components/entornos/lista-tareas";
 import NuevaTarea from "@/components/tareas/nueva-tarea";
-import { getEntornosByEquipoId, getEquipoById, getEquipoBySlug, getTareasByEquipoId } from "@/lib/data";
+import { getEquipoById } from "@/lib/data";
+import { getEntornosByEquipoId } from "@/lib/entornos/data";
+import { getEquipoBySlug } from "@/lib/equipos/data";
+import { getTareasByEquipoId } from "@/lib/tareas/data";
 import { Plus } from "lucide-react";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+	title: "Taskroll | Todas las tareas",
+};
 
 export default async function Tareas({
 	params,
@@ -45,15 +53,17 @@ export default async function Tareas({
 			<div className="flex h-[calc(100vh-70px)] flex-col overflow-y-scroll p-8">
 				<div className="flex items-center justify-between">
 					<h1 className="text-3xl font-bold">Todas las tareas de {equipo.nombre}</h1>
-					<div className="flex gap-4 items-center">
+					<div className="flex items-center gap-4">
 						{!zeroTareas && tareas && <BusquedaTareas />}
-						{entornos && entornos?.length > 0 && <button
-							className="flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
-							popoverTarget={"nueva-tarea-equipo-"+slug}
-						>
-							<Plus className="size-5" />
-							Añadir Tarea
-						</button>}
+						{entornos && entornos?.length > 0 && (
+							<button
+								className="flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
+								popoverTarget={"nueva-tarea-equipo-" + slug}
+							>
+								<Plus className="size-5" />
+								Añadir Tarea
+							</button>
+						)}
 					</div>
 				</div>
 
@@ -65,7 +75,7 @@ export default async function Tareas({
 					</span>
 				)}
 			</div>
-			<NuevaTarea entorno={"equipo-"+slug} />
+			<NuevaTarea entorno={"equipo-" + slug} />
 		</>
 	);
 }

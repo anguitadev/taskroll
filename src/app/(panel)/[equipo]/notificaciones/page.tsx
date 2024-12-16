@@ -1,6 +1,11 @@
 import ListaNotificaciones from "@/components/notificaciones/lista-notificaciones";
-import { getNotificacionesByEquipoSlug } from "@/lib/data";
+import { getNotificacionesByEquipoSlug } from "@/lib/notificaciones/data";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+	title: "Taskroll | Notificaciones",
+};
 
 export default async function Notificaciones({ params }: { params: Promise<{ equipo: string }> }) {
 	const equipoSlug = (await params).equipo;

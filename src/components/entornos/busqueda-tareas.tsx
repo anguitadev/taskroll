@@ -7,6 +7,7 @@ export default function BusquedaTareas() {
 	const pathname = usePathname();
 	const { replace } = useRouter();
 
+	// Si existe una busqueda, se muestra en el input
 	function handleSearch(tarea: string) {
 		const params = new URLSearchParams(searchParams);
 		if (tarea) {

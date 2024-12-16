@@ -11,7 +11,8 @@ export interface Notificacion {
 			entorno: {
 				slug: string;
 				equipo: {
-					id: string;
+					id?: string;
+					slug?: string;
 				};
 			};
 		};

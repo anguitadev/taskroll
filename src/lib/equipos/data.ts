@@ -91,3 +91,11 @@ export async function isUsuarioEquipoAdmin(equipoSlug: string) {
 
 	return data ? data.length > 0 : false;
 }
+
+export async function getEquipoById(id: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase.from("Equipos").select("*").eq("id", id).limit(1).single();
+
+	return data;
+}

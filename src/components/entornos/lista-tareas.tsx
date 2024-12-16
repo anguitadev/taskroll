@@ -1,25 +1,8 @@
 "use client";
+import { Tarea } from "@/lib/tareas/types";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import TablaTareas from "../proyectos/tabla-tareas";
-
-interface Tarea {
-	usuario: { color: string; nombre_completo: string };
-	tarea: {
-		id: string;
-		titulo: string;
-		slug: string;
-		fecha_fin: string;
-		estado: string;
-		prioridad: string;
-		entorno: {
-			nombre: string;
-			entorno: {
-				nombre: string;
-			};
-		};
-	};
-}
 
 export default function ListaTareas({
 	tareas,
@@ -37,6 +20,7 @@ export default function ListaTareas({
 	const hoy = moment(new Date());
 	const manana = moment(new Date().setDate(new Date().getDate() + 1));
 
+	// Se filtran las tareas por fecha
 	useEffect(() => {
 		const tareasPendientes = tareas?.filter(tarea => {
 			return moment(tarea.tarea?.fecha_fin).startOf("day").isBefore(hoy.startOf("day"));
@@ -64,6 +48,7 @@ export default function ListaTareas({
 
 	}, [tareas]);
 
+	// Se muestran las tareas en base a la búsqueda
 	useEffect(() => {
 		if (query === undefined) return setTareasBuscadas([]);
 		const tareaBuscada = tareas?.filter(tarea => {

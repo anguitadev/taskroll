@@ -1,37 +1,16 @@
 "use client";
 
-import { deleteAllNotificaciones, removeNotificacion } from "@/lib/actions";
+import { deleteAllNotificaciones, deleteNotificacion } from "@/lib/notificaciones/actions";
+import { Notificacion } from "@/lib/notificaciones/types";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-interface Notificacion {
-	id: string;
-	notificacion: string;
-	created_at: string;
-	tarea: {
-		estado: string;
-		titulo: string;
-		slug: string;
-		entorno: {
-			slug: string;
-			entorno: {
-				slug: string;
-				equipo: {
-					slug: string;
-				};
-			};
-		};
-	};
-}
 
 export default function ListaNotificaciones({
 	notificaciones: todasNotificaciones,
 }: {
 	notificaciones: Notificacion[];
 }) {
-	const [notificaciones, setNotificaciones] = useState(todasNotificaciones);
-
 	const estados: { [key: string]: string } = {
 		Abierto: "bg-zinc-600",
 		Progreso: "bg-sky-600",
@@ -39,9 +18,11 @@ export default function ListaNotificaciones({
 		Completado: "bg-green-600",
 	};
 
+	const [notificaciones, setNotificaciones] = useState(todasNotificaciones);
+
 	function handleEliminarNotificacion(notificacionId: string) {
 		try {
-			removeNotificacion(notificacionId);
+			deleteNotificacion(notificacionId);
 		} catch (error) {
 			console.log(error);
 		} finally {
