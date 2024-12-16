@@ -84,3 +84,73 @@ export async function getEntornoById(id: string) {
 
 	return data;
 }
+
+export async function getEntornoProyectoBySlug(entornoSlug: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Entornos")
+		.select("*")
+		.eq("slug", entornoSlug)
+		.limit(1)
+		.single();
+
+	return data;
+}
+
+export async function getUsuariosByEntornoId(entornoId: string) {
+	const supabase = await createClient();
+	const { data: usuarios } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin, entorno, Usuarios(*)")
+		.eq("entorno", entornoId);
+	return usuarios;
+}
+
+export async function getUsuariosByEntornoSlug(entornoSlug: string) {
+	const entorno = await getEntornoBySlug(entornoSlug);
+	if (!entorno) return [];
+
+	const entornoId = entorno.id;
+
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin, entorno, Usuarios(*)")
+		.eq("entorno", entornoId);
+
+	return data;
+}
+
+export async function getAdminCountEntorno(entornoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin")
+		.eq("entorno", entornoId)
+		.eq("admin", true);
+
+	return data ? data.length : 0;
+}
+
+export async function isEntornoAdminByUsuarioId(usuarioId: string, entornoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("admin")
+		.eq("entorno", entornoId)
+		.eq("usuario", usuarioId)
+		.eq("admin", true)
+		.limit(1)
+		.single();
+
+	return data ? data.admin : false;
+}
+
+export async function getAllEntornosByEquipoId(equipoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase.from("Entornos").select("*").eq("equipo", equipoId);
+	return data;
+}

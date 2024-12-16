@@ -99,3 +99,42 @@ export async function getEquipoById(id: string) {
 
 	return data;
 }
+
+export async function getEquipoByEntornoId(id: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Entornos")
+		.select("Equipos(slug)")
+		.eq("id", id)
+		.limit(1)
+		.single();
+
+	return data;
+}
+
+export async function getAdminCountEquipo(equipoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("admin")
+		.eq("equipo", equipoId)
+		.eq("admin", true);
+
+	return data ? data.length : 0;
+}
+
+export async function isEquipoAdminByUsuarioId(usuarioId: string, equipoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("admin")
+		.eq("equipo", equipoId)
+		.eq("usuario", usuarioId)
+		.eq("admin", true)
+		.limit(1)
+		.single();
+
+	return data ? data.admin : false;
+}

@@ -15,3 +15,12 @@ export async function getProyectoBySlug(slug: string) {
 
 	return data;
 }
+
+export async function getUsuariosByProyectoId(proyectoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Entornos")
+		.select("Usuarios(*)")
+		.eq("entorno", proyectoId);
+	return data;
+}

@@ -204,3 +204,19 @@ export async function removeComentario(idComentario: string) {
 	const { error } = await supabase.from("Comentarios").delete().eq("id", idComentario);
 	if (error) throw error;
 }
+
+export async function removeUserFromTarea(tareaId: string, userId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase
+		.from("Usuarios_Tareas")
+		.delete()
+		.eq("tarea", tareaId)
+		.eq("usuario", userId);
+	if (error) throw error;
+}
+
+export async function removeTarea(tareaId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Tareas").delete().eq("id", tareaId);
+	if (error) throw error;
+}

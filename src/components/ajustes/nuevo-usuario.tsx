@@ -1,9 +1,15 @@
 "use client";
 
-import { addUsuarioToEntorno, addUsuarioToEquipo } from "@/lib/actions";
+import { addUsuarioToEntorno, addUsuarioToEquipo } from "@/lib/entornos/actions";
 import { useState } from "react";
 
-export default function NuevoUsuario({ equipoSlug, entornoSlug }: { equipoSlug?: string; entornoSlug?: string }) {
+export default function NuevoUsuario({
+	equipoSlug,
+	entornoSlug,
+}: {
+	equipoSlug?: string;
+	entornoSlug?: string;
+}) {
 	const [nombreusuario, setNombreUsuario] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -26,7 +32,9 @@ export default function NuevoUsuario({ equipoSlug, entornoSlug }: { equipoSlug?:
 			popover="auto"
 			className="flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 		>
-			<span className="mb-6 block text-lg font-semibold">Añadir nuevo usuario al {equipoSlug ? "equipo" : "entorno" }</span>
+			<span className="mb-6 block text-lg font-semibold">
+				Añadir nuevo usuario al {equipoSlug ? "equipo" : "entorno"}
+			</span>
 			<label>Introduce el nombre de usuario del nuevo miembro:</label>
 			<div className="mt-4 flex w-full gap-2">
 				<input

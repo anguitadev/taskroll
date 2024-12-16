@@ -1,22 +1,14 @@
 "use client";
 import { Tables } from "@/db.types";
-import { updateEntornoById } from "@/lib/actions";
+import { updateEntornoById } from "@/lib/entornos/actions";
+import { Entorno } from "@/lib/entornos/types";
 import { useState } from "react";
 
 export default function DatosEntorno({
 	entorno,
 	propietario,
 }: {
-	entorno: {
-		color: string;
-		descripcion: string | null;
-		entorno: string | null;
-		equipo: string | null;
-		id: string;
-		nombre: string;
-		propietario: string;
-		slug: string;
-	};
+	entorno: Entorno;
 	propietario: Tables<"Usuarios">;
 }) {
 	const [nombre, setNombre] = useState(entorno?.nombre);

@@ -1,5 +1,6 @@
 "use client";
-import { removeUsuarioEntorno, removeUsuarioEquipo } from "@/lib/actions";
+import { removeUsuarioEntorno } from "@/lib/entornos/actions";
+import { removeUsuarioEquipo } from "@/lib/equipos/actions";
 import { Trash2 } from "lucide-react";
 
 export default function AccionesUsuario({

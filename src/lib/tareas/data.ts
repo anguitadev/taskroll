@@ -278,3 +278,18 @@ export async function getTareaUrlById(idTarea: string) {
 
 	return `https://taskroll.app/${slugs?.entorno?.entorno?.equipo?.slug}/${slugs?.entorno?.entorno?.slug}/${slugs?.entorno?.slug}/${slugs?.slug}`;
 }
+
+export async function getTareasByEntornoId(entornoId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase.from("Tareas").select("*").eq("entorno", entornoId);
+	return data;
+}
+
+export async function getUsuariosByTareaId(tareaId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("Usuarios(*)")
+		.eq("tarea", tareaId);
+	return data;
+}

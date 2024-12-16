@@ -1,6 +1,7 @@
 "use client";
 
-import { updateUsuarioRolEntorno, updateUsuarioRolEquipo } from "@/lib/actions";
+import { updateUsuarioRolEntorno } from "@/lib/entornos/actions";
+import { updateUsuarioRolEquipo } from "@/lib/equipos/actions";
 import { useState } from "react";
 
 export default function SelectRol({

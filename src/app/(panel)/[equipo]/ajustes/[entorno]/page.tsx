@@ -2,13 +2,12 @@ import DatosEntorno from "@/components/ajustes/entornos/datos";
 import NuevoUsuario from "@/components/ajustes/nuevo-usuario";
 import TablaUsuarios from "@/components/ajustes/tabla-usuarios";
 import { Tables } from "@/db.types";
+import { getUsuario, getUsuarioById } from "@/lib/auth/data";
 import {
 	getEntornoProyectoBySlug,
-	getUsuario,
-	getUsuarioById,
 	getUsuariosByEntornoId,
 	isEntornoAdmin,
-} from "@/lib/data";
+} from "@/lib/entornos/data";
 import { Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -19,17 +18,13 @@ export default async function AjustesEntorno(props: { params: Params }) {
 	const entornoSlug = params.entorno;
 
 	const entorno = await getEntornoProyectoBySlug(entornoSlug);
-
 	if (!entorno) return notFound();
 
 	const isAdmin = await isEntornoAdmin(entorno.id);
-
 	if (!isAdmin) return notFound();
 
 	const propietario: Tables<"Usuarios"> = await getUsuarioById(entorno.propietario);
-
 	const usuariosEntorno = await getUsuariosByEntornoId(entorno.id);
-
 	const usuarioLoggeado = await getUsuario();
 
 	return (

@@ -40,3 +40,27 @@ export async function getUsuariosByEquipoSlug(equipoSlug: string) {
 
 	return data;
 }
+
+export async function getUsuarioById(usuarioId: string) {
+	const supabase = await createClient();
+	const { data: usuario } = await supabase
+		.from("Usuarios")
+		.select("*")
+		.eq("id", usuarioId)
+		.limit(1)
+		.single();
+
+	return usuario as Tables<"Usuarios">;
+}
+
+export async function getUsuarioByNombreUsuario(nombre_usuario: string) {
+	const supabase = await createClient();
+	const { data: usuario } = await supabase
+		.from("Usuarios")
+		.select("*")
+		.eq("nombre_usuario", nombre_usuario)
+		.limit(1)
+		.single();
+	if (!usuario) return;
+	return usuario;
+}
