@@ -8,14 +8,6 @@ import moment from "moment";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Usuario = {
-	Usuarios: {
-		id: string;
-		color: string;
-		nombre_completo: string;
-	};
-};
-
 export default function TablaTareas({
 	tareas,
 	extraData,
