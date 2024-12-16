@@ -1,29 +1,11 @@
 import AjustesDelPerfil from "@/components/ajustes/perfil";
-import { createClient } from "@/utils/supabase/server";
-
-interface User {
-	nombre_usuario: string;
-	nombre_completo: string;
-	color: string;
-	puesto: string | null;
-	email: string | undefined;
-}
+import { getUsuario } from "@/lib/auth/data";
+import { notFound } from "next/navigation";
 
 export default async function AjustesCuentaPerfil() {
 
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	const { data: infoUsuario } = await supabase
-		.from("Usuarios")
-		.select("nombre_usuario, nombre_completo, color, puesto")
-		.eq("id", user!.id);
-
-	const usuario = infoUsuario!.pop() as User;
-
-	usuario.email = user!.email;
+	const usuario = await getUsuario();
+	if (!usuario) return notFound();
 
 	return (
 		<>
@@ -37,7 +19,7 @@ export default async function AjustesCuentaPerfil() {
 						Aquí puedes realizar cambios sobre tu perfil.
 					</span>
 				</div>
-				<AjustesDelPerfil {...usuario} />
+				<AjustesDelPerfil usuario={usuario} />
 			</div>
 		</>
 	);

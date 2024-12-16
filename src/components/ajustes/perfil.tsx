@@ -1,29 +1,18 @@
 "use client";
-import { createClient } from "@/utils/supabase/client";
+import { updateUsuario } from "@/lib/auth/actions";
 import clsx from "clsx";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 interface User {
-	nombre_usuario: string;
-	nombre_completo: string;
 	color: string;
+	email: string;
+	id: string;
+	nombre_completo: string;
+	nombre_usuario: string;
 	puesto: string | null;
-	email: string | undefined;
 }
 
-export default function AjustesDelPerfil(usuario: User) {
-	const supabase = createClient();
-
-	const [loading, setLoading] = useState(true);
-	const [color, setColor] = useState<string | null>(usuario.color);
-	const [correoElectronico, setCorreoElectronico] = useState<string | null>(null);
-	const [nombreCompleto, setNombreCompleto] = useState<string | null>(null);
-	const [nombreUsuario, setNombreUsuario] = useState<string | null>(null);
-	const [puesto, setPuesto] = useState<string | null>(null);
-
-	const [success, setSuccess] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
-
+export default function AjustesDelPerfil({ usuario }: { usuario: User }) {
 	const colorOptions = [
 		"bg-red-600",
 		"bg-orange-600",
@@ -33,76 +22,28 @@ export default function AjustesDelPerfil(usuario: User) {
 		"bg-pink-600",
 	];
 
-	const getUsuario = useCallback(async () => {
-		try {
-			setLoading(true);
+	const [loading, setLoading] = useState(false);
+	const [color, setColor] = useState<string>(usuario.color);
+	const [nombreCompleto, setNombreCompleto] = useState<string>(usuario.nombre_completo);
+	const [nombreUsuario, setNombreUsuario] = useState<string>(usuario.nombre_usuario);
+	const [puesto, setPuesto] = useState<string | null>(usuario.puesto);
 
-			const { data, error, status } = await supabase
-				.from("Usuarios")
-				.select(`nombre_completo, nombre_usuario, puesto, color`)
-				.eq("nombre_usuario", usuario?.nombre_usuario)
-				.single();
+	const [success, setSuccess] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
-			if (error && status !== 406) {
-				console.log(error);
-				throw error;
-			}
-
-			if (data) {
-				setCorreoElectronico(usuario.email!);
-				setNombreCompleto(data.nombre_completo);
-				setNombreUsuario(data.nombre_usuario);
-				setPuesto(data.puesto);
-				setColor(data.color);
-			}
-		} catch (error) {
-			alert("Error cargando los datos de usuario.");
-			console.log(error);
-		} finally {
-			setLoading(false);
-		}
-	}, [usuario, supabase]);
-
-	useEffect(() => {
-		getUsuario();
-	}, [usuario, getUsuario]);
-
-	async function updateUsuario({
-		nombreCompleto,
-		nombreUsuario,
-		puesto,
-		color,
-	}: {
-		nombreCompleto: string | null;
-		nombreUsuario: string | null;
-		puesto: string | null;
-		color: string | null;
-	}) {
+	async function handleUpdate() {
 		if (nombreCompleto == "") {
 			setError("Por favor, introduce tu nombre.");
 		} else {
 			setError(null);
 			try {
 				setLoading(true);
-
-				const { error } = await supabase
-					.from("Usuarios")
-					.update({
-						nombre_completo: nombreCompleto,
-						nombre_usuario: nombreUsuario,
-						puesto: puesto,
-						color: color,
-					})
-					.eq("nombre_usuario", usuario.nombre_usuario);
-				if (error) throw error;
-				setSuccess("Perfil actualizado correctamente.");
+				await updateUsuario(nombreCompleto, nombreUsuario, color, puesto);
 			} catch (error) {
-				if (error) {
-					setError("El nombre de usuario ya existe.");
-				}
-				console.log(error);
+				if (error instanceof Error) setError(error.message);
 			} finally {
 				setLoading(false);
+				setSuccess("Perfil actualizado correctamente.");
 			}
 		}
 	}
@@ -142,9 +83,9 @@ export default function AjustesDelPerfil(usuario: User) {
 				</div>
 				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row">
 					<span className="font-semibold">Correo Electrónico</span>
-					<span>{correoElectronico}</span>
+					<span>{usuario.email}</span>
 				</div>
-				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
+				<div className="flex flex-col justify-between gap-2 border-t border-neutral-800 p-6 md:flex-row">
 					<label htmlFor="nombreCompleto" className="font-semibold">
 						Nombre Completo
 					</label>
@@ -156,7 +97,7 @@ export default function AjustesDelPerfil(usuario: User) {
 						onChange={e => setNombreCompleto(e.target.value)}
 					/>
 				</div>
-				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
+				<div className="flex flex-col justify-between gap-2 border-t border-neutral-800 p-6 md:flex-row">
 					<label htmlFor="nombreUsuario" className="font-semibold">
 						Nombre de Usuario
 					</label>
@@ -168,7 +109,7 @@ export default function AjustesDelPerfil(usuario: User) {
 						onChange={e => setNombreUsuario(e.target.value)}
 					/>
 				</div>
-				<div className="flex flex-col justify-between gap-2 p-6 md:flex-row border-t border-neutral-800">
+				<div className="flex flex-col justify-between gap-2 border-t border-neutral-800 p-6 md:flex-row">
 					<label htmlFor="puesto" className="font-semibold">
 						Puesto
 					</label>
@@ -185,7 +126,7 @@ export default function AjustesDelPerfil(usuario: User) {
 			{error && <span className="mt-2 block text-red-500">{error}</span>}
 			<button
 				className="mt-4 w-full rounded bg-indigo-600 py-3 font-semibold"
-				onClick={() => updateUsuario({ nombreCompleto, nombreUsuario, puesto, color })}
+				onClick={handleUpdate}
 				disabled={loading}
 			>
 				{loading ? "Cargando ..." : "Actualizar"}
@@ -206,9 +147,11 @@ export default function AjustesDelPerfil(usuario: User) {
 					<span className="text-lg font-semibold">
 						¿Estás seguro que quieres eliminar tu cuenta?
 					</span>
-					<button className="rounded bg-red-600 p-2 text-neutral-200"
-					onClick={handleDelete}
-					disabled>
+					<button
+						className="rounded bg-red-600 p-2 text-neutral-200"
+						onClick={handleDelete}
+						disabled
+					>
 						Eliminar
 					</button>
 				</div>
