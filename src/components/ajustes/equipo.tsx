@@ -1,23 +1,12 @@
 "use client";
 
-import { deleteEquipo, updateEquipo } from "@/app/(panel)/[equipo]/ajustes/equipo/actions";
 import { Tables } from "@/db.types";
-import { createClient } from "@/utils/supabase/client";
+import { deleteEquipo, updateEquipo } from "@/lib/equipos/actions";
 import clsx from "clsx";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
-	const supabase = createClient();
-
-	const [colorEquipo, setColorEquipo] = useState<string>("");
-	const [nombreEquipo, setNombreEquipo] = useState<string>("");
-	const [slugEquipo, setSlugEquipo] = useState<string>("");
-
-	const [success, setSuccess] = useState<string | null>(null);
-	const [clientError, setClientError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
-
 	const colorOptions = [
 		"bg-red-600",
 		"bg-orange-600",
@@ -27,6 +16,14 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 		"bg-pink-600",
 	];
 
+	const [colorEquipo, setColorEquipo] = useState<string>(equipo.color);
+	const [nombreEquipo, setNombreEquipo] = useState<string>(equipo.nombre);
+	const [slugEquipo, setSlugEquipo] = useState<string>(equipo.slug);
+
+	const [success, setSuccess] = useState<string | null>(null);
+	const [clientError, setClientError] = useState<string | null>(null);
+	const [loading, setLoading] = useState(false);
+
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
@@ -35,52 +32,32 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 		if (searchParams.get("error")) setClientError("La URL del equipo ya existe.");
 	}, [pathname, searchParams]);
 
-	function handleUpdate() {
+	async function handleUpdate() {
 		if (nombreEquipo == "" || slugEquipo === "") {
 			setClientError("Los campos no pueden estar vacíos.");
 		} else {
-			updateEquipo({
-				idEquipo: equipo.id,
-				nombreEquipo,
-				slugEquipo,
-				colorEquipo,
-			});
+			try {
+				setLoading(true);
+				await updateEquipo({
+					idEquipo: equipo.id,
+					nombreEquipo,
+					slugEquipo,
+					colorEquipo,
+				});
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setLoading(false);
+			}
 		}
 	}
 
-	const getEquipo = useCallback(async () => {
+	async function handleDelete() {
 		try {
-			setLoading(true);
-
-			const { data, error, status } = await supabase
-				.from("Equipos")
-				.select(`nombre, slug, color`)
-				.eq("id", equipo.id)
-				.single();
-
-			if (error && status !== 406) {
-				throw error;
-			}
-
-			if (data) {
-				setNombreEquipo(data.nombre);
-				setSlugEquipo(data.slug);
-				setColorEquipo(data.color);
-			}
+			await deleteEquipo(equipo.id);
 		} catch (error) {
-			alert("Error cargando los datos del equipo.");
 			console.log(error);
-		} finally {
-			setLoading(false);
 		}
-	}, [equipo, supabase]);
-
-	useEffect(() => {
-		getEquipo();
-	}, [equipo, getEquipo]);
-
-	function handleDelete() {
-		deleteEquipo(equipo.id);
 	}
 
 	return (
@@ -124,7 +101,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 						onChange={e => setNombreEquipo(e.target.value)}
 					/>
 				</div>
-				<div className="flex flex-col md:flex-row justify-between border-t border-neutral-800 p-6">
+				<div className="flex flex-col justify-between border-t border-neutral-800 p-6 md:flex-row">
 					<label htmlFor="slugEquipo" className="font-semibold">
 						URL del Equipo
 					</label>
@@ -132,7 +109,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 						<span>taskroll.app/</span>
 						<input
 							id="slugEquipo"
-							className="rounded border border-neutral-800 px-2 py-1 w-full"
+							className="w-full rounded border border-neutral-800 px-2 py-1"
 							type="text"
 							value={slugEquipo || ""}
 							onChange={e => setSlugEquipo(e.target.value)}
@@ -144,7 +121,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 			{clientError && <span className="mt-2 block text-red-500">{clientError}</span>}
 			<button
 				className="mt-4 w-full rounded bg-indigo-600 py-3 font-semibold"
-				onClick={() => handleUpdate()}
+				onClick={handleUpdate}
 				disabled={loading}
 			>
 				{loading ? "Cargando ..." : "Actualizar"}

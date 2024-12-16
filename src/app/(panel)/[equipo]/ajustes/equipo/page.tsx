@@ -1,7 +1,6 @@
 import AjustesDelEquipo from "@/components/ajustes/equipo";
 import { Tables } from "@/db.types";
-import { isUsuarioEquipoAdmin } from "@/lib/data";
-import { createClient } from "@/utils/supabase/server";
+import { getEquipoBySlug, isUsuarioEquipoAdmin } from "@/lib/equipos/data";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ equipo: string }>;
@@ -11,15 +10,9 @@ export default async function AjustesEquipo(props: { params: Params }) {
 	const equipoSlug = params.equipo;
 	
 	const isAdmin = await isUsuarioEquipoAdmin(equipoSlug);
-
 	if (!isAdmin) return notFound();
 
-	const supabase = await createClient();
-	const { data: equipo } = await supabase
-		.from("Equipos")
-		.select("id, nombre, slug, color")
-		.eq("slug", equipoSlug)
-		.single();
+	const equipo = await getEquipoBySlug(equipoSlug);
 
 	return (
 		<>
