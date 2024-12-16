@@ -1,5 +1,5 @@
 import WrapperDocumentos from "@/components/documentos-equipo/wrapper-documentos";
-import { getDocumentosByEquipoSlug } from "@/lib/data";
+import { getDocumentosByEquipoSlug } from "@/lib/documentos/data";
 
 export default async function Documentos({ params }: { params: Promise<{ equipo: string }> }) {
 	const equipoSlug = (await params).equipo;

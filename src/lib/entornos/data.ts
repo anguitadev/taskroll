@@ -76,3 +76,11 @@ export async function getEntornoBySlug(entornoSlug: string) {
 
 	return data;
 }
+
+export async function getEntornoById(id: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase.from("Entornos").select("*").eq("id", id).limit(1).single();
+
+	return data;
+}

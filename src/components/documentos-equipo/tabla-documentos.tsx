@@ -1,4 +1,5 @@
-import { deleteDocumentoByUrl } from "@/lib/actions";
+import { deleteDocumentoByUrl } from "@/lib/documentos/actions";
+import { DocumentosEquipo } from "@/lib/documentos/types";
 import { CircleDollarSign, CircleX, Download, FileText, Settings2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,40 +9,23 @@ import Visualizador from "../documentos/visualizador";
 export default function TablaDocumentos({
 	documentosEquipo,
 }: {
-	documentosEquipo:
-		| {
-				created_at: string;
-				destinatario: string | null;
-				entorno: {
-					slug: string;
-					nombre: string;
-					entorno: {
-						slug: string;
-						nombre: string;
-						entorno: {
-							slug: string;
-							nombre: string;
-						};
-					} | null;
-				} | null;
-				id: string;
-				nombre: string;
-				propietario: string;
-				url: string;
-		  }[]
-		| null
-		| undefined;
+	documentosEquipo: DocumentosEquipo[] | null | undefined;
 }) {
+	const pathname = usePathname();
+	const equipoSlug = pathname.split("/")[1];
+
 	const [documentos, setDocumentos] = useState(documentosEquipo);
 	const [documentoSeleccionado, setDocumentoSeleccionado] = useState<string | null>(null);
 	const [nominas, setNominas] = useState(false);
 
+	// Mostrar si son nóminas
 	useEffect(() => {
 		const numeroNominas = documentosEquipo?.filter(documento => documento.entorno === null);
 		if (numeroNominas) setNominas(numeroNominas.length == documentosEquipo?.length);
 		setDocumentos(documentosEquipo);
 	}, [documentosEquipo]);
 
+	// Eliminar documento
 	async function handleDeleteDocumento(documentoUrl: string) {
 		try {
 			await deleteDocumentoByUrl(documentoUrl);
@@ -52,13 +36,12 @@ export default function TablaDocumentos({
 		}
 	}
 
-	const pathname = usePathname();
-	const equipoSlug = pathname.split("/")[1];
-
+	// Ver documento
 	function handleVerDocumento(documentoUrl: string) {
 		setDocumentoSeleccionado(documentoUrl);
 	}
 
+	// Cerrar popup
 	function closePopup() {
 		setDocumentoSeleccionado(null);
 	}
@@ -69,8 +52,12 @@ export default function TablaDocumentos({
 				<tbody>
 					<tr className="text-left text-sm font-light text-neutral-400">
 						<th className="border-b border-neutral-700 pb-2">Nombre</th>
-						{!nominas && <th className="w-64 border-b border-neutral-700 pb-2">Entorno</th>}
-						{!nominas && <th className="w-64 border-b border-neutral-700 pb-2">Proyecto</th>}
+						{!nominas && (
+							<th className="w-64 border-b border-neutral-700 pb-2">Entorno</th>
+						)}
+						{!nominas && (
+							<th className="w-64 border-b border-neutral-700 pb-2">Proyecto</th>
+						)}
 						<th className="w-52 border-b border-neutral-700 pb-2">Fecha</th>
 						<th className="w-16 border-b border-neutral-700 pb-2">
 							<Settings2 className="m-auto size-5" />
@@ -89,30 +76,36 @@ export default function TablaDocumentos({
 								)}
 								<span className="font-semibold">{documento.nombre}</span>
 							</td>
-							{!nominas && <td className="border-b border-neutral-700 pb-2">
-								{documento.entorno && documento.entorno.entorno ? (
-									<Link href={`/${equipoSlug}/${documento.entorno.entorno.slug}`}>
-										{documento.entorno.entorno.nombre}
-									</Link>
-								) : documento.entorno && !documento.entorno.entorno ? (
-									<Link href={`/${equipoSlug}/${documento.entorno.slug}`}>
-										{documento.entorno.nombre}
-									</Link>
-								) : (
-									""
-								)}
-							</td>}
-							{!nominas && <td className="border-b border-neutral-700 pb-2">
-								{documento.entorno && documento.entorno.entorno ? (
-									<Link
-										href={`/${equipoSlug}/${documento.entorno.entorno.slug}/${documento.entorno.slug}`}
-									>
-										{documento.entorno.nombre}
-									</Link>
-								) : (
-									""
-								)}
-							</td>}
+							{!nominas && (
+								<td className="border-b border-neutral-700 pb-2">
+									{documento.entorno && documento.entorno.entorno ? (
+										<Link
+											href={`/${equipoSlug}/${documento.entorno.entorno.slug}`}
+										>
+											{documento.entorno.entorno.nombre}
+										</Link>
+									) : documento.entorno && !documento.entorno.entorno ? (
+										<Link href={`/${equipoSlug}/${documento.entorno.slug}`}>
+											{documento.entorno.nombre}
+										</Link>
+									) : (
+										""
+									)}
+								</td>
+							)}
+							{!nominas && (
+								<td className="border-b border-neutral-700 pb-2">
+									{documento.entorno && documento.entorno.entorno ? (
+										<Link
+											href={`/${equipoSlug}/${documento.entorno.entorno.slug}/${documento.entorno.slug}`}
+										>
+											{documento.entorno.nombre}
+										</Link>
+									) : (
+										""
+									)}
+								</td>
+							)}
 							<td className="border-b border-neutral-700 pb-2 font-mono">
 								{new Date(documento.created_at).toLocaleDateString()}
 							</td>

@@ -1,5 +1,6 @@
 "use client";
-import { getUsuario } from "@/lib/data-client";
+import { getUsuario } from "@/lib/auth/data-client";
+import { DocumentosEquipo } from "@/lib/documentos/types";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import TablaDocumentos from "./tabla-documentos";
@@ -7,35 +8,14 @@ import TablaDocumentos from "./tabla-documentos";
 export default function WrapperDocumentos({
 	documentosEquipo,
 }: {
-	documentosEquipo:
-		| {
-				created_at: string;
-				destinatario: string | null;
-				entorno: {
-					slug: string;
-					nombre: string;
-					entorno: {
-						slug: string;
-						nombre: string;
-						entorno: {
-							slug: string;
-							nombre: string;
-						};
-					} | null;
-				} | null;
-				id: string;
-				nombre: string;
-				propietario: string;
-				url: string;
-		  }[]
-		| null
-		| undefined;
+	documentosEquipo: DocumentosEquipo[] | null | undefined;
 }) {
 	const [tab, setTab] = useState<"todos" | "mios" | "nominas">("todos");
 	const [documentos, setDocumentos] = useState(documentosEquipo);
 
+	// Ordenar documentos según la tab
 	useEffect(() => {
-		const efecto = async () => {
+		const ordenarDocumentos = async () => {
 			if (tab === "todos") setDocumentos(documentosEquipo);
 			if (tab === "mios") {
 				const usuario = await getUsuario();
@@ -49,7 +29,7 @@ export default function WrapperDocumentos({
 				setDocumentos(documentosEquipo?.filter(documento => documento.entorno === null));
 			}
 		};
-		efecto();
+		ordenarDocumentos();
 	}, [tab]);
 
 	return (
