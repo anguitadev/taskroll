@@ -1,7 +1,7 @@
 "use client";
 import { deleteTarea } from "@/lib/tareas/actions";
 import { getTareaLinkById, getUsuariosByTarea } from "@/lib/tareas/data-client";
-import { Tarea } from "@/lib/tareas/types";
+import { Tarea, UsuariosTareas } from "@/lib/tareas/types";
 import clsx from "clsx";
 import { FlagTriangleRight, Settings2, Trash2 } from "lucide-react";
 import moment from "moment";
@@ -41,13 +41,13 @@ export default function TablaTareas({
 	};
 
 	const [usuariosPorTarea, setUsuariosPorTarea] = useState<{
-		[key: string]: Usuario[];
+		[key: string]: UsuariosTareas[];
 	}>({});
 
 	// Cargar los usuarios de cada tarea
 	useEffect(() => {
 		async function fetchUsuarios() {
-			const usuariosMap: { [key: string]: Usuario[] } = {};
+			const usuariosMap: { [key: string]: UsuariosTareas[] } = {};
 			for (const tarea of tareas) {
 				if (tarea.tarea) {
 					const usuarios = await getUsuariosByTarea(tarea.tarea.id);
@@ -153,16 +153,16 @@ export default function TablaTareas({
 									</td>
 								)}
 								<td className="flex flex-row justify-center border-b border-neutral-700 pb-2">
-									{usuariosPorTarea[tarea.tarea.id]?.map(usuario => (
+									{usuariosPorTarea[tarea.tarea.id] && usuariosPorTarea[tarea.tarea.id].map(usuario => (
 										<div
-											key={usuario.Usuarios.id}
-											title={usuario.Usuarios.nombre_completo}
+											key={usuario.Usuarios?.id}
+											title={usuario.Usuarios?.nombre_completo}
 											className={
 												"-ml-2 flex size-7 cursor-default items-center justify-center rounded-full border-2 border-neutral-900 text-center text-sm " +
-												usuario.Usuarios.color
+												usuario.Usuarios?.color
 											}
 										>
-											{usuario.Usuarios.nombre_completo[0].toUpperCase()}
+											{usuario.Usuarios?.nombre_completo[0].toUpperCase()}
 										</div>
 									)) || <span>Cargando...</span>}
 								</td>
