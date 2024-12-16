@@ -1,96 +1,46 @@
 "use client";
 import HistorialMarcajes from "@/components/marcajes/historial-marcajes";
 import Incidencia from "@/components/marcajes/incidencia";
-import { createClient } from "@/utils/supabase/client";
-import { useCallback, useEffect, useState } from "react";
+import { marcarEntrada, marcarSalida } from "@/lib/marcajes/actions";
+import { getUltimoMarcaje } from "@/lib/marcajes/data-client";
+import { useEffect, useState } from "react";
 import Clock from "react-live-clock";
 
 export default function Marcajes() {
 	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	const date = new Date();
 
-	const supabase = createClient();
-
 	const [entrada, setEntrada] = useState(true);
 
-	const getUltimoMarcaje = useCallback(async () => {
-		const { data } = await supabase
-			.from("Marcajes")
-			.select("id, entrada, salida, entrada_2, salida_2")
-			.or("salida.is.null,salida_2.is.null")
-			.order("entrada", { ascending: false })
-			.limit(1);
+	// Obtiene el último marcaje
+	async function fetchData() {
+		const ultimoMarcaje = await getUltimoMarcaje();
 
-		if (data && data.length > 0) {
-			const diaEntrada = new Date(data[0].entrada).getDay();
+		if (ultimoMarcaje && ultimoMarcaje.length > 0) {
+			const diaEntrada = new Date(ultimoMarcaje[0].entrada).getDay();
 			const hoy = new Date().getDay();
 			if (diaEntrada == hoy) {
 				if (
-					(data[0].entrada && !data[0].salida) ||
-					(data[0].entrada_2 && !data[0].salida_2)
+					(ultimoMarcaje[0].entrada && !ultimoMarcaje[0].salida) ||
+					(ultimoMarcaje[0].entrada_2 && !ultimoMarcaje[0].salida_2)
 				) {
 					setEntrada(false);
 				}
-				return data;
 			}
 		}
-	}, [supabase]);
+	}
 
 	useEffect(() => {
-		getUltimoMarcaje();
-	}, [getUltimoMarcaje]);
-
-	async function marcarEntrada() {
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-
-		const ultimoMarcaje = await getUltimoMarcaje();
-
-		if (ultimoMarcaje && ultimoMarcaje.length > 0) {
-			if (ultimoMarcaje[0].salida) {
-				await supabase
-					.from("Marcajes")
-					.update({
-						entrada_2: new Date().toISOString(),
-					})
-					.eq("id", ultimoMarcaje[0].id);
-			}
-		} else {
-			await supabase.from("Marcajes").insert({
-				usuario: user!.id,
-				entrada: new Date().toISOString(),
-			});
-		}
-	}
-
-	async function marcarSalida() {
-		const ultimoMarcaje = await getUltimoMarcaje();
-
-		if (ultimoMarcaje && ultimoMarcaje.length > 0) {
-			if (!ultimoMarcaje[0].salida) {
-				await supabase
-					.from("Marcajes")
-					.update({
-						salida: new Date().toISOString(),
-					})
-					.eq("id", ultimoMarcaje[0].id);
-			} else if (!ultimoMarcaje[0].salida_2) {
-				await supabase
-					.from("Marcajes")
-					.update({
-						salida_2: new Date().toISOString(),
-					})
-					.eq("id", ultimoMarcaje[0].id);
-			}
-		}
-	}
+		fetchData();
+	}, [entrada]);
 
 	async function handleMarcaje() {
 		if (entrada) {
 			await marcarEntrada();
+			await fetchData();
 		} else {
 			await marcarSalida();
+			await fetchData();
 		}
 		setEntrada(!entrada);
 	}
@@ -100,9 +50,9 @@ export default function Marcajes() {
 			<div className="border-b border-neutral-800 p-3 text-center">
 				<span>Registro de Marcajes</span>
 			</div>
-			<div className="xl:px-16 md:pt-16 md:pb-8 p-3 overflow-y-scroll  max-h-[calc(100vh-70px)]">
+			<div className="max-h-[calc(100vh-70px)] overflow-y-scroll p-3 md:pb-8 md:pt-16 xl:px-16">
 				<h1 className="text-3xl font-bold">Registro de Marcajes</h1>
-				<div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
+				<div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
 					<div className="rounded-lg border border-neutral-700 bg-neutral-800 p-8">
 						<div>
 							<h2 className="text-lg font-semibold">Realizar nuevo marcaje</h2>
@@ -119,7 +69,7 @@ export default function Marcajes() {
 								Marcar {entrada ? "Entrada" : "Salida"}
 							</button>
 						</div>
-						<Incidencia	/>
+						<Incidencia />
 					</div>
 					<HistorialMarcajes entrada={entrada} />
 				</div>

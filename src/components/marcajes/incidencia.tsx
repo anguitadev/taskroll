@@ -1,7 +1,9 @@
 import { Tables } from "@/db.types";
+import { getUsuario } from "@/lib/auth/data-client";
+import { getIncidencias } from "@/lib/marcajes/data-client";
 import { createClient } from "@/utils/supabase/client";
 import { Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Incidencia() {
 	const supabase = createClient();
@@ -11,44 +13,37 @@ export default function Incidencia() {
 	const [success, setSuccess] = useState<string | null>(null);
 	const [incidencias, setIncidencias] = useState<Tables<"Incidencias">[] | null>(null);
 
-	const getIncidencias = useCallback(async () => {
-		const { data } = await supabase.from("Incidencias").select("*").range(0, 9);
+	async function fetchIncidencias() {
+		const incidencias = await getIncidencias();
+		setIncidencias(incidencias?.length ? incidencias : null);
+	}
 
-		if (data && data?.length > 0) {
-			setIncidencias(data);
-		} else {
-			setIncidencias(null);
-		}
-	}, [supabase]);
-
-	const crearIncidencia = useCallback(async () => {
+	async function crearIncidencia() {
 		if (comentario == "") {
 			setSuccess(null);
 			setError("Por favor, introduce tu incidencia.");
 		} else {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
+			const usuario = await getUsuario();
 
 			await supabase.from("Incidencias").insert({
 				comentario: comentario,
-				usuario: user!.id,
+				usuario: usuario.id,
 			});
 
 			setError(null);
 			setSuccess("Incidencia creada correctamente.");
 			setComentarios("");
 		}
-	}, [comentario, supabase]);
+	}
 
 	useEffect(() => {
-		getIncidencias();
-	}, [getIncidencias, crearIncidencia]);
+		fetchIncidencias();
+	}, [crearIncidencia]);
 
 	async function deleteIncidencia(id: string) {
 		const { error } = await supabase.from("Incidencias").delete().eq("id", id);
 		if (!error) {
-			getIncidencias();
+			await fetchIncidencias();
 		}
 	}
 

@@ -1,15 +1,7 @@
-import { createClient } from "@/utils/supabase/client";
+import { getMarcajes } from "@/lib/marcajes/data-client";
+import { Marcaje } from "@/lib/marcajes/types";
 import { diferenciaTiempo } from "@/utils/time";
 import { useCallback, useEffect, useState } from "react";
-
-interface Marcaje {
-	entrada: string;
-	salida: string;
-	entrada_2: string;
-	salida_2: string;
-}
-
-const supabase = createClient();
 
 export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 	const [marcajes, setMarcajes] = useState<Marcaje[] | null>(null);
@@ -18,28 +10,13 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 	const [selectedMonth, setSelectedMonth] = useState<string>("");
 	const [selectedYear, setSelectedYear] = useState<string>("");
 
-	const getMarcajes = useCallback(async () => {
-		try {
-			const {
-				data: { user },
-				error: userError,
-			} = await supabase.auth.getUser();
-			if (userError || !user) throw userError || new Error("User not found");
+	// Cargar los marcajes
+	async function fetchMarcajes() {
+		const marcajes = await getMarcajes();
+		setMarcajes(marcajes);
+	}
 
-			const { data, error } = await supabase
-				.from("Marcajes")
-				.select("entrada, salida, entrada_2, salida_2")
-				.eq("usuario", user.id)
-				.order("entrada", { ascending: false });
-
-			if (error) throw error;
-
-			setMarcajes(data || []);
-		} catch (error) {
-			console.error("Error fetching marcajes:", error);
-		}
-	}, []);
-
+	// Cargar los selects según los marcajes del usuario
 	const loadSelects = useCallback(() => {
 		if (!marcajes) return;
 
@@ -80,6 +57,7 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 		if (selectedYear === "") setSelectedYear(firstAnio);
 	}, [marcajes, selectedMonth, selectedYear]);
 
+	// Filtrar los marcajes según el mes y el año del mes seleccionado
 	const filterMarcajes = useCallback(() => {
 		if (!marcajes) return;
 
@@ -98,8 +76,8 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 	}, [marcajes, selectedMonth, selectedYear]);
 
 	useEffect(() => {
-		getMarcajes();
-	}, [entrada, getMarcajes]);
+		fetchMarcajes();
+	}, [entrada]);
 
 	useEffect(() => {
 		loadSelects();
