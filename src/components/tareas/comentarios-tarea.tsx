@@ -1,21 +1,9 @@
 "use client";
 
-import { addComentario } from "@/lib/actions";
-import { removeComentario } from "@/lib/data-client";
+import { addComentario, removeComentario } from "@/lib/tareas/actions";
+import { Comentario } from "@/lib/tareas/types";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-
-type Comentario = {
-	comentario: string;
-	created_at: string;
-	id: string;
-	tarea: string;
-	usuario: string;
-	Usuarios: {
-		nombre_completo: string;
-		color: string;
-	} | null;
-};
 
 export default function ComentariosTarea({
 	comentarios,

@@ -1,6 +1,6 @@
 "use client";
 
-import { updateTituloTarea } from "@/lib/actions";
+import { updateTituloTarea } from "@/lib/tareas/actions";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 

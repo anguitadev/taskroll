@@ -1,5 +1,5 @@
 "use client";
-import { updateDescripcionTarea } from "@/lib/actions";
+import { updateDescripcionTarea } from "@/lib/tareas/actions";
 import { PencilLine } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";

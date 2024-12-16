@@ -1,5 +1,5 @@
 "use client";
-import { deleteTareaBySlug } from "@/lib/actions";
+import { deleteTareaBySlug } from "@/lib/tareas/actions";
 import { Trash2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -7,6 +7,7 @@ export default function EliminarTarea({ slugTarea }: { slugTarea: string }) {
 	const pathname = usePathname();
 	const router = useRouter();
 
+	// Eliminamos la tarea y redirigimos al proyecto
 	function handleDeleteTarea() {
 		deleteTareaBySlug(slugTarea);
 		router.push(pathname.substring(0, pathname.lastIndexOf("/")));

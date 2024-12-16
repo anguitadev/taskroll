@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 
 	metadata.title = "Taskroll | " + tareaSlug;
 
-	// Cargar los documentos del entorno
+	// Fetch nombre del entorno y el proyecto de la tarea
 	const nombres = await getEntornoAndProyectoNamesByTareaSlug(tareaSlug);
 
 	return (

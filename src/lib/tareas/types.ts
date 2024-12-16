@@ -18,10 +18,13 @@ export interface Tarea {
 
 export type UsuariosTareas = {
 	Usuarios: {
-		id: string;
 		color: string;
+		email: string;
+		id: string;
 		nombre_completo: string;
-	};
+		nombre_usuario: string;
+		puesto: string | null;
+	} | null;
 };
 
 export type Enlace = {
@@ -45,4 +48,15 @@ export type Usuarios = {
 		nombre_usuario: string;
 		puesto: string | null;
 	};
+};
+ export type Comentario = {
+	comentario: string;
+	created_at: string;
+	id: string;
+	tarea: string;
+	usuario: string;
+	Usuarios: {
+		nombre_completo: string;
+		color: string;
+	} | null;
 };

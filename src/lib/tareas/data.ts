@@ -199,3 +199,82 @@ export async function getEntornoAndProyectoNamesByTareaSlug(tareaSlug: string) {
 		nombreTarea: tarea.titulo,
 	};
 }
+
+export async function getComentariosByTarea(tareaId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Comentarios")
+		.select("*, Usuarios(nombre_completo, color)")
+		.eq("tarea", tareaId)
+		.order("created_at", { ascending: false });
+	return data;
+}
+
+export async function getTareaBySlug(slugTarea: string) {
+	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+
+	if (!usuario) return null;
+
+	const { data: tarea } = await supabase
+		.from("Tareas")
+		.select("*")
+		.eq("slug", slugTarea)
+		.limit(1)
+		.single();
+
+	if (!tarea) return null;
+
+	const { data: usuario_tarea } = await supabase
+		.from("Usuarios_Tareas")
+		.select("id")
+		.eq("tarea", tarea.id)
+		.eq("usuario", usuario.id)
+		.limit(1)
+		.single();
+
+	const { data: usuario_entorno } = await supabase
+		.from("Usuarios_Entornos")
+		.select("id")
+		.eq("entorno", tarea.entorno)
+		.limit(1)
+		.single();
+
+	if (!usuario_entorno || !usuario_tarea) return null;
+
+	return tarea;
+}
+
+export async function getUsuariosByTarea(tareaId: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Usuarios_Tareas")
+		.select("Usuarios(*)")
+		.eq("tarea", tareaId)
+		.order("Usuarios(nombre_completo)", { ascending: true });
+
+	return data;
+}
+
+export async function getTareaUrlById(idTarea: string) {
+	const supabase = await createClient();
+	const { data } = await supabase
+		.from("Tareas")
+		.select("slug, entorno(slug, entorno(slug, equipo(slug)))")
+		.eq("id", idTarea)
+		.single();
+
+	const slugs = data as unknown as {
+		slug: string;
+		entorno: {
+			slug: string;
+			entorno: {
+				slug: string;
+				equipo: { slug: string };
+			};
+		};
+	};
+
+	return `https://taskroll.app/${slugs?.entorno?.entorno?.equipo?.slug}/${slugs?.entorno?.entorno?.slug}/${slugs?.entorno?.slug}/${slugs?.slug}`;
+}

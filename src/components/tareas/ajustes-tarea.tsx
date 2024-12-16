@@ -1,13 +1,15 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
+import { getUsuariosFromEntorno } from "@/lib/entornos/data-client";
+import { UsuariosEntorno } from "@/lib/entornos/types";
 import {
 	cambiarEstadoTarea,
 	cambiarFechaFinal,
 	cambiarPrioridadTarea,
 	cambiarUsuariosTarea,
-} from "@/lib/actions";
-import { getUsuariosFromEntorno } from "@/lib/data-client";
+} from "@/lib/tareas/actions";
+import { UsuariosTareas } from "@/lib/tareas/types";
 import clsx from "clsx";
 import { es } from "date-fns/locale/es";
 import { CalendarDays, Check, CirclePower, FlagTriangleRight, Rocket, Users } from "lucide-react";
@@ -26,34 +28,12 @@ type Tarea = {
 	titulo: string;
 };
 
-type Usuarios =
-	| {
-			Usuarios: {
-				color: string;
-				id: string;
-				nombre_completo: string;
-				nombre_usuario: string;
-				puesto: string | null;
-			} | null;
-	  }[]
-	| null;
-
-type UsuariosEntorno =
-	| {
-			color: string;
-			id: string;
-			nombre_completo: string;
-			nombre_usuario: string;
-			puesto: string | null;
-	  }[]
-	| null;
-
 export default function AjustesTarea({
 	tarea,
 	usuarios: usuariosTarea,
 }: {
 	tarea: Tarea;
-	usuarios: Usuarios;
+	usuarios: UsuariosTareas[] | null;
 }) {
 	const estados: { [key: string]: string } = {
 		Abierto: "bg-zinc-600",
@@ -73,36 +53,12 @@ export default function AjustesTarea({
 	const [initial, setInitial] = useState(true);
 	const [estado, setEstado] = useState(tarea.estado);
 	const [fechaFinal, setFechaFinal] = useState<Date | undefined>(new Date(tarea.fecha_fin!));
-	const [usuarios, setUsuarios] = useState<Usuarios>(usuariosTarea ?? []);
-	const [usuariosEntorno, setUsuariosEntorno] = useState<UsuariosEntorno>(null);
+	const [usuarios, setUsuarios] = useState<UsuariosTareas[] | null>(usuariosTarea);
+	const [usuariosEntorno, setUsuariosEntorno] = useState<UsuariosEntorno[] | null>(null);
 	const [prioridad, setPrioridad] = useState(tarea.prioridad);
 	const [mostrarUsuarios, setMostrarUsuarios] = useState(false);
 
-	function toggleEstadoCompletado() {
-		if (estado === "Completado") {
-			setEstado("Abierto");
-		} else {
-			setEstado("Completado");
-		}
-	}
-
-	function toggleUsuarios() {
-		setMostrarUsuarios(!mostrarUsuarios);
-		document.getElementById("usuarios")?.classList.toggle("hidden");
-	}
-
-	function addRemoveUsuario(idUsuario: string) {
-		const usuario = usuariosEntorno?.find(usuario => usuario.id === idUsuario);
-
-		const inTarea = usuarios?.find(usuario => usuario.Usuarios?.id === idUsuario);
-
-		if (inTarea) {
-			setUsuarios(usuarios!.filter(item => item.Usuarios?.id !== idUsuario));
-		} else {
-			setUsuarios(usuarios!.concat([{ Usuarios: usuario! }]));
-		}
-	}
-
+	// Evitar que se ejecuten los useEffects en el primer render
 	useEffect(() => {
 		if (initial) {
 			setInitial(false);
@@ -110,11 +66,13 @@ export default function AjustesTarea({
 		}
 	}, [usuarios, estado, initial, prioridad, fechaFinal]);
 
+	// Actualizar usuarios
 	useEffect(() => {
 		if (initial || !usuarios) return;
 		cambiarUsuariosTarea(tarea.id, usuarios);
 	}, [usuarios]);
 
+	// Mostrar los usuarios del entorno
 	useEffect(() => {
 		if (mostrarUsuarios) {
 			if (initial) return;
@@ -128,6 +86,7 @@ export default function AjustesTarea({
 		}
 	}, [mostrarUsuarios]);
 
+	// Actualizar estado
 	useEffect(() => {
 		if (initial) return;
 		try {
@@ -137,6 +96,7 @@ export default function AjustesTarea({
 		}
 	}, [estado]);
 
+	// Actualizar fecha
 	useEffect(() => {
 		if (initial) return;
 		try {
@@ -146,6 +106,7 @@ export default function AjustesTarea({
 		}
 	}, [fechaFinal]);
 
+	// Actualizar prioridad
 	useEffect(() => {
 		if (initial) return;
 		try {
@@ -154,6 +115,32 @@ export default function AjustesTarea({
 			console.log(error);
 		}
 	}, [prioridad]);
+
+	// Función para añadir o quitar un usuario
+	function addRemoveUsuario(idUsuario: string) {
+		const usuario = usuariosEntorno?.find(usuario => usuario.id === idUsuario);
+
+		const inTarea = usuarios?.find(usuario => usuario.Usuarios?.id === idUsuario);
+
+		if (inTarea) {
+			setUsuarios(usuarios!.filter(item => item.Usuarios?.id !== idUsuario));
+		} else {
+			setUsuarios(usuarios!.concat([{ Usuarios: usuario! }]));
+		}
+	}
+
+	function toggleEstadoCompletado() {
+		if (estado === "Completado") {
+			setEstado("Abierto");
+		} else {
+			setEstado("Completado");
+		}
+	}
+
+	function toggleUsuarios() {
+		setMostrarUsuarios(!mostrarUsuarios);
+		document.getElementById("usuarios")?.classList.toggle("hidden");
+	}
 
 	function toggleCalendario() {
 		document.getElementById("calendario")?.classList.toggle("hidden");

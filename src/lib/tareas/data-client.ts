@@ -42,3 +42,25 @@ export async function getTareasByProyectoSlug(idProyecto: string) {
 
 	return data as unknown as Tarea[];
 }
+
+export async function getTareaUrlById(idTarea: string) {
+	const supabase = createClient();
+	const { data } = await supabase
+		.from("Tareas")
+		.select("slug, entorno(slug, entorno(slug, equipo(slug)))")
+		.eq("id", idTarea)
+		.single();
+
+	const slugs = data as unknown as {
+		slug: string;
+		entorno: {
+			slug: string;
+			entorno: {
+				slug: string;
+				equipo: { slug: string };
+			};
+		};
+	};
+
+	return `https://taskroll.app/${slugs?.entorno?.entorno?.equipo?.slug}/${slugs?.entorno?.entorno?.slug}/${slugs?.entorno?.slug}/${slugs?.slug}`;
+}
