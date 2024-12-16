@@ -2,7 +2,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getEquipoSlugByUsuarioId, getUsuario } from "../data";
+import { getEquipoSlugByUsuarioId } from "../equipos/data";
+import { getUsuario } from "./data";
 
 export async function login(formData: FormData) {
 	const supabase = await createClient();

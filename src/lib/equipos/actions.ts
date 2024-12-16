@@ -2,9 +2,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getAllEntornosByEquipoId } from "../data";
 import { removeUsuarioEntorno } from "../entornos/actions";
-import { getUsuariosByEntornoId } from "../entornos/data";
+import { getAllEntornosByEquipoId, getUsuariosByEntornoId } from "../entornos/data";
 import { getAdminCountEquipo, getEquipoById, isEquipoAdminByUsuarioId } from "./data";
 
 export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {

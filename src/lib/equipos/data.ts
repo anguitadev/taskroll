@@ -138,3 +138,15 @@ export async function isEquipoAdminByUsuarioId(usuarioId: string, equipoId: stri
 
 	return data ? data.admin : false;
 }
+
+export async function getEquipoSlugByUsuarioId(id: string) {
+	const supabase = await createClient();
+
+	const { data: equipo } = await supabase
+		.from("Usuarios_Equipos")
+		.select("Equipos(slug)")
+		.eq("usuario", id)
+		.limit(1);
+
+	return equipo![0].Equipos?.slug;
+}

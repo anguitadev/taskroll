@@ -1,4 +1,4 @@
-import { createEntorno } from "@/lib/actions";
+import { createEntorno } from "@/lib/entornos/actions";
 import clsx from "clsx";
 import { Plus } from "lucide-react";
 import { usePathname } from "next/navigation";

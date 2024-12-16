@@ -1,7 +1,7 @@
 "use client";
 import { Tables } from "@/db.types";
-import { deleteIncidenciaById } from "@/lib/actions";
-import { getIncidenciasByUsuarioId, getMarcajesByUsuarioId } from "@/lib/data-client";
+import { deleteIncidenciaById } from "@/lib/marcajes/actions";
+import { getIncidenciasByUsuarioId, getMarcajesByUsuarioId } from "@/lib/marcajes/data-client";
 import { diferenciaTiempo } from "@/utils/time";
 import { Download, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

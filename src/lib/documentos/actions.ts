@@ -1,3 +1,4 @@
+"use server";
 import { createClient } from "@/utils/supabase/client";
 import { UTApi } from "uploadthing/server";
 import { getUsuario } from "../auth/data-client";

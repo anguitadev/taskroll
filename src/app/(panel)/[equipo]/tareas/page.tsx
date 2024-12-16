@@ -1,9 +1,8 @@
 import BusquedaTareas from "@/components/entornos/busqueda-tareas";
 import ListaTareas from "@/components/entornos/lista-tareas";
 import NuevaTarea from "@/components/tareas/nueva-tarea";
-import { getEquipoById } from "@/lib/data";
 import { getEntornosByEquipoId } from "@/lib/entornos/data";
-import { getEquipoBySlug } from "@/lib/equipos/data";
+import { getEquipoById, getEquipoBySlug } from "@/lib/equipos/data";
 import { getTareasByEquipoId } from "@/lib/tareas/data";
 import { Plus } from "lucide-react";
 import { Metadata } from "next";

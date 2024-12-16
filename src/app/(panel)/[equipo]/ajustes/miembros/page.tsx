@@ -1,6 +1,7 @@
 import NuevoUsuario from "@/components/ajustes/nuevo-usuario";
 import TablaUsuarios from "@/components/ajustes/tabla-usuarios";
-import { getUsuario, getUsuariosByEquipoSlug, isUsuarioEquipoAdmin } from "@/lib/data";
+import { getUsuario, getUsuariosByEquipoSlug } from "@/lib/auth/data";
+import { isUsuarioEquipoAdmin } from "@/lib/equipos/data";
 import { Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -10,13 +11,11 @@ export default async function Miembros(props: { params: Params }) {
 	const equipoSlug = params.equipo;
 
 	const isAdmin = await isUsuarioEquipoAdmin(equipoSlug);
-
 	if (!isAdmin) return notFound();
 
 	const usuariosEquipo = await getUsuariosByEquipoSlug(equipoSlug);
 
 	const usuarioLoggeado = await getUsuario();
-
 	if (!usuarioLoggeado) return notFound();
 
 	return (

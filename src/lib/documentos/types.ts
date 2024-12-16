@@ -49,3 +49,24 @@ export type DocumentosEquipo = {
 	propietario: string;
 	url: string;
 };
+
+export type Nomina = {
+			created_at: string;
+			destinatario: string | null;
+			entorno: {
+				slug: string;
+				nombre: string;
+				entorno: {
+					slug: string;
+					nombre: string;
+					entorno: {
+						slug: string;
+						nombre: string;
+					};
+				} | null;
+			} | null;
+			id: string;
+			nombre: string;
+			propietario: string;
+			url: string;
+	  };

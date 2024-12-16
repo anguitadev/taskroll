@@ -1,10 +1,12 @@
-import { createClient } from "@/utils/supabase/client";
-import { getUsuario } from "../auth/data-client";
+"use server";
+import { createClient } from "@/utils/supabase/server";
+import { getUsuario } from "../auth/data";
 import { getUltimoMarcaje } from "./data-client";
 
 export async function marcarEntrada() {
-    const supabase = createClient();
+	const supabase = await createClient();
 	const usuario = await getUsuario();
+	if (!usuario) return;
 
 	const ultimoMarcaje = await getUltimoMarcaje();
 
@@ -26,7 +28,7 @@ export async function marcarEntrada() {
 }
 
 export async function marcarSalida() {
-    const supabase = createClient();
+	const supabase = await createClient();
 	const ultimoMarcaje = await getUltimoMarcaje();
 
 	if (ultimoMarcaje && ultimoMarcaje.length > 0) {
@@ -46,4 +48,10 @@ export async function marcarSalida() {
 				.eq("id", ultimoMarcaje[0].id);
 		}
 	}
+}
+
+export async function deleteIncidenciaById(incidenciaId: string) {
+	const supabase = await createClient();
+	const { error } = await supabase.from("Incidencias").delete().eq("id", incidenciaId);
+	if (error) throw error;
 }

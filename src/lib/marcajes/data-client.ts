@@ -39,3 +39,23 @@ export async function getIncidencias() {
 
 	return data;
 }
+
+export async function getIncidenciasByUsuarioId(usuarioId: string) {
+	const supabase = createClient();
+
+	const { data, error } = await supabase.from("Incidencias").select("*").eq("usuario", usuarioId);
+
+	if (error) throw error;
+
+	return data;
+}
+
+export async function getMarcajesByUsuarioId(usuarioId: string) {
+	const supabase = createClient();
+
+	const { data, error } = await supabase.from("Marcajes").select("*").eq("usuario", usuarioId);
+
+	if (error) throw error;
+
+	return data;
+}

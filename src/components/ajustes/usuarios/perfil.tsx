@@ -1,7 +1,8 @@
 "use client";
 import TablaDocumentos from "@/components/documentos-equipo/tabla-documentos";
-import { createDocumento } from "@/lib/actions";
-import { getNominasByUsuarioId, getUsuario } from "@/lib/data-client";
+import { getUsuario } from "@/lib/auth/data-client";
+import { createDocumento } from "@/lib/documentos/actions";
+import { getNominasByUsuarioId } from "@/lib/documentos/data-client";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import { createProyecto } from "@/lib/actions";
+import { createProyecto } from "@/lib/proyectos/actions";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 

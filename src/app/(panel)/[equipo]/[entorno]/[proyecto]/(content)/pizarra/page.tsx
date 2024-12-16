@@ -1,5 +1,5 @@
 import CanvasPizarra from "@/components/pizarra/canvas-pizarra";
-import { getPizarraFromProyecto } from "@/lib/data";
+import { getPizarraFromProyecto } from "@/lib/pizarras/data";
 import Link from "next/link";
 
 export default async function Pizarra({
