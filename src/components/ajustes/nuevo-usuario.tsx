@@ -30,7 +30,7 @@ export default function NuevoUsuario({
 		<div
 			id="nuevo-usuario"
 			popover="auto"
-			className="flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+			className="max-w-[calc(100vw-4%)] flex-col rounded border border-neutral-800 bg-neutral-950 p-2 md:p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 		>
 			<span className="mb-6 block text-lg font-semibold">
 				Añadir nuevo usuario al {equipoSlug ? "equipo" : "entorno"}

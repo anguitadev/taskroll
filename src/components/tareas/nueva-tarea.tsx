@@ -199,7 +199,7 @@ export default function NuevaTarea({ entorno }: { entorno: string }) {
 			<div
 				id={"nueva-tarea-" + entorno}
 				popover="auto"
-				className="min-w-[900px] overflow-visible rounded-lg border border-neutral-800 p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+				className="max-w-[calc(100vw-4%)] min-w-[900px] overflow-visible rounded-lg border border-neutral-800 p-2 md:p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 			>
 				<span className="text-2xl font-semibold">Crear Nueva Tarea</span>
 				<div className="mt-6 w-full rounded border border-neutral-800">

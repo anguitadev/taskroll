@@ -27,7 +27,7 @@ export default function NuevoDocumento() {
 			<div
 				id="nuevo-documento"
 				popover="auto"
-				className="w-[640px] rounded-lg border border-neutral-800 p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+				className="max-w-[calc(100vw-4%)] w-[640px] rounded-lg border border-neutral-800 p-2 md:p-8 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 			>
 				<span className="text-2xl font-semibold">Añadir Nuevo Documento</span>
 				<div className="mt-6 rounded border border-neutral-800 p-4">

@@ -224,7 +224,7 @@ export default function Sidebar({
 									<div
 										id="select"
 										popover="auto"
-										className="absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
+										className="max-w-[calc(100vw-4%)] absolute inset-0 left-2 top-28 m-0 w-64 rounded border border-neutral-800 bg-neutral-950 text-sm"
 									>
 										{equipos.map(equipo => {
 											return (

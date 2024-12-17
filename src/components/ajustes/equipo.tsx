@@ -136,7 +136,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 			<div
 				id="pop"
 				popover="auto"
-				className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+				className="max-w-[calc(100vw-4%)] w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-2 md:p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 			>
 				<div className="flex flex-col gap-4 text-center">
 					<span className="text-lg font-semibold">
