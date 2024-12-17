@@ -10,6 +10,7 @@ import {
 	getAdminCountEntorno,
 	getEntornoById,
 	getEntornoProyectoBySlug,
+	getUsuarioCountByEntornoId,
 	getUsuariosByEntornoId,
 	getUsuariosByEntornoSlug,
 	isEntornoAdminByUsuarioId,
@@ -60,6 +61,8 @@ export async function createEntorno({
 		return console.log(errorEntornos);
 	}
 
+	console.log(data);
+
 	await createPizarra(data[0].id);
 
 	const { error } = await supabase.from("Usuarios_Entornos").insert({
@@ -88,11 +91,11 @@ export async function createPizarra(idEntorno: string) {
 	}
 }
 
-export async function updateEntornoById(entornoId: string, nombre: string, descripcion: string) {
+export async function updateEntornoById(entornoId: string, nombre: string, color: string, descripcion: string) {
 	const supabase = await createClient();
 	const { error } = await supabase
 		.from("Entornos")
-		.update({ nombre: nombre, descripcion: descripcion })
+		.update({ nombre: nombre, color: color, descripcion: descripcion })
 		.eq("id", entornoId);
 	if (error) throw new Error("Ha habido un error al actualizar el entorno.");
 }
@@ -171,7 +174,14 @@ export async function removeUsuarioEntorno(usuarioId: string, entornoId: string)
 
 	if (isAdmin) adminCount--;
 
-	if (adminCount == 0) throw new Error("El entorno debe tener al menos un admin");
+	if (adminCount == 0){
+		const usuarioCount = await getUsuarioCountByEntornoId(entornoId);
+		if (usuarioCount > 1){
+			throw new Error("El entorno debe tener al menos un admin");
+		} else {
+			await deleteEntornoById(entornoId);
+		}
+	} 
 
 	const proyectosEntorno = await getProyectosByEntornoId(entornoId);
 

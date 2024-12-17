@@ -152,3 +152,14 @@ export async function getEquipoSlugByUsuarioId(id: string) {
 
 	return equipo[0].Equipos?.slug;
 }
+
+export async function getUsuarioCountByEquipoId(equipoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase
+		.from("Usuarios_Equipos")
+		.select("usuario")
+		.eq("equipo", equipoId);
+
+	return data ? data.length : 0;
+}

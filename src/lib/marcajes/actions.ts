@@ -1,7 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { getUsuario } from "../auth/data";
-import { getUltimoMarcaje } from "./data-client";
+import { getUltimoMarcaje } from "./data";
 
 export async function marcarEntrada() {
 	const supabase = await createClient();

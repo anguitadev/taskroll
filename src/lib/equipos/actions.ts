@@ -2,9 +2,15 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getUsuario } from "../auth/data";
 import { removeUsuarioEntorno } from "../entornos/actions";
 import { getAllEntornosByEquipoId, getUsuariosByEntornoId } from "../entornos/data";
-import { getAdminCountEquipo, getEquipoById, isEquipoAdminByUsuarioId } from "./data";
+import {
+	getAdminCountEquipo,
+	getEquipoById,
+	getUsuarioCountByEquipoId,
+	isEquipoAdminByUsuarioId,
+} from "./data";
 
 export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 	let adminCount = await getAdminCountEquipo(equipoId);
@@ -12,10 +18,21 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 
 	if (isAdmin) adminCount--;
 
-	if (adminCount == 0) throw new Error("El equipo debe tener al menos un admin");
+	const supabase = await createClient();
+
+	// Comrpobamos si es el último admin
+	if (adminCount == 0) {
+		const ususarioCount = await getUsuarioCountByEquipoId(equipoId);
+		if (ususarioCount > 1) {
+			throw new Error("El equipo debe tener al menos un admin");
+		} else {
+			await supabase.from("Equipos").delete().eq("id", equipoId);
+		}
+	}
 
 	const entornosEquipo = await getAllEntornosByEquipoId(equipoId);
 
+	// Eliminamos al usuario de los entornos y proyectos
 	if (entornosEquipo) {
 		for (const entorno of entornosEquipo) {
 			const usuariosEntorno = await getUsuariosByEntornoId(entorno.id);
@@ -35,7 +52,7 @@ export async function removeUsuarioEquipo(usuarioId: string, equipoId: string) {
 		}
 	}
 
-	const supabase = await createClient();
+	// Eliminamos al usuario del equipo
 	const { error } = await supabase
 		.from("Usuarios_Equipos")
 		.delete()
@@ -98,19 +115,21 @@ export async function updateEquipo({
 
 export async function deleteEquipo(idEquipo: string) {
 	const supabase = await createClient();
+
+	const usuario = await getUsuario();
+	if (!usuario) return;
+
+	const isAdmin = await isEquipoAdminByUsuarioId(usuario.id, idEquipo);
+	if (!isAdmin) throw new Error("No tienes permisos para eliminar el equipo.");
+
 	const { error } = await supabase.from("Equipos").delete().eq("id", idEquipo);
 
-	const { data: usuario } = await supabase.auth.getUser();
-
-	if (error) {
-		console.log(error);
-		redirect("/ajustes/equipos?error=" + error.code);
-	}
+	if (error) throw new Error("Ha habido un error al eliminar el equipo.");
 
 	const { data: equipo } = await supabase
 		.from("Usuarios_Equipos")
 		.select("Equipos(slug)")
-		.eq("usuario", usuario.user!.id)
+		.eq("usuario", usuario.id)
 		.limit(1);
 
 	if (!equipo || equipo.length == 0) {

@@ -123,5 +123,6 @@ export async function updateUsuario(
 			color: color,
 		})
 		.eq("nombre_usuario", usuario.nombre_usuario);
-	if (error) throw new Error("No se ha podido actualizar el perfil. Pro favor, inténtalo de nuevo.");
+	if (error)
+		throw new Error("No se ha podido actualizar el perfil. Pro favor, inténtalo de nuevo.");
 }

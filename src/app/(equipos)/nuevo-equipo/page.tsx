@@ -1,12 +1,19 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { getUsuario } from "@/lib/auth/data-client";
+import { redirect, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import nuevoEquipo from "./actions";
 
 export default function NuevoEquipo() {
 	const [nombreEquipo, setNombreEquipo] = useState("");
     const searchParams = useSearchParams();
-	const loginError = searchParams.get("error");
+	const clientError = searchParams.get("error");
+
+	async function checkUsuario() {
+		const usuario = await getUsuario();
+		if (!usuario) return redirect("/login");
+	}
+	checkUsuario();
 
 	return (
 		<div className="m-auto flex w-[500px] flex-col items-center pt-32 font-sans">
@@ -38,7 +45,7 @@ export default function NuevoEquipo() {
 						Crear Equipo
 					</button>
 				</form>
-                {loginError && <p className="text-red-500">Ha habido un error al crear el equipo.</p>}
+                {clientError && <p className="text-red-500">Ha habido un error al crear el equipo.</p>}
 			</div>
 		</div>
 	);

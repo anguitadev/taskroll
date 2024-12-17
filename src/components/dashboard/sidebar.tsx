@@ -344,7 +344,7 @@ export default function Sidebar({
 															<div>
 																<span
 																	className={clsx(
-																		"text-md flex size-5 items-center justify-center rounded bg-indigo-500 font-semibold group-hover:hidden",
+																		"text-md flex size-5 items-center justify-center rounded font-semibold group-hover:hidden",
 																		entornoData.color,
 																	)}
 																>

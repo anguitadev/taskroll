@@ -1,7 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/client";
 import { UTApi } from "uploadthing/server";
-import { getUsuario } from "../auth/data-client";
+import { getUsuario } from "../auth/data";
 
 export async function deleteDocumentoByUrl(documentoUrl: string) {
 	const utapi = new UTApi();

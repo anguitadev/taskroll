@@ -56,7 +56,7 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 		try {
 			await deleteEquipo(equipo.id);
 		} catch (error) {
-			console.log(error);
+			if (error instanceof Error) setClientError(error.message);
 		}
 	}
 

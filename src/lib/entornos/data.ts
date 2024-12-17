@@ -154,3 +154,11 @@ export async function getAllEntornosByEquipoId(equipoId: string) {
 	const { data } = await supabase.from("Entornos").select("*").eq("equipo", equipoId);
 	return data;
 }
+
+export async function getUsuarioCountByEntornoId(entornoId: string) {
+	const supabase = await createClient();
+
+	const { data } = await supabase.from("Usuarios_Entornos").select("usuario").eq("entorno", entornoId);
+
+	return data ? data.length : 0;
+}

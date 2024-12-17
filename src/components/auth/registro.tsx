@@ -106,6 +106,7 @@ export default function Registro() {
 				name="email"
 				type="email"
 				placeholder="correo@electronico.com"
+				autoComplete="email"
 				value={formData.email}
 				onChange={handleChange}
 				required

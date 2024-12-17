@@ -92,6 +92,14 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 		setSelectedMonth(meses[anio][0]);
 	}
 
+	function convertDate(date: string) {
+		if (date) return new Date(date.replace(" ", "T")).toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+		});
+	}
+
 	return (
 		<div className="rounded-lg border border-neutral-700 bg-neutral-800 p-8">
 			<div className="flex flex-row items-baseline justify-between">
@@ -138,16 +146,17 @@ export default function HistorialMarcajes({ entrada }: { entrada: boolean }) {
 									{new Date(marcaje.entrada).toLocaleDateString("es-ES")}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
-									{marcaje.entrada.substring(11, 19)}
+									{/* {marcaje.entrada.substring(11, 19)} */}
+									{convertDate(marcaje.entrada)}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
-									{marcaje.salida?.substring(11, 19)}
+									{convertDate(marcaje.salida)}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
-									{marcaje.entrada_2?.substring(11, 19)}
+									{convertDate(marcaje.entrada_2)}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
-									{marcaje.salida_2?.substring(11, 19)}
+									{convertDate(marcaje.salida_2)}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">
 									{diferenciaTiempo(marcaje)}

@@ -15,8 +15,18 @@ export default function DatosEntorno({
 	propietario: Tables<"Usuarios">;
 	isAdmin: boolean;
 }) {
-	const [nombre, setNombre] = useState(entorno?.nombre);
-	const [descripcion, setDescripcion] = useState(entorno?.descripcion);
+	const colorOptions = [
+		"bg-red-600",
+		"bg-orange-600",
+		"bg-green-600",
+		"bg-sky-600",
+		"bg-indigo-600",
+		"bg-pink-600",
+	];
+
+	const [nombre, setNombre] = useState(entorno.nombre);
+	const [descripcion, setDescripcion] = useState(entorno.descripcion);
+	const [color, setColor] = useState<string>(entorno.color);
 	const [clientError, setClientError] = useState<string | null>(null);
 
 	const pathname = usePathname();
@@ -27,7 +37,7 @@ export default function DatosEntorno({
 			return;
 		}
 		try {
-			await updateEntornoById(entorno.id, nombre, descripcion ?? "");
+			await updateEntornoById(entorno.id, nombre, color, descripcion ?? "");
 		} catch (error) {
 			if (error instanceof Error) setClientError(error.message);
 		} finally {
@@ -48,6 +58,19 @@ export default function DatosEntorno({
 	if (entorno)
 		return (
 			<>
+				<div className="flex flex-row gap-2 mb-4">
+					{colorOptions.map((option, index) => {
+						return (
+							<div
+								key={index}
+								className={clsx("size-8 cursor-pointer rounded " + option, {
+									"border-4 border-neutral-300": option === color,
+								})}
+								onClick={() => setColor(option)}
+							/>
+						);
+					})}
+				</div>
 				<div className="grid grid-cols-2 grid-rows-2 gap-4">
 					<div className="flex flex-col gap-2">
 						<label className="font-medium text-neutral-400">Nombre:</label>
@@ -88,17 +111,22 @@ export default function DatosEntorno({
 				{clientError && <p className="mt-2 text-red-500">{clientError}</p>}
 				<div className="flex gap-2">
 					<button
-						className={clsx("mt-4 rounded border border-indigo-500 bg-indigo-600 p-1 font-medium", isAdmin && " w-1/2")}
+						className={clsx(
+							"mt-4 rounded border border-indigo-500 bg-indigo-600 p-1 font-medium",
+							isAdmin && "w-1/2",
+						)}
 						onClick={handleUpdate}
 					>
 						Actualizar
 					</button>
-					{isAdmin &&<button
-						className="mt-4 rounded border border-red-500 bg-red-600 p-1 font-medium w-1/2"
-						onClick={handleDelete}
-					>
-						Eliminar
-					</button>}
+					{isAdmin && (
+						<button
+							className="mt-4 w-1/2 rounded border border-red-500 bg-red-600 p-1 font-medium"
+							onClick={handleDelete}
+						>
+							Eliminar
+						</button>
+					)}
 				</div>
 			</>
 		);
