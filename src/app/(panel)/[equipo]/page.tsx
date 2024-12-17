@@ -64,7 +64,7 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 					</Link>
 				)}
 			</div>
-			<div className="flex h-[calc(100vh-70px)] flex-col justify-between overflow-y-scroll p-8">
+			<div className="flex h-[calc(100vh-70px)] flex-col justify-between overflow-y-scroll p-3 md:pb-8 md:pt-16 xl:px-16">
 				<div>
 					<div className="flex items-center gap-2">
 						<h1 className="text-3xl font-bold">Hola de nuevo!</h1>

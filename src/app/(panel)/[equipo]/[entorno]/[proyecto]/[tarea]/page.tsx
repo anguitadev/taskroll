@@ -24,13 +24,13 @@ export default async function Tarea({ params }: { params: Promise<{ tarea: strin
 	const usuario = await getUsuario();
 
 	return (
-		<div className="grid h-[calc(100vh-70px)] grid-cols-4">
-			<div className="col-span-3 overflow-y-scroll p-8">
+		<div className="grid h-[calc(100vh-70px)] md:grid-cols-4">
+			<div className="md:col-span-3 overflow-y-scroll p-3 md:pb-8 md:pt-16 xl:px-16">
 				<TituloTarea tituloTarea={tarea.titulo} idTarea={tarea.id} />
 				<AjustesTarea tarea={tarea} usuarios={usuarios} />
 				<DescripcionTarea descripcion={tarea.descripcion} idTarea={tarea.id} />
 			</div>
-			<div className="flex flex-col justify-stretch border-l border-neutral-800">
+			<div className="hidden md:flex flex-col justify-stretch border-l border-neutral-800">
 				<ComentariosTarea comentarios={comentarios} idTarea={tarea.id} idUsuario={usuario?.id} />
 			</div>
 		</div>

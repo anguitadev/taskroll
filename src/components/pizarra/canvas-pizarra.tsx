@@ -29,7 +29,7 @@ export default function CanvasPizarra({
 	}
 
 	return (
-		<div className="relative h-[calc(100vh-295px)] grow overflow-y-scroll rounded-lg border border-neutral-700 bg-neutral-950 p-4">
+		<div className="relative h-[calc(100vh-295px)] grow overflow-y-scroll rounded-lg border border-neutral-700 bg-neutral-950 md:p-4">
 			<button
 				className="absolute right-1 top-2 flex items-center gap-2 rounded border border-neutral-700 bg-neutral-800 px-2 py-1 text-sm text-neutral-400"
 				onClick={handleEditar}
@@ -38,7 +38,7 @@ export default function CanvasPizarra({
 				{editar ? "Guardar Pizarra" : "Editar Pizarra"}
 			</button>
 			{!editar ? (
-				<div className="prose mx-auto min-h-full min-w-[1000px] bg-neutral-800 p-8 dark:prose-invert">
+				<div className="prose mx-auto min-h-full md:min-w-[1000px] bg-neutral-800 p-2 md:p-8 dark:prose-invert">
 					<Markdown remarkPlugins={[remarkGfm]}>{contenidoPizarra}</Markdown>
 				</div>
 			) : (

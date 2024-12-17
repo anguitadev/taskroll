@@ -34,7 +34,7 @@ export default async function DashboardLayout({
 					Ajustes
 				</Link>}
 			</div>
-			<div className="flex max-h-[calc(100vh-70px)] flex-col overflow-y-scroll p-8">
+			<div className="flex max-h-[calc(100vh-70px)] flex-col overflow-y-scroll p-3 md:pb-8 md:pt-16 xl:px-16">
 				<h1 className="text-3xl font-bold">{proyecto.nombre}</h1>
 				{proyecto.descripcion && (
 					<p className="mt-2 text-neutral-400">{proyecto.descripcion}</p>

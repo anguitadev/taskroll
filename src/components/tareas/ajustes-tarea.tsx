@@ -148,7 +148,7 @@ export default function AjustesTarea({
 
 	return (
 		<div className="my-16 grid w-2/3 grid-cols-2 grid-rows-2 gap-x-24 gap-y-2">
-			<div className="flex justify-between">
+			<div className="flex flex-col md:flex-row justify-between">
 				<div className="flex items-center gap-2 text-neutral-400">
 					<CirclePower className="size-5" /> <span>Estado</span>
 				</div>
@@ -176,7 +176,7 @@ export default function AjustesTarea({
 				</div>
 			</div>
 
-			<div className="flex justify-between">
+			<div className="flex flex-col md:flex-row justify-between">
 				<div className="flex items-center gap-2 text-neutral-400">
 					<Users className="size-5" /> <span>Usuarios</span>
 				</div>
@@ -227,7 +227,7 @@ export default function AjustesTarea({
 				</div>
 			</div>
 
-			<div className="flex justify-between">
+			<div className="flex flex-col md:flex-row justify-between">
 				<div className="flex items-center gap-2 text-neutral-400">
 					<CalendarDays className="size-5" /> <span>Fecha límite</span>
 				</div>
@@ -259,7 +259,7 @@ export default function AjustesTarea({
 				</div>
 			</div>
 
-			<div className="flex justify-between">
+			<div className="flex flex-col md:flex-row justify-between">
 				<div className="flex items-center gap-2 text-neutral-400">
 					<Rocket className="size-5" /> <span>Prioridad</span>
 				</div>

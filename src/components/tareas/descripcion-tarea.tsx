@@ -42,13 +42,13 @@ export default function DescripcionTarea({
 				)}
 			</div>
 			{!editar ? (
-				<div className="prose mt-4 h-[calc(100vh-425px)] max-w-full overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-8 dark:prose-invert">
+				<div className="prose mt-4 h-[calc(100vh-425px)] max-w-full overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-2 md:p-8 dark:prose-invert">
 					<Markdown>{contenidoDescripcion}</Markdown>
 				</div>
 			) : (
 				<form className="max-w-full">
 					<textarea
-						className="mt-4 h-[calc(100vh-425px)] w-full overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-8"
+						className="mt-4 h-[calc(100vh-425px)] w-full overflow-y-scroll rounded border border-neutral-700 bg-neutral-800 p-2 md:p-8"
 						value={contenidoDescripcion ?? ""}
 						onChange={e => setContenidoDescripcion(e.target.value)}
 					></textarea>
