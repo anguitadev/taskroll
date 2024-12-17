@@ -17,9 +17,9 @@ export default async function TablaEstadisticas({ equipoSlug }: { equipoSlug: st
 		<table className="mt-2 w-full table-fixed border-separate border-spacing-y-2 overflow-y-scroll p-2">
 			<tbody>
 				<tr className="text-xs font-light">
-					<th className="border-b border-neutral-700 pb-2">Completadas</th>
-					<th className="border-b border-neutral-700 pb-2">Usuario</th>
-					<th className="border-b border-neutral-700 pb-2">Totales</th>
+					<th className="border-b border-neutral-700 pb-2 w-1/4">Completadas</th>
+					<th className="border-b border-neutral-700 pb-2 w-2/4">Usuario</th>
+					<th className="border-b border-neutral-700 pb-2 w-1/4">Totales</th>
 				</tr>
 				{usuariosEquipo.map(
 					usuario =>

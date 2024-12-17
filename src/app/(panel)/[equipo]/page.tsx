@@ -76,7 +76,7 @@ export default async function Equipo({ params }: { params: Promise<{ equipo: str
 						En ellos encontrarás información relevante sobre tus proyectos.
 					</p>
 				</div>
-				<div className="mt-4 grid grid-cols-8 grid-rows-3 gap-4">
+				<div className="mt-4 flex flex-col md:grid md:grid-cols-8 md:grid-rows-3 gap-4">
 					<div className="col-span-2 rounded border border-neutral-700 bg-neutral-800 p-4">
 						<div className="flex items-center justify-between">
 							<span className="font-semibold">Tareas Totales</span>

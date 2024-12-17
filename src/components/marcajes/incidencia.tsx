@@ -78,7 +78,7 @@ export default function Incidencia() {
 				<div
 					id="incidencias"
 					popover="auto"
-					className="w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
+					className="max-w-[calc(100vw-4%)] w-[640px] flex-col rounded border border-neutral-800 bg-neutral-950 p-6 backdrop:brightness-50 backdrop:backdrop-blur-sm"
 				>
 					<span className="mb-6 block text-lg font-semibold">
 						Estas son tus últimas incidencias:

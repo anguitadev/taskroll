@@ -156,20 +156,20 @@ export default function Sidebar({
 		<>
 			{!sidebar && (
 				<ArrowRightFromLine
-					className="absolute inset-3 size-6 stroke-neutral-400 sm:hidden"
+					className="absolute inset-3 z-10 size-6 stroke-neutral-400 sm:hidden"
 					onClick={toggleSidebar}
 				/>
 			)}
 			<div
 				id="sidebar"
 				className={clsx(
-					`max-h-screen flex-col justify-stretch sm:flex ${className}`,
+					`h-screen flex-col z-10 justify-stretch sm:flex ${className}`,
 					sidebar
 						? "absolute flex min-w-52 border-r border-neutral-800 bg-neutral-950 p-2"
 						: "hidden",
 				)}
 			>
-				<div className={`grow flex-col sm:flex ${className}`}>
+				<div className={`grow flex-col flex ${className}`}>
 					<div className="flex flex-row items-center justify-between p-3">
 						<Link href={"/" + equipo!.slug} className="text-xl font-semibold">
 							Taskroll
