@@ -17,13 +17,14 @@ export default function ListaDocumentos({
 	}[];
 }) {
 	const pathname = usePathname();
+	const basePath = pathname.substring(0, pathname.lastIndexOf("/") + 1);
 	const selected = pathname.split("/").pop();
 
 	return (
 		<div className="flex h-[calc(100vh-295px)] max-h-[calc(100vh-295px)] min-w-96 max-w-96 flex-col overflow-y-scroll border-r border-neutral-700 pr-1">
 			{documentosEntorno.map(documento => (
 				<Link
-					href={`${pathname}/${documento.url}`}
+					href={selected !== "documentos" ? `${basePath}/${documento.url}` : `${pathname}/${documento.url}`}
 					key={documento.id}
 					className={clsx(
 						"has-tooltip flex max-w-96 cursor-pointer items-center justify-between gap-2 overflow-hidden rounded-l px-4 py-2 transition hover:border-r-2 hover:border-indigo-600 hover:bg-neutral-800",

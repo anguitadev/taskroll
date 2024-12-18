@@ -11,7 +11,7 @@ export default async function Documentos({ params }: { params: Promise<{ equipo:
 			<div className="relative flex justify-center border-b border-neutral-800 p-3 text-center">
 				<span>Documentos</span>
 			</div>
-			<div className="flex h-[calc(100vh-70px)] flex-col overflow-y-scroll p-8">
+			<div className="flex h-[calc(100vh-70px)] flex-col overflow-y-scroll p-2 md:p-8">
 				<h1 className="text-3xl font-bold">Documentos</h1>
 
 				<WrapperDocumentos documentosEquipo={documentosEquipo} />

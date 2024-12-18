@@ -37,7 +37,7 @@ export async function createEntorno({
 		.normalize("NFD")
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
-		.replace(/ /g, "-");
+		.replace(/ /g, "-").replace(/[:/]/g, "");
 
 	const { data: entorno } = await supabase.from("Entornos").select("*").like("slug", slug);
 

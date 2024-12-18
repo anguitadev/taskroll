@@ -18,7 +18,7 @@ export default async function nuevoEquipo(formData: FormData) {
 
 	const nombreEquipo = formData.get("nombreEquipo") as string;
 
-	const slug = nombreEquipo.toLowerCase().replace(/ /g, "-");
+	const slug = nombreEquipo.toLowerCase().replace(/ /g, "-").replace(/[:/]/g, "");
 
 	const { data: Usuarios_Equipos } = await supabase
 		.from("Usuarios_Equipos")
@@ -56,5 +56,5 @@ export default async function nuevoEquipo(formData: FormData) {
 	}
 
 	revalidatePath("/", "layout");
-	redirect("/" + nombreEquipo.toLowerCase().replace(/ /g, "-"));
+	redirect("/" + nombreEquipo.toLowerCase().replace(/ /g, "-").replace(/[:/]/g, ""));
 }

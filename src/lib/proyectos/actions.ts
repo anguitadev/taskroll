@@ -20,7 +20,7 @@ export async function createProyecto(
 		.normalize("NFD")
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
-		.replace(/ /g, "-");
+		.replace(/ /g, "-").replace(/[:/]/g, "");
 
 	const { data: proyecto } = await supabase
 		.from("Entornos")

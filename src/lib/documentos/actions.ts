@@ -1,12 +1,12 @@
 "use server";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 import { UTApi } from "uploadthing/server";
 import { getUsuario } from "../auth/data";
 
 export async function deleteDocumentoByUrl(documentoUrl: string) {
 	const utapi = new UTApi();
 	await utapi.deleteFiles(documentoUrl);
-	const supabase = createClient();
+	const supabase = await createClient();
 	const { error } = await supabase.from("Documentos").delete().eq("url", documentoUrl);
 	if (error) throw error;
 }
@@ -19,7 +19,7 @@ export async function createDocumento(
 ) {
 	if (pathname === "nomina" && destinatario) {
 		const usuario = await getUsuario();
-		const supabase = createClient();
+		const supabase = await createClient();
 		const { error } = await supabase.from("Documentos").insert({
 			nombre: nombreDocumento,
 			url: fileKey,
@@ -32,7 +32,7 @@ export async function createDocumento(
 		const entorno = slugs[slugs.indexOf("documentos") - 1];
 
 		if (entorno) {
-			const supabase = createClient();
+			const supabase = await createClient();
 
 			const { data: entornoId } = await supabase
 				.from("Entornos")
@@ -46,7 +46,7 @@ export async function createDocumento(
 				const { error } = await supabase.from("Documentos").insert({
 					nombre: nombreDocumento,
 					url: fileKey,
-					entorno: entornoId!.id,
+					entorno: entornoId.id,
 					propietario: usuario!.id,
 				});
 				if (error) return error;
