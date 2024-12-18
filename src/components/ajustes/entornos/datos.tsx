@@ -71,7 +71,7 @@ export default function DatosEntorno({
 						);
 					})}
 				</div>
-				<div className="grid grid-cols-2 grid-rows-2 gap-4">
+				<div className="sm:grid sm:grid-cols-2 sm:grid-rows-2 gap-4">
 					<div className="flex flex-col gap-2">
 						<label className="font-medium text-neutral-400">Nombre:</label>
 						<input

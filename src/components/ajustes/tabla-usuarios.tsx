@@ -23,13 +23,13 @@ export default function TablaUsuarios({
 	usuarioLoggeado: string;
 }) {
 	return (
-		<table className="mt-8 w-full table-fixed border-separate border-spacing-y-2 overflow-y-scroll p-2 text-left">
+		<table className="mt-8 sm:w-full sm:table-fixed border-separate border-spacing-y-2 overflow-scroll p-2 text-left">
 			<tbody>
 				<tr className="text-xs font-light text-neutral-400">
-					<th className="border-b border-neutral-700 pb-2">Nombre</th>
+					<th className="min-w-[225px] sm:min-w-fit border-b border-neutral-700 pb-2">Nombre</th>
 					<th className="w-56 border-b border-neutral-700 pb-2">Usuario</th>
 					<th className="w-64 border-b border-neutral-700 pb-2">Email</th>
-					<th className="w-56 border-b border-neutral-700 pb-2">Puesto</th>
+					<th className="w-56 border-b border-neutral-700 pb-2 hidden sm:table-cell">Puesto</th>
 					<th className="w-28 border-b border-neutral-700 pb-2">Rol</th>
 					<th className="w-12 border-b border-neutral-700 pb-2">
 						<Settings2 className="m-auto size-4 stroke-neutral-400" />
@@ -50,7 +50,7 @@ export default function TablaUsuarios({
 										{usuario.Usuarios.email}
 									</a>
 								</td>
-								<td className="border-b border-neutral-700 pb-2">
+								<td className="border-b border-neutral-700 pb-2 hidden sm:table-cell">
 									{usuario.Usuarios.puesto}
 								</td>
 								<td className="border-b border-neutral-700 pb-2">

@@ -23,8 +23,8 @@ export default async function Miembros(props: { params: Params }) {
 			<div className="border-b border-neutral-800 p-3 text-center">
 				<span>Miembros del Equipo</span>
 			</div>
-			<div className="max-h-[calc(100vh-70px)] w-full overflow-y-scroll p-8">
-				<div className="flex items-center justify-between">
+			<div className="max-h-[calc(100vh-70px)] w-full overflow-y-scroll p-2 sm:p-8">
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between">
 					<div className="flex flex-col">
 						<h1 className="text-3xl font-semibold">Miembros del Equipo</h1>
 						<span className="text-sm text-neutral-400">
@@ -32,7 +32,7 @@ export default async function Miembros(props: { params: Params }) {
 						</span>
 					</div>
 					<button
-						className="mb-2 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
+						className="mb-2 mt-4 sm:mt-0 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100 justify-center"
 						popoverTarget="nuevo-usuario"
 					>
 						<Plus className="size-5" />

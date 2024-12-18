@@ -33,12 +33,12 @@ export default async function AjustesEntorno(props: { params: Params }) {
 				<span>Ajustes de {entorno.nombre}</span>
 			</div>
 			<div className="max-h-[calc(100vh-70px)] w-full overflow-y-scroll">
-				<div className="m-auto flex w-[640px] flex-col rounded border border-neutral-700 bg-neutral-800 p-4 md:mt-8">
+				<div className="m-auto flex sm:w-[640px] flex-col rounded border border-neutral-700 bg-neutral-800 p-4 md:mt-8">
 					<h1 className="mb-4 text-3xl font-semibold">Datos</h1>
 					<DatosEntorno entorno={entorno} propietario={propietario} isAdmin={isAdmin} />
 				</div>
 				<hr className="my-8 w-full border border-neutral-800" />
-				<div className="p-8">
+				<div className="p-2 sm:p-8">
 					<div className="flex items-center justify-between">
 						<h1 className="mb-4 text-3xl font-semibold">Miembros:</h1>
 						<button

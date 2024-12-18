@@ -42,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 		return (
 			<div className="flex h-screen max-h-screen w-screen flex-row gap-4 overflow-hidden font-sans sm:p-2">
 				<Sidebar
-					className="w-42 lg:w-64 lg:min-w-64 lg:max-w-64"
+					className="max-w-52 sm:w-64 sm:min-w-64 sm:max-w-64"
 					equipos={equipos}
 					usuario={usuario}
 					entornos={entornos || []}
