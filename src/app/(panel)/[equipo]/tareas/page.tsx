@@ -49,10 +49,10 @@ export default async function Tareas({
 			<div className="relative flex justify-center border-b border-neutral-800 p-3 text-center">
 				<span>Todas las tareas</span>
 			</div>
-			<div className="flex h-[calc(100vh-70px)] flex-col overflow-y-scroll p-8">
+			<div className="flex h-[calc(100vh-70px)] flex-col overflow-y-scroll p-2 sm:p-8">
 				<div className="flex items-center justify-between">
 					<h1 className="text-3xl font-bold">Todas las tareas de {equipo.nombre}</h1>
-					<div className="flex items-center gap-4">
+					<div className="hidden items-center gap-4 sm:flex">
 						{!zeroTareas && tareas && <BusquedaTareas />}
 						{entornos && entornos?.length > 0 && (
 							<button

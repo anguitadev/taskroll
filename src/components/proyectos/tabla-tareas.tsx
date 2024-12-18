@@ -94,19 +94,21 @@ export default function TablaTareas({
 	}
 
 	return (
-		<table className="mt-2 w-full min-w-[570px] border-separate border-spacing-y-2 p-2">
+		<table className="mt-2 w-full border-separate border-spacing-y-2 p-2 sm:min-w-[570px]">
 			<tbody>
 				<tr className="text-sm font-light text-neutral-400">
 					<th className="border-b border-neutral-700 pb-2 text-left">Nombre</th>
 					{extraData && (
-						<th className="w-64 border-b border-neutral-700 pb-2 text-left">
+						<th className="hidden w-64 border-b border-neutral-700 pb-2 text-left sm:table-cell">
 							Proyecto
 						</th>
 					)}
-					<th className="w-44 border-b border-neutral-700 pb-2">Usuarios</th>
-					<th className="w-44 border-b border-neutral-700 pb-2">Fecha final</th>
-					<th className="w-44 border-b border-neutral-700 pb-2">Prioridad</th>
-					<th className="w-12 border-b border-neutral-700 pb-2">
+					<th className="hidden w-44 border-b border-neutral-700 pb-2 sm:table-cell">
+						Usuarios
+					</th>
+					<th className="border-b border-neutral-700 pb-2 sm:w-44">Fecha final</th>
+					<th className="border-b border-neutral-700 pb-2 sm:w-44">Prioridad</th>
+					<th className="hidden w-12 border-b border-neutral-700 pb-2 sm:table-cell">
 						<Settings2 className="m-auto size-5" />
 					</th>
 				</tr>
@@ -138,29 +140,30 @@ export default function TablaTareas({
 								</td>
 								{extraData && (
 									<td
-										className="cursor-pointer border-b border-neutral-700 pb-2 text-left text-sm"
+										className="hidden cursor-pointer border-b border-neutral-700 pb-2 text-left text-sm sm:table-cell"
 										onClick={() => handleRedirect(tarea.tarea!.id, false)}
 									>
 										{tarea.tarea.entorno.nombre}
 									</td>
 								)}
-								<td className="flex flex-row justify-center border-b border-neutral-700 pb-2">
-									{usuariosPorTarea[tarea.tarea.id] && usuariosPorTarea[tarea.tarea.id].map(usuario => (
-										<div
-											key={usuario.Usuarios?.id}
-											title={usuario.Usuarios?.nombre_completo}
-											className={
-												"-ml-2 flex size-7 cursor-default items-center justify-center rounded-full border-2 border-neutral-900 text-center text-sm " +
-												usuario.Usuarios?.color
-											}
-										>
-											{usuario.Usuarios?.nombre_completo[0].toUpperCase()}
-										</div>
-									)) || <span>Cargando...</span>}
+								<td className="hidden flex-row justify-center border-b border-neutral-700 pb-2 sm:flex">
+									{(usuariosPorTarea[tarea.tarea.id] &&
+										usuariosPorTarea[tarea.tarea.id].map(usuario => (
+											<div
+												key={usuario.Usuarios?.id}
+												title={usuario.Usuarios?.nombre_completo}
+												className={
+													"-ml-2 flex size-7 cursor-default items-center justify-center rounded-full border-2 border-neutral-900 text-center text-sm " +
+													usuario.Usuarios?.color
+												}
+											>
+												{usuario.Usuarios?.nombre_completo[0].toUpperCase()}
+											</div>
+										))) || <span>Cargando...</span>}
 								</td>
 								<td
 									className={clsx(
-										"border-b border-neutral-700 pb-2 font-mono",
+										"sm:text-base border-b border-neutral-700 pb-2 font-mono text-sm",
 										tarea.tarea.fecha_fin &&
 											moment(tarea.tarea?.fecha_fin)
 												.startOf("day")
@@ -181,7 +184,7 @@ export default function TablaTareas({
 											)}
 								</td>
 								<td
-									className="border-b border-neutral-700 pb-2"
+									className="border-b border-neutral-700 sm:pb-2"
 									title={tarea.tarea.prioridad}
 								>
 									<FlagTriangleRight
@@ -190,7 +193,7 @@ export default function TablaTareas({
 										}
 									/>
 								</td>
-								<td className="border-b border-neutral-700 pb-2">
+								<td className="hidden border-b border-neutral-700 pb-2 sm:table-cell">
 									<Trash2
 										onClick={() => {
 											handleDeleteTarea(tarea.tarea!.id);

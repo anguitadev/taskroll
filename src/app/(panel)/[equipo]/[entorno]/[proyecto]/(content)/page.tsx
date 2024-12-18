@@ -20,7 +20,7 @@ export default async function Proyecto({
 	return (
 		<>
 			<div className="my-6 flex w-full border-b border-neutral-700 justify-between items-center">
-				<div>
+				<div className="hidden sm:flex">
 					<Link
 						href={`/${equipoSlug}/${entornoSlug}/${proyectoSlug}`}
 						className="transitionborder-b cursor-pointer rounded-t border-b-2 border-indigo-600 bg-neutral-800 px-4 py-2"
@@ -41,7 +41,7 @@ export default async function Proyecto({
 					</Link>
 				</div>
 				<button
-					className="mb-2 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
+					className="mb-2 flex items-center gap-2 rounded border border-indigo-700 bg-indigo-600 px-2 py-1 text-sm text-neutral-100 absolute right-2 top-2 sm:static"
 					popoverTarget={"nueva-tarea-"+proyecto.id}
 				>
 					<Plus className="size-5" />

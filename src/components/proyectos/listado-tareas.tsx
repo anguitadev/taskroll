@@ -80,7 +80,7 @@ export default function ListadoTareas({ idProyecto }: { idProyecto: string }) {
 	const tareasCompletadas = tareas.filter(tarea => tarea.tarea?.estado === "Completado");
 
 	return (
-		<div className="mt-8 p-4">
+		<div className="mt-8 sm:p-4">
 			{tareasAbiertas.length > 0 && (
 				<>
 					<h2 className="text-xl font-semibold">Tareas Abiertas</h2>

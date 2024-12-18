@@ -28,8 +28,8 @@ export default async function DashboardLayout({
 
 	return (
 		<>
-			<div className="flex items-center justify-between border-b border-neutral-800 p-2">
-				<div className="flex items-center gap-2">
+			<div className="flex items-center justify-end border-b border-neutral-800 p-2 sm:justify-between">
+				<div className="hidden items-center gap-2 sm:flex">
 					<Link
 						href={"/" + equipoSlug + "/" + entornoSlug}
 						className="text-sm font-semibold"

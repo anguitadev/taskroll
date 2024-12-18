@@ -60,7 +60,7 @@ export default async function Entorno({
 
 	return (
 		<>
-			<div className="my-6 flex w-full border-b border-neutral-700">
+			<div className="my-6 w-full border-b border-neutral-700 hidden sm:flex">
 				<Link
 					href={`/${equipoSlug}/${entornoSlug}`}
 					className="transitionborder-b cursor-pointer rounded-t border-b-2 border-indigo-600 bg-neutral-800 px-4 py-2"
