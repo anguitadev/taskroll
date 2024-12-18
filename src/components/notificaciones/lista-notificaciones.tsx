@@ -49,9 +49,9 @@ export default function ListaNotificaciones({
 				{notificaciones && notificaciones.length > 0 && (
 					<button
 						onClick={handleEliminarTodasNotificaciones}
-						className="flex items-center gap-2 rounded border border-indigo-500 bg-indigo-600 px-2 py-1 text-neutral-100"
+						className="sm:text-md flex items-center gap-2 rounded border border-indigo-500 bg-indigo-600 px-2 py-1 text-sm text-neutral-100"
 					>
-						<Trash2 className="size-4" /> Eliminar Notificaciones
+						<Trash2 className="hidden size-4 sm:block" /> Eliminar Notificaciones
 					</button>
 				)}
 			</div>
@@ -60,7 +60,7 @@ export default function ListaNotificaciones({
 					notificaciones.map(notificacion => (
 						<div
 							key={notificacion.id}
-							className="group flex h-14 cursor-pointer items-center justify-between gap-4 rounded border border-neutral-700 bg-neutral-900 p-4 transition hover:bg-neutral-800"
+							className="group flex cursor-pointer flex-col sm:items-center justify-between gap-4 rounded border border-neutral-700 bg-neutral-900 p-4 transition hover:bg-neutral-800 sm:h-14 sm:flex-row"
 						>
 							<Link
 								href={
@@ -73,25 +73,29 @@ export default function ListaNotificaciones({
 									"/" +
 									notificacion.tarea?.slug
 								}
-								className="flex items-center gap-4"
+								className="flex gap-4 flex-col sm:flex-row"
 							>
-								<div
-									className={
-										"flex size-5 items-center rounded-full " +
-										estados[notificacion.tarea?.estado]
-									}
-								>
+								<div className="flex gap-2 items-center">
 									<div
 										className={
-											"m-auto size-4 rounded-full border-2 border-neutral-900 " +
+											"flex size-5 items-center rounded-full " +
 											estados[notificacion.tarea?.estado]
 										}
-									/>
+									>
+										<div
+											className={
+												"m-auto size-4 rounded-full border-2 border-neutral-900 " +
+												estados[notificacion.tarea?.estado]
+											}
+										/>
+									</div>
+									<span className="font-semibold">
+										{notificacion.tarea?.titulo}
+									</span>
 								</div>
-								<span className="font-semibold">{notificacion.tarea?.titulo}</span>
 								<span>{notificacion.notificacion}</span>
 							</Link>
-							<div className="flex w-64 justify-end text-right">
+							<div className="hidden sm:flex w-64 justify-end text-right">
 								<span className="p-2 text-sm group-hover:hidden">
 									{new Date(notificacion.created_at).toLocaleString()}
 								</span>

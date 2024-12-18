@@ -48,17 +48,17 @@ export default function TablaDocumentos({
 
 	return (
 		<>
-			<table className="mt-2 w-full min-w-[570px] table-fixed border-separate border-spacing-y-2 overflow-y-scroll p-2">
+			<table className="mt-2 w-full sm:min-w-[570px] table-fixed border-separate border-spacing-y-2 overflow-y-scroll p-2 overflow-x-scroll max-w-screen">
 				<tbody>
 					<tr className="text-left text-sm font-light text-neutral-400">
 						<th className="border-b border-neutral-700 pb-2">Nombre</th>
 						{!nominas && (
-							<th className="w-64 border-b border-neutral-700 pb-2">Entorno</th>
+							<th className="hidden md:table-cell w-64 border-b border-neutral-700 pb-2">Entorno</th>
 						)}
 						{!nominas && (
-							<th className="w-64 border-b border-neutral-700 pb-2">Proyecto</th>
+							<th className="hidden md:table-cell w-64 border-b border-neutral-700 pb-2">Proyecto</th>
 						)}
-						<th className="w-52 border-b border-neutral-700 pb-2">Fecha</th>
+						<th className="hidden md:table-cell w-52 border-b border-neutral-700 pb-2">Fecha</th>
 						<th className="w-16 border-b border-neutral-700 pb-2">
 							<Settings2 className="m-auto size-5" />
 						</th>
@@ -77,7 +77,7 @@ export default function TablaDocumentos({
 								<span className="font-semibold">{documento.nombre}</span>
 							</td>
 							{!nominas && (
-								<td className="border-b border-neutral-700 pb-2">
+								<td className="hidden md:table-cell border-b border-neutral-700 pb-2">
 									{documento.entorno && documento.entorno.entorno ? (
 										<Link
 											href={`/${equipoSlug}/${documento.entorno.entorno.slug}`}
@@ -94,7 +94,7 @@ export default function TablaDocumentos({
 								</td>
 							)}
 							{!nominas && (
-								<td className="border-b border-neutral-700 pb-2">
+								<td className="hidden md:table-cell border-b border-neutral-700 pb-2">
 									{documento.entorno && documento.entorno.entorno ? (
 										<Link
 											href={`/${equipoSlug}/${documento.entorno.entorno.slug}/${documento.entorno.slug}`}
@@ -106,7 +106,7 @@ export default function TablaDocumentos({
 									)}
 								</td>
 							)}
-							<td className="border-b border-neutral-700 pb-2 font-mono">
+							<td className="hidden md:table-cell border-b border-neutral-700 pb-2 font-mono">
 								{new Date(documento.created_at).toLocaleDateString()}
 							</td>
 							<td className="border-b border-neutral-700 pb-2">
@@ -133,7 +133,7 @@ export default function TablaDocumentos({
 						<button className="absolute right-4 top-4" onClick={closePopup}>
 							<CircleX className="size-8 stroke-neutral-100 hover:stroke-red-500" />
 						</button>
-						<div className="m-auto h-screen w-2/3">
+						<div className="m-auto h-screen sm:w-2/3">
 							<Visualizador documento={documentoSeleccionado} />
 						</div>
 					</div>
