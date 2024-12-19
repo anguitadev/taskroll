@@ -12,7 +12,7 @@ export default function TablaDocumentos({
 	documentosEquipo: DocumentosEquipo[] | null | undefined;
 }) {
 	const pathname = usePathname();
-	const equipoSlug = pathname.split("/")[1];
+	const equipoSlug = pathname?.split("/")[1];
 
 	const [documentos, setDocumentos] = useState(documentosEquipo);
 	const [documentoSeleccionado, setDocumentoSeleccionado] = useState<string | null>(null);

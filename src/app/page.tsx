@@ -1,8 +1,8 @@
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Rocket } from "lucide-react";
 import Image from "next/image";
@@ -18,27 +18,31 @@ export default function Home() {
 					</a>
 					<nav>
 						<ul className="flex flex-row items-center gap-5 text-neutral-300">
-							<a href="#" className="hidden md:inline">
-								Inicio
-							</a>
-							<a href="#productividad" className="hidden md:inline">
-								Productividad
-							</a>
-							<a href="#marcajes" className="hidden md:inline">
-								Marcajes
-							</a>
-							<a href="#faqs" className="hidden md:inline">
-								FAQs
-							</a>
-							<Link href="/login" className="border-neutral-700 pl-5 md:border-l">
-								Inicia Sesión
-							</Link>
-							<Link
-								href="/signup"
-								className="rounded border border-indigo-600 bg-indigo-500 px-3 py-1 text-neutral-100 transition hover:bg-indigo-600"
-							>
-								Regístrate
-							</Link>
+							<li className="hidden md:inline">
+								<a href="#">Inicio</a>
+							</li>
+							<li className="hidden md:inline">
+								<a href="#productividad">Productividad</a>
+							</li>
+							<li className="hidden md:inline">
+								<a href="#marcajes">Marcajes</a>
+							</li>
+							<li className="hidden md:inline">
+								<a href="#faqs">FAQs</a>
+							</li>
+							<li>
+								<Link href="/login" className="border-neutral-700 pl-5 md:border-l">
+									Inicia Sesión
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/signup"
+									className="rounded border border-indigo-600 bg-indigo-500 px-3 py-1 text-neutral-100 transition hover:bg-indigo-600"
+								>
+									Regístrate
+								</Link>
+							</li>
 						</ul>
 					</nav>
 				</div>

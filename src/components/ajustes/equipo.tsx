@@ -28,8 +28,8 @@ export default function AjustesDelEquipo(equipo: Tables<"Equipos">) {
 	const searchParams = useSearchParams();
 
 	useEffect(() => {
-		if (searchParams.get("success")) setSuccess("Equipo actualizado correctamente.");
-		if (searchParams.get("error")) setClientError("La URL del equipo ya existe.");
+		if (searchParams?.get("success")) setSuccess("Equipo actualizado correctamente.");
+		if (searchParams?.get("error")) setClientError("La URL del equipo ya existe.");
 	}, [pathname, searchParams]);
 
 	async function handleUpdate() {

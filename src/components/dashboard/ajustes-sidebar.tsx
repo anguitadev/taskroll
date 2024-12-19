@@ -24,7 +24,7 @@ export default function AjustesSidebar({
 }) {
 	const pathname = usePathname();
 
-	const equipoSlug = pathname.split("/")[1];
+	const equipoSlug = pathname?.split("/")[1];
 
 	const [entornosAdmin, setEntornosAdmin] = useState<EntornosFromUsuario>([]);
 	const [proyectosAdmin, setProyectosAdmin] = useState<EntornosFromUsuario>([]);

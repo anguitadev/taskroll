@@ -22,7 +22,7 @@ export default function Registro() {
 
 	//Comprobar si hay errores
 	const searchParams = useSearchParams();
-	const error = searchParams.get("error");
+	const error = searchParams?.get("error");
 
 	// Mostrar/ocultar la contraseña
 	const handleToggle = useCallback(() => {
