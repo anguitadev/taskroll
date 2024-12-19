@@ -27,6 +27,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es-ES" className="scroll-smooth">
+			<head>
+				<script
+					defer
+					src="https://cloud.umami.is/script.js"
+					data-website-id="827f46f8-12bd-416d-a854-7d3619e5fcc5"
+				></script>
+			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} bg-neutral-950 text-neutral-200 antialiased`}
 			>
