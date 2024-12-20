@@ -10,6 +10,8 @@ export async function marcarEntrada() {
 
 	const ultimoMarcaje = await getUltimoMarcaje();
 
+	console.log(ultimoMarcaje);
+
 	if (ultimoMarcaje && ultimoMarcaje.length > 0) {
 		if (ultimoMarcaje[0].salida) {
 			await supabase
